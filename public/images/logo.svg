@@ -1,0 +1,7 @@
+<svg width="48" height="40" viewBox="0 0 48 50" fill="none" xmlns="http://www.w3.org/2000/svg" aria-labelledby="title desc">
+  <title id="title">Optimized SVG Icon</title>
+  <desc id="desc">An abstract icon with geometrical shapes and lines.</desc>
+  <path fill-rule="evenodd" clip-rule="evenodd" 
+        d="M33.15 9.66L23.99 4.86L5.55 14.51L0.92 12.09L23.99 0L37.8 7.23L33.15 9.66ZM23.99 19.31L42.43 9.66L47.07 12.09L23.99 24.16L10.19 16.94L14.83 14.51L23.99 19.31ZM4.63 25.89L0 23.47V37.91L23.07 50V45.15L4.63 35.49V25.89ZM18.43 28.27L0 18.62V13.77L23.07 25.84V40.3L18.43 37.86V28.27ZM38.73 23.47V18.62L24.92 25.84V50L29.55 47.57V28.27L38.73 23.47ZM43.35 35.49V16.19L48 13.77V37.91L34.19 45.15V40.3L43.35 35.49Z" 
+        fill="currentColor" class="fill-primary-contrast" />
+</svg>

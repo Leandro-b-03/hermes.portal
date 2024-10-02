@@ -1,0 +1,239 @@
+<script setup lang="ts">
+
+const route = useRoute();
+const router = useRouter();
+const carrierStore = useCarrierStore();
+
+const loading = computed(() => carrierStore.isLoading);
+const carriers = computed(() => carrierStore.data);
+const query = computed(() => new URLSearchParams(route.query).toString());
+const selectedData = ref();
+const filter = route.query.filter?.toString() || '';
+const fields = ref([
+  'tax_id',
+  'name',
+  'address',
+  'address_2',
+  'city',
+  'state',
+  'country',
+  'zip',
+  'contact_name',
+  'contact_phone',
+  'contact_email',
+  'contact_fax',
+  'contact_mobile',
+  'contact_title',
+  'contact_department',
+  'created_at',
+  'updated_at',
+]);
+
+const links = breadcrump(route.path);
+const items = ref([
+  {
+    items: [
+      { label: 'export', icon: 'pi pi-fw pi-download', function: () => exportData() },
+    ]
+  }
+]);
+const modal = ref({
+  contactInfo: {
+    open: false,
+    data: null
+  },
+});
+
+onMounted(async () => {
+  await carrierStore.fetchData(query.value);
+});
+
+watch(() => route.query, async () => {
+  await carrierStore.fetchData(query.value);
+});
+
+const getSeverity = (status: string): string => {
+  if (status === 'Pending') return 'warning';
+  if (status === 'Active') return 'success';
+  if (status === 'Inactive') return 'danger';
+  return 'info';
+};
+
+const getSeverityB = (status: boolean): string => {
+  if (status) return 'success';
+  return 'danger';
+};
+
+const showContactInfo = (carrier: any): void => {
+  modal.value.contactInfo.open = true;
+  modal.value.contactInfo.data = carrier;
+};
+
+const onPageChange = (event: { first: number }): void =>{
+  scrollToTop();
+  const newPage = event.page + 1; // PrimeVue pages are 0-indexed, so add 1
+  const newPerPage = event.rows;
+  router.push({
+    query: {
+      ...router.currentRoute.value.query,
+      page: newPage,
+      per_page: newPerPage
+    }
+  });
+};
+
+const exportData = async (): Promise<void> => {
+  console.log('Exporting data');
+};
+</script>
+
+<template>
+  <div class="p-8 flex flex-col flex-auto">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+        <ul
+          class="list-none p-0 m-0 bg-surface-0 dark:bg-surface-900 flex font-medium overflow-y-hidden overflow-x-auto">
+          <li v-for="(link, index) in links" :key="index" class="relative p-4">
+            <PagesBreadcrump :name="link" :index="index" />
+          </li>
+        </ul>
+
+        <div class="bg-surface-50 dark:bg-surface-950 pt-2">
+          <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
+            <div class="mb-2 flex items-center justify-between">
+              <div class="flex items-center">
+                <i class="pi pi-table text-surface-500 dark:text-surface-300 mr-2 text-xl" />
+                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('carriers.index.title')
+                  }}</span>
+              </div>
+              <div>
+                <NuxtLink to="/carriers/create" v-tooltip.top="$t('setup.options.add')" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">
+                  <i class="pi pi-plus"></i>
+                </NuxtLink>
+                <Button v-tooltip.top="$t('setup.options.title')" icon="pi pi-ellipsis-v" text rounded @click="$refs.menu.toggle($event)" />
+                <Menu ref="menu" :popup="true" :model="items" >
+                  <template #start>
+                    <li class="pl-3 pt-3 list-none">
+                      <span class="text-md font-semibold text-surface-500">{{ $t('setup.options.title') }}</span>
+                    </li>
+                  </template>
+                  <template #item="{item, props}">
+                    <li class="p-2 cursor-pointer" @click="item.function">
+                      <i class="pi pi-fw text-surface-500 dark:text-surface-300 mr-2" :class="item.icon" />
+                      <span class="text-surface-900 dark:text-surface-0">{{ item.label }}</span>
+                    </li>
+                  </template>
+                </Menu>
+              </div>
+            </div>
+            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.index.subtitle') }}
+            </div>
+            <div>
+              <DataTable :value="carriers?.data" :loading="loading" sortMode="multiple" v-model:selection="selectedData" dataKey="carrier.id">
+                <template #header>
+                  <div class="flex justify-end">
+                    <div class="w-30">
+                      <PagesSearchTable v-model:filter="filter" v-model:fields="fields" />
+                    </div>
+                  </div>
+                </template>
+                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+                <Column field="name" :header="$t(`carriers.index.table.name`)" />
+                <Column field="tax_id" :header="$t(`carriers.index.table.tax_id`)">
+                  <template #body="slotProps">
+                    <span>{{ slotProps.data.tax_id }}</span>
+                  </template>
+                </Column>
+                <Column field="address" :header="$t(`carriers.index.table.address`)">
+                  <template #body="slotProps">
+                    <span class="cursor-pointer"
+                    v-tooltip.top="slotProps.data.address + ' - ' + slotProps.data.address_2 + ', ' + slotProps.data.city + ' - ' + slotProps.data.state + ', ' + slotProps.data.zip">
+                      {{ slotProps.data.address }}
+                    </span>
+                  </template>
+                </Column>
+                <Column field="zip" :header="$t(`carriers.index.table.zip`)">
+                  <template #body="slotProps">
+                    <span>{{ slotProps.data.zip }}</span>
+                  </template>
+                </Column>
+                <Column field="carrier_contact.name" :header="$t(`carriers.index.table.contact_name`)">
+                  <template #body="slotProps">
+                    <span class="cursor-pointer" @click="showContactInfo(slotProps.data.carrier_contact)">{{ slotProps.data.carrier_contact.name }}</span>
+                  </template>
+                </Column>
+                <Column field="active" :header="$t(`carriers.index.table.status`)">
+                  <template #body="slotProps">
+                    <Badge :severity="getSeverityB(slotProps.data.carrier_shipper.active)" :value="$t(`setup.status.${slotProps.data.carrier_shipper.active}`)" />
+                  </template>
+                </Column>
+                <Column field="updated_at" :header="$t(`carriers.index.table.updated_at`)">
+                  <template #body="slotProps">
+                    {{ formatDate(slotProps.data.updated_at, true) }}
+                  </template>
+                </Column>
+                <Column :header="$t(`carriers.index.table.actions`)">
+                  <template #body="slotProps">
+                    <Button v-tooltip.left="$t('setup.options.edit')" icon="pi pi-pencil" class="mr-2" />
+                    <Button v-tooltip.right="$t('setup.options.delete')" icon="pi pi-trash" class="mr-2" />
+                  </template>
+                </Column>
+              </DataTable>
+              <Paginator class="border-b border-slate-200" :totalRecords="carriers?.total" :rows="carriers?.per_page" :first="carriers?.from" :last="carriers?.to"
+                :rowsPerPageOptions="[10, 25, 50, 100]" @page="onPageChange">
+                <template #start="slotProps">
+                  {{ `${$t('setup.tables.total')}: ${carriers?.total}` }}
+                </template>
+                <template #end>
+                </template>
+              </Paginator>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Dialog v-model:visible="modal.contactInfo.open" maximizable modal :header="$t('carriers.index.contact_info.title')" :style="{ width: '45rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <div class="font-medium text-3xl text-surface-900 dark:text-surface-0 mb-4">{{ modal.contactInfo.data.name }}</div>
+    <div class="text-surface-500 dark:text-surface-300 mb-8">{{ `${$t('setup.tax_id')}: ${modal.contactInfo.data.tax_id}` }} </div>
+    <ul class="list-none p-0 m-0 border-t border-surface">
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.name') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">{{ modal.contactInfo.data.name }}</div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap">
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.contact_title') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12 leading-normal">{{ modal.contactInfo.data.title }}</div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.department') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">{{ modal.contactInfo.data.department }}</div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap">
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.email') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
+                <a :href="`mailto:${modal.contactInfo.data.email}`" target="_blank"><Tag class="mr-2" :value="modal.contactInfo.data.email" :rounded="true" /></a>
+            </div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.phone') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
+            <Tag :value="`${modal.contactInfo.data.phone}`" severity="info" :rounded="true" />
+          </div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.mobile') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
+            <Tag :value="`${modal.contactInfo.data.mobile}`" severity="success" :rounded="true" />
+          </div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.fax') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
+            <Tag :value="`${modal.contactInfo.data.fax}`" severity="warning" :rounded="true" />
+          </div>
+        </li>
+    </ul>
+  </Dialog>
+</template>

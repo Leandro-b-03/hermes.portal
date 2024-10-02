@@ -1,0 +1,114 @@
+import { defineStore } from 'pinia';
+import { v4 as uuidv4 } from 'uuid';
+import type { IUser } from '@/types/user.types';
+
+export type AuthStoreState = {
+  authUser: IUser | null;
+  isLoading: boolean; 
+  error: string | null;  
+};
+
+export const useAuthStore = defineStore({
+  id: 'authStore',
+  state: (): AuthStoreState => ({
+    authUser: null,
+    isLoading: true,
+    error: null,
+  }),
+  getters: {
+    isAuthenticated: (state) => !!state.authUser,
+  },
+  actions: {
+    setAuthUser(user: IUser | null): void {
+      this.authUser = user;
+    },
+    async login(user_data: []): Promise<any> {
+      console.log('user_data', user_data);
+      this.isLoading = true;
+      this.error = null;
+
+      const storedSessionId = sessionStorage.sessionId || null;
+
+      if (!storedSessionId) {
+        sessionStorage.sessionId = uuidv4();
+      }
+
+      try {
+        const body = { token: sessionStorage.sessionId, action: 'sign_in', user: user_data };
+        const user = await $fetch('/api/auth', { method: 'POST', body: body });
+        this.setAuthUser(user);
+        sessionStorage.authenticated = true;
+        return true;
+      } catch (error: any) {
+        this.error = error.response.data.error || 'An error occurred during login';
+        sessionStorage.authenticated = false;
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async signup(user_data: string[]): Promise<void> {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const user = await $fetch('/api/auth', { method: 'POST', body: { token: sessionStorage.sessionId, action: 'sign_up', user: user_data } });
+        this.setAuthUser(user);
+        sessionStorage.authenticated = true;
+      } catch (error: any) {
+        this.error = error.data.message || 'An error occurred during signup';
+        sessionStorage.authenticated = false;
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async fetchMe(): Promise<void> { 
+      this.isLoading = true;
+      this.error = null;
+
+      const storedSessionId = sessionStorage.sessionId || null;
+
+      if (!storedSessionId) {
+        sessionStorage.sessionId = uuidv4();
+      }
+
+      try {
+        const response = await $fetch('/api/auth', { method: 'GET', query: { token: sessionStorage.sessionId, action: 'current_user' } });
+
+        this.setAuthUser(response?.user);
+        sessionStorage.authenticated = true;
+      } catch (error: any) {
+        this.error = error.message || 'Failed to fetch user information';
+        this.setAuthUser(null);
+        sessionStorage.authenticated = false;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async socialLogin(data: FormData): Promise<void> {
+      this.isLoading = true;
+      this.error = null;
+
+      try {
+        const user = await $fetch('/api/auth', { method: 'POST', body: { token: sessionStorage.sessionId, action: 'google_oauth2/callback', ...data } });
+        this.setAuthUser(user);
+        sessionStorage.authenticated = true;
+      } catch (err) {
+        this.error = err.message || 'An error occurred during social login';
+        sessionStorage.authenticated = false;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async logout() {
+      const response = await $fetch('/api/auth', { method: 'DELETE', body: { token: sessionStorage.sessionId, action: 'sign_out' } });
+      if (response.success) {
+        this.setAuthUser(null);
+      }
+
+      sessionStorage.authenticated = false;
+
+      return response;
+    },
+  },
+});
