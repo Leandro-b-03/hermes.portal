@@ -18,13 +18,13 @@ const fields = ref([
   'state',
   'country',
   'zip',
-  'contact_name',
-  'contact_phone',
-  'contact_email',
-  'contact_fax',
-  'contact_mobile',
-  'contact_title',
-  'contact_department',
+  'carrierContact.name',
+  'carrierContact.phone',
+  'carrierContact.email',
+  'carrierContact.fax',
+  'carrierContact.mobile',
+  'carrierContact.title',
+  'carrierContact.department',
   'created_at',
   'updated_at',
 ]);
@@ -80,6 +80,10 @@ const onPageChange = (event: { first: number }): void =>{
       per_page: newPerPage
     }
   });
+};
+
+const edit = (id: number): void => {
+  router.push({ path: `/carriers/${id}/edit` });
 };
 
 const exportData = async (): Promise<void> => {
@@ -174,7 +178,7 @@ const exportData = async (): Promise<void> => {
                 </Column>
                 <Column :header="$t(`carriers.index.table.actions`)">
                   <template #body="slotProps">
-                    <Button v-tooltip.left="$t('setup.options.edit')" icon="pi pi-pencil" class="mr-2" />
+                    <Button v-tooltip.left="$t('setup.options.edit')" icon="pi pi-pencil" class="mr-2" @click="edit(slotProps.data.id)" />
                     <Button v-tooltip.right="$t('setup.options.delete')" icon="pi pi-trash" class="mr-2" />
                   </template>
                 </Column>

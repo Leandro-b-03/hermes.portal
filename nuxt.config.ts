@@ -43,6 +43,9 @@ export default defineNuxtConfig({
       setMiddleware(pages)
     }
   },
+  plugins: [
+    '@/plugins/primevue-toastservice.ts',
+  ],
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   css: ['@/assets/main.scss'],

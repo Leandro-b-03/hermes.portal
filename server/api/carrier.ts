@@ -16,9 +16,20 @@ export default defineEventHandler(async (event) => {
 
   try {
     switch (event.node.req.method) {
-      // case 'POST':
+      case 'POST':
+        if (body.action == 'find') {
+          const response = await apiCall('POST', '/v1/carrier/find', body);
+          return response.carrier;
+        } else if (body.action == 'create') {
+          const response = await apiCall('POST', '/v1/carrier', body);
+          return response.carrier;
+        }
 
-      // case 'PUT':
+      case 'PUT':
+        if (body.action == 'update') {
+          const response = await apiCall('PUT', `/v1/carrier/${body.carrier.id}`, body);
+          return response.carrier;
+        }
 
       // case 'DELETE':
 
@@ -31,8 +42,11 @@ export default defineEventHandler(async (event) => {
           queries.append('filter', `${query.filter || ''}`);
           queries.append('fields[]', `${query.fields || ''}`);
           
-          const data = await apiCall('GET', `/v1/carrier?${queries.toString()}`, { token: query.token});
-          return data.carriers;
+          const response = await apiCall('GET', `/v1/carrier?${queries.toString()}`, { token: query.token});
+          return response.carriers;
+        } else if (query.action == 'collect_carrier') {
+          const response = await apiCall('GET', `/v1/carrier/${query.id}`, { token: query.token });
+          return response.carrier;
         }
 
       default:

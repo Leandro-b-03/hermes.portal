@@ -57,36 +57,20 @@ export const apiHandler = () => {
 
       return body.data;
     } catch (error) {
-      console.log('error', error.response);
+      console.log(error.response);
       // Handle errors, including token expiration and 422 validation errors
-      if (error.response && error.response.status === 401) {
-        const data = await error.response._data;
-        throw createError({ statusCode: 401, message: data.messages,  });
+      if (error.response) {
+        const { status, _data: data } = await error.response;
+        
+        throw createError({ 
+          statusCode: status || 500, 
+          data: data.errors,
+          message: 'An unexpected error occurred.' 
+        });
+      } else {
+        // Handle errors without a response object
+        throw createError({ statusCode: 500, message: 'Internal Server Error' });
       }
-
-      if (error.response && error.response.status === 422) {
-        const data = await error.response._data;
-        throw createError({ statusCode: 422, message: data.messages });
-      }
-
-      if (error.response && error.response.status === 403) {
-        const data = await error.response._data;
-        throw createError({ statusCode: 403, message: data.messages });
-      }
-
-      if (error.response && error.response.status === 404) {
-        const data = await error.response._data;
-        throw createError({ statusCode: 404, message: data.messages });
-      }
-
-      // Handle other errors or retry if token has expired (similar to your Axios interceptor)
-      // if (error.response && error.response.status === 403) {
-      //   const newToken = await refreshToken();
-      //   storage.setItem('auth', newToken);
-      //   return apiCall(method, url, data);
-      // }
-
-      throw createError({ statusCode: 500, message: 'Internal Server Error' });
     }
   };
 
