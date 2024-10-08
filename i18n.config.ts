@@ -57,6 +57,7 @@ export default defineI18nConfig(() => ({
         orders: 'Ordens',
         settings: 'Configurações',
         create: 'Cadastrar',
+        edit: 'Editar',
       },
       carriers: {
         fields: {
@@ -132,6 +133,10 @@ export default defineI18nConfig(() => ({
           buttons: {
             cancel: 'Cancelar',
             save: 'Cadastrar',
+          },
+          message: {
+            success: 'Transportadora cadastrada com sucesso.',
+            error: 'Erro ao cadastrar transportadora.',
           }
         },
         edit: {
@@ -140,6 +145,10 @@ export default defineI18nConfig(() => ({
           buttons: {
             cancel: 'Cancelar',
             save: 'Salvar',
+          },
+          message: {
+            success: 'Transportadora editada com sucesso.',
+            error: 'Erro ao editar transportadora.',
           }
         }
       },
@@ -155,7 +164,13 @@ export default defineI18nConfig(() => ({
       orders: 'Ordens',
       settings: 'Configurações',
       setup: {
+        success: 'Sucesso',
+        error: 'Erro',
         tax_id: 'CNPJ',
+        export: {
+          all: 'Exportar todos registros',
+          partial: 'Exportar parcial',
+        },
         status: {
           1: 'Ativo',
           0: 'Inativo',

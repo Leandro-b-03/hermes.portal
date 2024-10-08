@@ -47,6 +47,9 @@ export default defineEventHandler(async (event) => {
         } else if (query.action == 'collect_carrier') {
           const response = await apiCall('GET', `/v1/carrier/${query.id}`, { token: query.token });
           return response.carrier;
+        } else if (query.action == 'export') {
+          const response = await apiCall('GET', `/v1/carrier/export`, { token: query.token }, null, true);
+          return response;
         }
 
       default:

@@ -11,7 +11,7 @@ export const apiHandler = () => {
     "Accept": "application/json",
   };
 
-  const apiCall = async (method: string, url: string, data: any = null, header: any = null) => {
+  const apiCall = async (method: string, url: string, data: any = null, header: any = null, blob: boolean = false) => {
     let sessionId = null;
 
     if (data.token != null && data.token != undefined && data.token != '' && data.token != 'null') {
@@ -45,6 +45,7 @@ export const apiHandler = () => {
         method,
         headers: { ...configHeaders, ...header, Authorization: token },
         body: data,
+        responseType: blob ? 'blob' : 'json',
       });
 
       const body = await response._data;
@@ -53,6 +54,10 @@ export const apiHandler = () => {
 
       if (token_) {
         await storage.setItem(`token_${sessionId}`, `Bearer ${token_}`);
+      }
+
+      if (blob) {
+        return body;
       }
 
       return body.data;

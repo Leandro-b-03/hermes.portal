@@ -216,11 +216,12 @@ const submit = async (): Promise<any> => {
     }
 
     carrierStore.createOrUpdate(carrier).then(() => {
-      console.log($toast);
-      $toast.add({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 });
-      // $toast.add({ severity: 'info', summary: t('setup.info'), detail: t(!carrier.id ? 'carriers.create.success' : 'carriers.edit.success'), life: 5000 });
+      // console.log($toast.add('teste'));
+      // $toast.add('teste');
+      $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t(!carrier.id ? 'carriers.create.message.success' : 'carriers.edit.message.success'), life: 5000 });
       router.push({ path: '/carriers' });
     }).catch((error) => {
+      $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('setup.error'), detail: t(!carrier.id ? 'carriers.create.message.error' : 'carriers.edit.message.error'), life: 5000 });
       console.log(error);
     });
   });

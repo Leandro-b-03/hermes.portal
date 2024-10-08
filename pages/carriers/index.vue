@@ -8,6 +8,7 @@ const loading = computed(() => carrierStore.isLoading);
 const carriers = computed(() => carrierStore.data);
 const query = computed(() => new URLSearchParams(route.query).toString());
 const selectedData = ref();
+const dt = ref();
 const filter = route.query.filter?.toString() || '';
 const fields = ref([
   'tax_id',
@@ -33,7 +34,8 @@ const links = breadcrump(route.path);
 const items = ref([
   {
     items: [
-      { label: 'export', icon: 'pi pi-fw pi-download', function: () => exportData() },
+      { label: 'export.all', icon: 'pi pi-fw pi-download', function: () => exportData() },
+      { label: 'export.partial', icon: 'pi pi-fw pi-file-excel', function: () => exportCSV() }
     ]
   }
 ]);
@@ -87,7 +89,22 @@ const edit = (id: number): void => {
 };
 
 const exportData = async (): Promise<void> => {
-  console.log('Exporting data');
+  await carrierStore.export().then((response: any) => {
+    console.log(response);
+    const url = window.URL.createObjectURL(new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'carriers.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }).catch((error: any) => {
+    console.error(error);
+  });
+};
+
+const exportCSV = (): void => {
+  dt.value.exportCSV();
 };
 </script>
 
@@ -95,12 +112,15 @@ const exportData = async (): Promise<void> => {
   <div class="p-8 flex flex-col flex-auto">
     <div class="grid grid-cols-12 gap-4">
       <div class="col-span-12">
-        <ul
-          class="list-none p-0 m-0 bg-surface-0 dark:bg-surface-900 flex font-medium overflow-y-hidden overflow-x-auto">
-          <li v-for="(link, index) in links" :key="index" class="relative p-4">
-            <PagesBreadcrump :name="link" :index="index" />
-          </li>
-        </ul>
+        <Transition name="fade" mode="out-in">
+          <Skeleton v-if="loading" height="3.4rem" class="rounded-none" />
+          <ul v-else
+            class="list-none p-0 m-0 bg-surface-0 dark:bg-surface-900 flex font-medium overflow-y-hidden overflow-x-auto">
+            <li v-for="(link, index) in links" :key="index" class="relative p-4">
+              <PagesBreadcrump :name="link" :index="index" />
+            </li>
+          </ul>
+        </Transition>
 
         <div class="bg-surface-50 dark:bg-surface-950 pt-2">
           <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
@@ -124,7 +144,7 @@ const exportData = async (): Promise<void> => {
                   <template #item="{item, props}">
                     <li class="p-2 cursor-pointer" @click="item.function">
                       <i class="pi pi-fw text-surface-500 dark:text-surface-300 mr-2" :class="item.icon" />
-                      <span class="text-surface-900 dark:text-surface-0">{{ item.label }}</span>
+                      <span class="text-surface-900 dark:text-surface-0">{{ $t(`setup.${item.label}`) }}</span>
                     </li>
                   </template>
                 </Menu>
@@ -133,7 +153,7 @@ const exportData = async (): Promise<void> => {
             <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.index.subtitle') }}
             </div>
             <div>
-              <DataTable :value="carriers?.data" :loading="loading" sortMode="multiple" v-model:selection="selectedData" dataKey="carrier.id">
+              <DataTable :value="carriers?.data" ref="dt" :loading="loading" sortMode="multiple" v-model:selection="selectedData" dataKey="carrier.id">
                 <template #header>
                   <div class="flex justify-end">
                     <div class="w-30">

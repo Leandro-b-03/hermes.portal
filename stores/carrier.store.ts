@@ -29,7 +29,6 @@ export const useCarrierStore = defineStore({
       try {
         params = params ? `${params}&action=collect_carriers&token=${sessionStorage.sessionId}` 
                 : `action=collect_carriers&token=${sessionStorage.sessionId}`;
-        console.log('params', params);
         const carriers = await $fetch<ICarrierListResponse[]>(`/api/carrier?${params}`, { method: "GET" });
         this.setCarriers(carriers);
       } catch (error: any) {
@@ -71,7 +70,6 @@ export const useCarrierStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        console.log('carrier', carrier);
         let response;
         if (!carrier.id || carrier.id === "") {
           response = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "POST", body: { action: 'create', token: sessionStorage.sessionId, carrier: carrier } });
@@ -86,6 +84,19 @@ export const useCarrierStore = defineStore({
         } else {
           this.error = error.data || "An error occurred while updating carrier";
         }
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async export(): Promise<any> {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const exportCarriers = await $fetch(`/api/carrier`, { method: "GET", params: { action: 'export', token: sessionStorage.sessionId } });
+        return exportCarriers;
+      } catch (error: any) {
+        this.error = error.data || "An error occurred while exporting carriers";
         return Promise.reject(this.error);
       } finally {
         this.isLoading = false;
