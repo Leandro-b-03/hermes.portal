@@ -12,7 +12,7 @@ const selectedFields = ref(props.fields || []);
 
 const fieldOptions = computed(() => 
   props.fields.map(field => ({
-    label: t(`carriers.fields.${field}`),
+    label: t(`carriers.fields.${field.replace('carrierContact', 'contact')}`),
     value: field
   }))
 );

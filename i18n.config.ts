@@ -39,7 +39,11 @@ export default defineI18nConfig(() => ({
         invoices: 'Faturas',
         events: 'Eventos',
         options: 'Opções',
-        carriers: 'Transportadoras',
+        carriers: {
+          title: 'Transportadoras',
+          manage: 'Gerenciar',
+          import: 'Importar tabela de frete',
+        },
         orders: 'Ordens',
         settings: 'Configurações',
       },
@@ -54,6 +58,7 @@ export default defineI18nConfig(() => ({
         events: 'Eventos',
         options: 'Opções',
         carriers: 'Transportadoras',
+        import: 'Importar tabela de frete',
         orders: 'Ordens',
         settings: 'Configurações',
         create: 'Cadastrar',
@@ -99,6 +104,8 @@ export default defineI18nConfig(() => ({
             department: 'Departamento',
             department_placeholder: 'Comercial',
           },
+          created_at: 'Criado em',
+          updated_at: 'Atualizado em',
           status: 'Status',
           active: 'Ativo',
           inactive: 'Desativado',
@@ -126,6 +133,20 @@ export default defineI18nConfig(() => ({
             department: 'Departamento',
             contact_title: 'Cargo',
           },
+          delete: {
+            title: 'Excluir Transportadora',
+            subtitle: 'Tem certeza que deseja excluir a transportadora?',
+            buttons: {
+              cancel: 'Cancelar',
+              delete: 'Excluir',
+            },
+            message: {
+              success_header: 'Sucesso',
+              success: 'Transportadora excluída com sucesso.',
+              error_header: 'Erro',
+              error: 'Erro ao excluir transportadora.',
+            }
+          }
         },
         create: {
           title: 'Cadastrar Transportadora',
@@ -149,6 +170,18 @@ export default defineI18nConfig(() => ({
           message: {
             success: 'Transportadora editada com sucesso.',
             error: 'Erro ao editar transportadora.',
+          }
+        },
+        import: {
+          title: 'Tabelas de Frete',
+          subtitle: 'Gerencie as suas tabelas de frete.',
+          buttons: {
+            cancel: 'Cancelar',
+            save: 'Importar',
+          },
+          message: {
+            success: 'Tabela de frete importada com sucesso.',
+            error: 'Erro ao importar tabela de frete.',
           }
         }
       },

@@ -25,7 +25,7 @@ const onThemeToggler = (): void => {
 </script>
 
 <template>
-  <header class="header min-w-full pl-[280px] relative lg:fixed top-0 left-0 z-10">
+  <header class="header min-w-full pl-[280px] relative lg:fixed top-0 left-0 z-20">
     <div class="h-[60px] flex justify-between items-center px-8 bg-surface-0 dark:bg-surface-950 shadow border-b border-surface">
       <div class="flex">
         <a v-ripple v-styleclass="{

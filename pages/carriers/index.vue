@@ -3,11 +3,14 @@
 const route = useRoute();
 const router = useRouter();
 const carrierStore = useCarrierStore();
+const confirm = useConfirm();
+const { $toast } = useNuxtApp();
+const t = useNuxtApp().$i18n.t;
 
 const loading = computed(() => carrierStore.isLoading);
 const carriers = computed(() => carrierStore.data);
 const query = computed(() => new URLSearchParams(route.query).toString());
-const selectedData = ref();
+// const selectedData = ref();
 const dt = ref();
 const filter = route.query.filter?.toString() || '';
 const fields = ref([
@@ -106,6 +109,36 @@ const exportData = async (): Promise<void> => {
 const exportCSV = (): void => {
   dt.value.exportCSV();
 };
+
+const deleteCarrier = (id: number): void => {
+  confirm.require({
+    message: t('carriers.index.delete.subtitle'),
+    header: t('carriers.index.delete.title'),
+    icon: 'pi pi-info-circle',
+    rejectLabel: t('setup.options.cancel'),
+    rejectProps: {
+      label: t('setup.options.cancel'),
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: t('setup.options.delete'),
+      severity: 'danger'
+    },
+    accept: () => {
+      carrierStore.delete(id).then((response) => {
+        console.log(response);
+        if (response) {
+          $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('carriers.index.delete.message.success_header'), detail:  t('carriers.index.delete.message.success'), life: 3000 });
+        } else {
+          $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('carriers.index.delete.message.error_header'), detail:  t('carriers.index.delete.message.error'), life: 3000 });
+        }
+      }).catch((error) => {
+        $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('carriers.index.delete.message.error_header'), detail:  t('carriers.index.delete.message.error'), life: 3000 });
+      });
+    }
+  });
+};
 </script>
 
 <template>
@@ -153,7 +186,8 @@ const exportCSV = (): void => {
             <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.index.subtitle') }}
             </div>
             <div>
-              <DataTable :value="carriers?.data" ref="dt" :loading="loading" sortMode="multiple" v-model:selection="selectedData" dataKey="carrier.id">
+              <ConfirmDialog></ConfirmDialog>
+              <DataTable :value="carriers?.data" ref="dt" :loading="loading" sortMode="multiple" dataKey="carrier.id">
                 <template #header>
                   <div class="flex justify-end">
                     <div class="w-30">
@@ -161,7 +195,7 @@ const exportCSV = (): void => {
                     </div>
                   </div>
                 </template>
-                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+                <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
                 <Column field="name" :header="$t(`carriers.index.table.name`)" />
                 <Column field="tax_id" :header="$t(`carriers.index.table.tax_id`)">
                   <template #body="slotProps">
@@ -199,7 +233,7 @@ const exportCSV = (): void => {
                 <Column :header="$t(`carriers.index.table.actions`)">
                   <template #body="slotProps">
                     <Button v-tooltip.left="$t('setup.options.edit')" icon="pi pi-pencil" class="mr-2" @click="edit(slotProps.data.id)" />
-                    <Button v-tooltip.right="$t('setup.options.delete')" icon="pi pi-trash" class="mr-2" />
+                    <Button v-tooltip.right="$t('setup.options.delete')" icon="pi pi-trash" class="mr-2" @click="deleteCarrier(slotProps.data.id)" />
                   </template>
                 </Column>
               </DataTable>

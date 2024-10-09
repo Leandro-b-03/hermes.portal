@@ -89,6 +89,21 @@ export const useCarrierStore = defineStore({
         this.isLoading = false;
       }
     },
+    async delete(id: number): Promise<any> {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const response = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "DELETE", body: { action: 'delete', token: sessionStorage.sessionId, id: id } });
+        console.log(this.data.data);
+        this.data.data = this.data.data.filter((carrier) => carrier.id !== id);
+        return true;
+      } catch (error: any) {
+        this.error = error.data || "An error occurred while deleting carrier";
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
     async export(): Promise<any> {
       this.isLoading = true;
       this.error = null;

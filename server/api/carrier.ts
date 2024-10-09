@@ -31,7 +31,11 @@ export default defineEventHandler(async (event) => {
           return response.carrier;
         }
 
-      // case 'DELETE':
+      case 'DELETE':
+        if (body.action == 'delete') {
+          const response = await apiCall('DELETE', `/v1/carrier/${body.id}`, body);
+          return response.carrier;
+        }
 
       case 'GET':
         if (query.action == 'collect_carriers') {

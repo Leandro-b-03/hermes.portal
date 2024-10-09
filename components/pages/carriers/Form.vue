@@ -142,7 +142,7 @@ watch((loading), async () => {
     carrier.contact.mobile = props.carrier?.carrier_contact?.mobile || '';
     carrier.contact.phone = props.carrier?.carrier_contact?.phone || '';
     carrier.contact.fax = props.carrier?.carrier_contact?.fax || '';
-    carrier.active = props.carrier?.carrier_shipper.active || true;
+    carrier.active = props.carrier?.carrier_shipper.active;
   }
 }, { deep: true, immediate: true });
 
@@ -215,14 +215,11 @@ const submit = async (): Promise<any> => {
       return;
     }
 
-    carrierStore.createOrUpdate(carrier).then(() => {
-      // console.log($toast.add('teste'));
-      // $toast.add('teste');
+    carrierStore.createOrUpdate(carrier).then((response) => {
       $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t(!carrier.id ? 'carriers.create.message.success' : 'carriers.edit.message.success'), life: 5000 });
       router.push({ path: '/carriers' });
     }).catch((error) => {
       $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('setup.error'), detail: t(!carrier.id ? 'carriers.create.message.error' : 'carriers.edit.message.error'), life: 5000 });
-      console.log(error);
     });
   });
 }
