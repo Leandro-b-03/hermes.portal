@@ -63,6 +63,7 @@ export default defineI18nConfig(() => ({
         settings: 'Configurações',
         create: 'Cadastrar',
         edit: 'Editar',
+        new: 'Novo',
       },
       carriers: {
         fields: {
@@ -182,6 +183,30 @@ export default defineI18nConfig(() => ({
           message: {
             success: 'Tabela de frete importada com sucesso.',
             error: 'Erro ao importar tabela de frete.',
+          },
+          new: {
+            title: 'Nova Tabela de Frete',
+            subtitle: 'Preencha os campos abaixo para importar uma nova tabela de frete.',
+            fields:{
+              carrier: 'Transportadora',
+              carrier_placeholder: 'Selecione a transportadora',
+              carrier_filter: 'Filtrar transportadora',
+              carrier_empty: 'Nenhuma transportadora encontrada',
+              dropzone: 'Arraste e solte o arquivo aqui ou clique para selecionar',
+              files: 'Arquivos',
+            },
+            table: {
+              title: 'Tabelas de Frete (.csv)',
+              header: {
+                name: 'Nome',
+                file: 'Arquivo',
+                file_name: 'Nome do arquivo',
+                size: 'Tamanho',
+                type: 'Tipo',
+                actions: 'Ações',
+              },
+              invalid_file: 'Arquivo inválido',
+            },
           }
         }
       },
@@ -200,6 +225,7 @@ export default defineI18nConfig(() => ({
         success: 'Sucesso',
         error: 'Erro',
         tax_id: 'CNPJ',
+        no_results: 'Nenhum resultado encontrado',
         export: {
           all: 'Exportar todos registros',
           partial: 'Exportar parcial',

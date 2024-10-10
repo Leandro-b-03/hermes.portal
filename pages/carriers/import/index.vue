@@ -1,13 +1,44 @@
 <script setup lang="ts">
 const route = useRoute();
+const router = useRouter();
+const importStore = useImportStore();
 
-const loading = ref(true);
-console.log(route.path);
+const loading = computed(() => importStore.isLoading);
+const carriers = computed(() => importStore.data);
+const query = computed(() => new URLSearchParams(route.query).toString());
 const links = breadcrump(route.path);
+const filter = route.query.filter?.toString() || '';
+const fields = ref([
+  'tax_id',
+  'name',
+  'freight_type',
+  'file_name',
+  'file_path',
+  'file_size',
+  'error_on_import',
+  'error_message',
+  'imported_at',
+  'error_at',
+  'created_at',
+  'updated_at',
+]);
 
-onMounted(() => {
-  loading.value = false;
+onMounted(async () => {
+  await importStore.fetchData(query.value);
 });
+
+const onPageChange = (event: { first: number }): void =>{
+  scrollToTop();
+  const newPage = event.page + 1; // PrimeVue pages are 0-indexed, so add 1
+  const newPerPage = event.rows;
+  router.push({
+    query: {
+      ...router.currentRoute.value.query,
+      page: newPage,
+      per_page: newPerPage
+    }
+  });
+};
 </script>
 
 <template>
@@ -33,7 +64,7 @@ onMounted(() => {
                   }}</span>
               </div>
               <div>
-                <NuxtLink to="/carriers/create" v-tooltip.top="$t('setup.options.add')" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">
+                <NuxtLink to="/carriers/import/new" v-tooltip.top="$t('setup.options.add')" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">
                   <i class="pi pi-plus"></i>
                 </NuxtLink>
                 <Button v-if="items" v-tooltip.top="$t('setup.options.title')" icon="pi pi-ellipsis-v" text rounded @click="$refs.menu.toggle($event)" />
@@ -57,7 +88,23 @@ onMounted(() => {
             <div>
               <ConfirmDialog></ConfirmDialog>
               <DataTable :value="carriers?.data" ref="dt" :loading="loading" sortMode="multiple" dataKey="carrier.id">
+                <template #header>
+                  <div v-if="carriers?.data?.length > 0" class="flex justify-end">
+                    <div class="w-30">
+                      <PagesSearchTable v-model:filter="filter" v-model:fields="fields" />
+                    </div>
+                  </div>
+                </template>
+                <template #empty>{{ $t('setup.no_results') }}</template>
               </DataTable>
+              <Paginator v-if="carriers.data?.length > 0" class="border-b border-slate-200" :totalRecords="carriers?.total" :rows="carriers?.per_page" :first="carriers?.from" :last="carriers?.to"
+                :rowsPerPageOptions="[10, 25, 50, 100]" @page="onPageChange">
+                <template #start="slotProps">
+                  {{ `${$t('setup.tables.total')}: ${carriers?.total}` }}
+                </template>
+                <template #end>
+                </template>
+              </Paginator>
             </div>
           </div>
         </div>

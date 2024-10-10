@@ -1,65 +1,76 @@
-import { defineEventHandler, readBody } from 'h3';
+import { defineEventHandler, readBody, getQuery } from 'h3';
 import { apiHandler } from '@/server/utils/handler';
 
 export default defineEventHandler(async (event) => {
-  const storage = useStorage('redis');
-  const { apiCall } = apiHandler(); // Use the apiCall function from the handler
+  const { apiCall } = apiHandler();
+  const method = event.node.req.method;
 
-  let body = null;
-  let query = null;
-
-  if (event.node.req.method !== 'GET') {
-    body = await readBody(event);
-  } else {
-    query = getQuery(event);
-  }
+  // Use a single object to hold both body and query parameters
+  const data = method === 'GET' ? getQuery(event) : await readBody(event); 
 
   try {
-    switch (event.node.req.method) {
+    switch (method) {
       case 'POST':
-        if (body.action == 'find') {
-          const response = await apiCall('POST', '/v1/carrier/find', body);
-          return response.carrier;
-        } else if (body.action == 'create') {
-          const response = await apiCall('POST', '/v1/carrier', body);
-          return response.carrier;
-        }
-
+        return handlePostRequest(data, apiCall);
       case 'PUT':
-        if (body.action == 'update') {
-          const response = await apiCall('PUT', `/v1/carrier/${body.carrier.id}`, body);
-          return response.carrier;
-        }
-
+        return handlePutRequest(data, apiCall);
       case 'DELETE':
-        if (body.action == 'delete') {
-          const response = await apiCall('DELETE', `/v1/carrier/${body.id}`, body);
-          return response.carrier;
-        }
-
+        return handleDeleteRequest(data, apiCall);
       case 'GET':
-        if (query.action == 'collect_carriers') {
-          const queries = new URLSearchParams();
-          queries.append('page', `${query.page || '1'}`);
-          queries.append('per_page', `${query.per_page || '10'}`);
-          queries.append('order_by', `${query.order_by || 'desc'}`);
-          queries.append('filter', `${query.filter || ''}`);
-          queries.append('fields[]', `${query.fields || ''}`);
-          
-          const response = await apiCall('GET', `/v1/carrier?${queries.toString()}`, { token: query.token});
-          return response.carriers;
-        } else if (query.action == 'collect_carrier') {
-          const response = await apiCall('GET', `/v1/carrier/${query.id}`, { token: query.token });
-          return response.carrier;
-        } else if (query.action == 'export') {
-          const response = await apiCall('GET', `/v1/carrier/export`, { token: query.token }, null, true);
-          return response;
-        }
-
+        return handleGetRequest(data, apiCall);
       default:
         throw createError({ statusCode: 405, message: 'Method Not Allowed' });
     }
   } catch (error) {
-    return error;
+    throw error; 
   }
 });
+
+// --- Helper functions for each HTTP method ---
+async function handlePostRequest(data: any, apiCall: any) {
+  if (data.action === 'find') {
+    return (await apiCall('POST', '/v1/carrier/find', data)).carrier;
+  } else if (data.action === 'create') {
+    return (await apiCall('POST', '/v1/carrier', data)).carrier;
+  }
+}
+
+async function handlePutRequest(data: any, apiCall: any) {
+  if (data.action === 'update') {
+    return (await apiCall('PUT', `/v1/carrier/${data.carrier.id}`, data)).carrier;
+  }
+}
+
+async function handleDeleteRequest(data: any, apiCall: any) {
+  if (data.action === 'delete') {
+    return (await apiCall('DELETE', `/v1/carrier/${data.id}`, data)).carrier;
+  }
+}
+
+async function handleGetRequest(data: any, apiCall: any) {
+  if (data.action === 'collect_carriers') {
+    const queryParams = new URLSearchParams({
+      page: data.page || '1',
+      per_page: data.per_page || '10',
+      order_by: data.order_by || 'desc',
+      filter: data.filter || '',
+      'fields[]': data.fields || '',
+    });
+    return (await apiCall('GET', `/v1/carrier?${queryParams}`, { token: data.token })).carriers;
+
+  } else if (data.action === 'collect_carrier') {
+    if (!data.id) throw createError({ statusCode: 400, message: 'Missing required parameter: id' });
+    const response = (await apiCall('GET', `/v1/carrier/${data.id}`, { token: data.token }));
+
+    if (response.carrier) {
+      return response.carrier;
+    } else {
+      return response.carriers;
+    }
+
+  } else if (data.action === 'export') {
+    return await apiCall('GET', `/v1/carrier/export`, { token: data.token }, null, true);
+  } else if (data.action === 'import_list') {
+    return (await apiCall('GET', `/v1/carrier/import`, { token: data.token })).imports;
+  }
+}

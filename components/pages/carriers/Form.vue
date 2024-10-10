@@ -133,16 +133,16 @@ watch((loading), async () => {
     carrier.state = props.carrier?.state || '';
     carrier.zip = props.carrier?.zip || '';
     carrier.country = props.carrier?.country || '';
-    carrier.contact.id = props.carrier?.carrier_contact?.id || '';
-    carrier.contact.shipper_id = props.carrier?.carrier_contact?.shipper_id || '';
-    carrier.contact.name = props.carrier?.carrier_contact?.name || '';
-    carrier.contact.email = props.carrier?.carrier_contact?.email || '';
-    carrier.contact.title = props.carrier?.carrier_contact?.title || '';
-    carrier.contact.department = props.carrier?.carrier_contact?.department || '';
-    carrier.contact.mobile = props.carrier?.carrier_contact?.mobile || '';
-    carrier.contact.phone = props.carrier?.carrier_contact?.phone || '';
-    carrier.contact.fax = props.carrier?.carrier_contact?.fax || '';
-    carrier.active = props.carrier?.carrier_shipper.active;
+    carrier.contact.id = props.carrier?.carrier_contact[0]?.id || '';
+    carrier.contact.shipper_id = props.carrier?.carrier_contact[0]?.shipper_id || '';
+    carrier.contact.name = props.carrier?.carrier_contact[0]?.name || '';
+    carrier.contact.email = props.carrier?.carrier_contact[0]?.email || '';
+    carrier.contact.title = props.carrier?.carrier_contact[0]?.title || '';
+    carrier.contact.department = props.carrier?.carrier_contact[0]?.department || '';
+    carrier.contact.mobile = props.carrier?.carrier_contact[0]?.mobile || '';
+    carrier.contact.phone = props.carrier?.carrier_contact[0]?.phone || '';
+    carrier.contact.fax = props.carrier?.carrier_contact[0]?.fax || '';
+    carrier.active = props.carrier?.carrier_shipper[0].active;
   }
 }, { deep: true, immediate: true });
 
@@ -166,16 +166,16 @@ const find = async (): Promise<any> => {
     carrier.city = response?.city;
     carrier.state = response?.state;
     carrier.country = response?.country;
-    carrier.contact.id = response?.carrier_contact.id;
-    carrier.contact.shipper_id = response?.carrier_contact.shipper_id;
-    carrier.contact.name = response?.carrier_contact.name;
-    carrier.contact.email = response?.carrier_contact.email;
-    carrier.contact.title = response?.carrier_contact.title;
-    carrier.contact.department = response?.carrier_contact.department;
-    carrier.contact.mobile = response?.carrier_contact.mobile;
-    carrier.contact.phone = response?.carrier_contact.phone;
-    carrier.contact.fax = response?.carrier_contact.fax;
-    carrier.active = response?.carrier_shipper.active;
+    carrier.contact.id = response?.carrier_contact[0].id;
+    carrier.contact.shipper_id = response?.carrier_contact[0].shipper_id;
+    carrier.contact.name = response?.carrier_contact[0].name;
+    carrier.contact.email = response?.carrier_contact[0].email;
+    carrier.contact.title = response?.carrier_contact[0].title;
+    carrier.contact.department = response?.carrier_contact[0].department;
+    carrier.contact.mobile = response?.carrier_contact[0].mobile;
+    carrier.contact.phone = response?.carrier_contact[0].phone;
+    carrier.contact.fax = response?.carrier_contact[0].fax;
+    carrier.active = response?.carrier_shipper[0].active;
   }).catch((error) => {
     if (error?.data?.tax_id) {
       errors.tax_id = true

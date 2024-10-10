@@ -189,7 +189,7 @@ const deleteCarrier = (id: number): void => {
               <ConfirmDialog></ConfirmDialog>
               <DataTable :value="carriers?.data" ref="dt" :loading="loading" sortMode="multiple" dataKey="carrier.id">
                 <template #header>
-                  <div class="flex justify-end">
+                  <div v-if="carriers?.data?.length > 0" class="flex justify-end">
                     <div class="w-30">
                       <PagesSearchTable v-model:filter="filter" v-model:fields="fields" />
                     </div>
@@ -217,12 +217,12 @@ const deleteCarrier = (id: number): void => {
                 </Column>
                 <Column field="carrier_contact.name" :header="$t(`carriers.index.table.contact_name`)">
                   <template #body="slotProps">
-                    <span class="cursor-pointer" @click="showContactInfo(slotProps.data.carrier_contact)">{{ slotProps.data.carrier_contact.name }}</span>
+                    <span class="cursor-pointer" @click="showContactInfo(slotProps.data.carrier_contact[0])">{{ slotProps.data.carrier_contact[0].name }}</span>
                   </template>
                 </Column>
-                <Column field="active" :header="$t(`carriers.index.table.status`)">
+                <Column field="carrier_shipper.active" :header="$t(`carriers.index.table.status`)">
                   <template #body="slotProps">
-                    <Badge :severity="getSeverityB(slotProps.data.carrier_shipper.active)" :value="$t(`setup.status.${slotProps.data.carrier_shipper.active}`)" />
+                    <Badge :severity="getSeverityB(slotProps.data.carrier_shipper[0].active)" :value="$t(`setup.status.${slotProps.data.carrier_shipper[0].active}`)" />
                   </template>
                 </Column>
                 <Column field="updated_at" :header="$t(`carriers.index.table.updated_at`)">
@@ -236,8 +236,9 @@ const deleteCarrier = (id: number): void => {
                     <Button v-tooltip.right="$t('setup.options.delete')" icon="pi pi-trash" class="mr-2" @click="deleteCarrier(slotProps.data.id)" />
                   </template>
                 </Column>
+                <template #empty>{{ $t('setup.no_results') }}</template>
               </DataTable>
-              <Paginator class="border-b border-slate-200" :totalRecords="carriers?.total" :rows="carriers?.per_page" :first="carriers?.from" :last="carriers?.to"
+              <Paginator v-if="carriers.data?.length > 0" class="border-b border-slate-200" :totalRecords="carriers?.total" :rows="carriers?.per_page" :first="carriers?.from" :last="carriers?.to"
                 :rowsPerPageOptions="[10, 25, 50, 100]" @page="onPageChange">
                 <template #start="slotProps">
                   {{ `${$t('setup.tables.total')}: ${carriers?.total}` }}

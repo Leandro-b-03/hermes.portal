@@ -4,6 +4,7 @@ import type { ICarrier, ICarrierListResponse } from "@/types/carrier.types";
 export type CarrierStoreState = {
   data: ICarrierListResponse[];
   carrier: ICarrierListResponse | null;
+  carrierList: any[];
   isLoading: boolean;
   error: string | null;
 };
@@ -13,6 +14,7 @@ export const useCarrierStore = defineStore({
   state: (): CarrierStoreState => ({
     data: [],
     carrier: null,
+    carrierList: [],
     isLoading: false,
     error: null,
   }),
@@ -42,11 +44,25 @@ export const useCarrierStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        const carrier = await $fetch<ICarrierListResponse>('/api/carrier/', { method: "GET", params: { action: 'collect_carrier', token: sessionStorage.sessionId, id: id } });
+        const carrier = await $fetch('/api/carrier/', { method: "GET", params: { action: 'collect_carrier', token: sessionStorage.sessionId, id: id } });
         this.setCarrier(carrier);
         return this.carrier;
       } catch (error: any) {
         this.error = error.data || "An error occurred while fetching carrier";
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async getList(): Promise<any> {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const carrierList = await $fetch('/api/carrier/', { method: "GET", params: { action: 'collect_carrier', token: sessionStorage.sessionId, id: 'list' } });
+        this.carrierList = carrierList;
+        return this.carrierList;
+      } catch (error: any) {
+        this.error = error.data || "An error occurred while fetching carrier list";
         return Promise.reject(this.error);
       } finally {
         this.isLoading = false;

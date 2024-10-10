@@ -129,8 +129,8 @@ watch((user), () => {
                     leaveToClass: 'hidden',
                     leaveActiveClass: 'animate-slideup'
                   }" class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
-                    <i class="pi mr-2" :class="link.icon" />
-                    <span class="font-medium">{{ $t(`sidebar.${link.name}`) }}</span>
+                    <i class="pi mr-2" :class="child_link.icon" />
+                    <span class="font-medium">{{ $t(`sidebar.${child_link.name}`) }}</span>
                     <i class="pi pi-chevron-down ml-auto" />
                   </a>
                   <ul
@@ -138,7 +138,7 @@ watch((user), () => {
                     <li v-for="sub_child_link in child_link.children">
                       <a
                         class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
-                        <i class="pi mr-2" :class="link.icon" />
+                        <i class="pi mr-2" :class="sub_child_link.icon" />
                         <span class="font-medium">{{ $t(`sidebar.${sub_child_link.name}`) }}</span>
                       </a>
                     </li>
@@ -146,7 +146,7 @@ watch((user), () => {
                   </div>
                   <NuxtLink v-else :to="child_link.url"
                     class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
-                      <i class="pi mr-2" :class="link.icon" />
+                      <i class="pi mr-2" :class="child_link.icon" />
                       <span class="font-medium">{{ $t(`sidebar.${child_link.name}`) }}</span>
                   </NuxtLink>
                 </li>
