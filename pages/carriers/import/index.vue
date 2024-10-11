@@ -6,6 +6,7 @@ const importStore = useImportStore();
 const loading = computed(() => importStore.isLoading);
 const carriers = computed(() => importStore.data);
 const query = computed(() => new URLSearchParams(route.query).toString());
+const expandedRows = ref({});
 const links = breadcrump(route.path);
 const filter = route.query.filter?.toString() || '';
 const fields = ref([
@@ -87,7 +88,7 @@ const onPageChange = (event: { first: number }): void =>{
             </div>
             <div>
               <ConfirmDialog></ConfirmDialog>
-              <DataTable :value="carriers?.data" ref="dt" :loading="loading" sortMode="multiple" dataKey="carrier.id">
+              <DataTable :value="carriers?.data" v-model:expandedRows="expandedRows" ref="dt" :loading="loading" sortMode="multiple" dataKey="carrier.id">
                 <template #header>
                   <div v-if="carriers?.data?.length > 0" class="flex justify-end">
                     <div class="w-30">
@@ -95,6 +96,31 @@ const onPageChange = (event: { first: number }): void =>{
                     </div>
                   </div>
                 </template>
+                <Column expander style="width: 5rem" />
+                <Column field="tax_id" :header="$t('carriers.import.tax_id')" sortable />
+                <Column field="name" :header="$t('carriers.import.name')" sortable />
+                <Column field="carrier_freight_table" :header="$t(`carriers.index.table.zip`)">
+                  <template #body="slotProps">
+                    <span>{{ slotProps.data.carrier_freight_table.length }}</span>
+                  </template>
+                </Column>
+                <template #expansion="slotProps">
+                  <div class="p-4">
+                    <DataTable :value="slotProps.data.carrier_freight_table" rowGroupMode="rowspan" groupRowsBy="uuid">
+                      <column header="#">
+                        <template #body="slotProps">
+                          <i class="pi" :class="(slotProps.data.error_on_import && !slotProps.data.imported_at) ? 'pi-exclamation-triangle text-red-500' : slotProps.data.imported_at ? 'pi-check text-green-500' : 'pi-hourglass text-yellow-600'"></i>
+                        </template>
+                      </column>
+                      <Column field="uuid" :header="$t('carriers.import.')" sortable></Column>
+                      <Column field="freight_type" :header="$t('carriers.import.')" sortable></Column>
+                      <Column field="freight_name" :header="$t('carriers.import.')" sortable></Column>
+                      <Column field="file_name" :header="$t('carriers.import.')" sortable></Column>
+                      <Column field="created_at" :header="$t('carriers.import.')" sortable></Column>
+                      <Column field="updated_at" :header="$t('carriers.import.')" sortable></Column>
+                    </DataTable>
+                  </div>
+              </template>
                 <template #empty>{{ $t('setup.no_results') }}</template>
               </DataTable>
               <Paginator v-if="carriers.data?.length > 0" class="border-b border-slate-200" :totalRecords="carriers?.total" :rows="carriers?.per_page" :first="carriers?.from" :last="carriers?.to"
