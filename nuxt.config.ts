@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import type { NuxtPage } from 'nuxt/schema'
+import path from 'path'
 import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
@@ -90,8 +91,11 @@ export default defineNuxtConfig({
     },
   },
   i18n:{
-    vueI18n: '@/i18n.config.ts',
-    locales: ['pt', 'en'],
+    langDir: 'i18n/',
+    locales: [
+      { code: 'pt', file: 'pt.json' },
+      { code: 'en', file: 'en.json' },
+    ],
     defaultLocale: 'pt',
   },
   runtimeConfig: {

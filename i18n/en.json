@@ -1,0 +1,257 @@
+{
+  "hermes_tms": "Hermes TMS",
+  "welcome": "Welcome",
+  "search": "Search",
+  "login": {
+    "google_tooltip": "Sign in with Google",
+    "or": "Or",
+    "email": "Email",
+    "email_placeholder": "Enter your email",
+    "password": "Password",
+    "password_placeholder": "Enter your password",
+    "remember_me": "Remember me",
+    "submit": "Sign in",
+    "forgot_password": "Forgot your password?",
+    "no_account": "Don't have an account?",
+    "no_account_signup": "Contact a representative",
+    "errors": {
+      "empty_field": "Fill in the fields in red.",
+      "invalid_user_pass": "Invalid username or password.",
+      "500": "Internal server error. Try again later."
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "reports": "Reports",
+    "revenue": "Revenue",
+    "view": "View",
+    "expenses": "Expenses",
+    "invoices": "Invoices",
+    "events": "Events",
+    "options": "Options",
+    "carriers": {
+      "title": "Carriers",
+      "manage": "Manage",
+      "import": "Import freight table"
+    },
+    "orders": "Orders",
+    "settings": "Settings"
+  },
+  "breadcrumb": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "reports": "Reports",
+    "revenue": "Revenue",
+    "view": "View",
+    "expenses": "Expenses",
+    "invoices": "Invoices",
+    "events": "Events",
+    "options": "Options",
+    "carriers": "Carriers",
+    "import": "Import freight table",
+    "orders": "Orders",
+    "settings": "Settings",
+    "create": "Create",
+    "edit": "Edit",
+    "new": "New"
+  },
+  "carriers": {
+    "fields": {
+      "name": "Name",
+      "name_placeholder": "Transport Company Ltd.",
+      "tax_id": "Tax ID",
+      "tax_id_placeholder": "00.000.000/0000-00",
+      "tax_id_invalid": "Invalid Tax ID",
+      "address": "Address",
+      "address_placeholder": "Street, Avenue, etc...",
+      "address_2": "Address 2",
+      "address_2_placeholder": "\"Address 2\": Docks, Warehouse",
+      "address_3": "Neighborhood",
+      "address_3_placeholder": "Neighborhood",
+      "number": "Number",
+      "number_placeholder": "123",
+      "city": "City",
+      "city_placeholder": "São Paulo",
+      "state": "State",
+      "state_placeholder": "SP",
+      "country": "Country",
+      "country_placeholder": "Brazil",
+      "zip": "ZIP",
+      "zip_placeholder": "00000-000",
+      "contact": {
+        "name": "Contact name",
+        "name_placeholder": "John Doe",
+        "name_error_required": "Contact name is required",
+        "phone": "Phone",
+        "phone_placeholder": "(11) 9999-9999",
+        "email": "Email",
+        "email_placeholder": "john.doe＠company.com",
+        "fax": "Fax",
+        "fax_placeholder": "(11) 9999-9999",
+        "mobile": "Mobile",
+        "mobile_placeholder": "(11) 99999-9999",
+        "title": "Title",
+        "title_placeholder": "Manager",
+        "department": "Department",
+        "department_placeholder": "Sales"
+      },
+      "created_at": "Created at",
+      "updated_at": "Updated at",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "index": {
+      "title": "Carriers",
+      "subtitle": "Manage your carriers and freight tables easily.",
+      "table": {
+        "name": "Name",
+        "tax_id": "Tax ID",
+        "address": "Address",
+        "zip": "ZIP",
+        "contact_name": "Contact name",
+        "status": "Status",
+        "updated_at": "Updated at",
+        "actions": "Actions"
+      },
+      "contact_info": {
+        "title": "Contact information",
+        "name": "Name",
+        "email": "Email",
+        "mobile": "Mobile",
+        "phone": "Phone",
+        "fax": "Fax",
+        "department": "Department",
+        "contact_title": "Title"
+      },
+      "delete": {
+        "title": "Delete Carrier",
+        "subtitle": "Are you sure you want to delete the carrier?",
+        "buttons": {
+          "cancel": "Cancel",
+          "delete": "Delete"
+        },
+        "message": {
+          "success_header": "Success",
+          "success": "Carrier deleted successfully.",
+          "error_header": "Error",
+          "error": "Error deleting carrier."
+        }
+      }
+    },
+    "create": {
+      "title": "Register Carrier",
+      "subtitle": "Fill in the fields below to register a new carrier.",
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Register"
+      },
+      "message": {
+        "success": "Carrier registered successfully.",
+        "error": "Error registering carrier."
+      }
+    },
+    "edit": {
+      "title": "Edit Carrier",
+      "subtitle": "Fill in the fields below to edit the carrier.",
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Save"
+      },
+      "message": {
+        "success": "Carrier edited successfully.",
+        "error": "Error editing carrier."
+      }
+    },
+    "import": {
+      "title": "Freight Tables",
+      "subtitle": "Manage your freight tables.",
+      "buttons": {
+        "cancel": "Cancel",
+        "save": "Import"
+      },
+      "message": {
+        "success": "Freight table imported successfully.",
+        "error": "Error importing freight table."
+      },
+      "new": {
+        "title": "New Freight Table",
+        "subtitle": "Fill in the fields below to import a new freight table.",
+        "fields": {
+          "carrier": "Carrier",
+          "carrier_placeholder": "Select the carrier",
+          "carrier_filter": "Filter carrier",
+          "carrier_empty": "No carrier found",
+          "dropzone": "Drag and drop the file here or click to select",
+          "files": "Files"
+        },
+        "table": {
+          "title": "Freight Tables (.csv)",
+          "header": {
+            "name": "Name",
+            "file": "File",
+            "file_name": "File name",
+            "size": "Size",
+            "type": "Type",
+            "actions": "Actions"
+          },
+          "invalid_file": "Invalid file"
+        }
+      }
+    }
+  },
+  "dashboard": "Dashboard",
+  "customers": "Customers",
+  "reports": "Reports",
+  "revenue": "Revenue",
+  "view": "View",
+  "expenses": "Expenses",
+  "invoices": "Invoices",
+  "events": "Events",
+  "options": "Options",
+  "orders": "Orders",
+  "settings": "Settings",
+  "setup": {
+    "success": "Success",
+    "error": "Error",
+    "tax_id": "Tax ID",
+    "no_results": "No results found",
+    "export": {
+      "all": "Export all records",
+      "partial": "Partial export"
+    },
+    "status": {
+      "1": "Active",
+      "0": "Inactive"
+    },
+    "options": {
+      "title": "Options",
+      "edit": "Edit",
+      "export": "Export",
+      "delete": "Delete",
+      "add": "Add",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "tables": {
+      "search": "Keyword",
+      "select": "Select fields",
+      "page": "Page",
+      "first": "First",
+      "rows": "Rows",
+      "last": "Last",
+      "of": "of",
+      "total": "Total"
+    },
+    "validations": {
+      "required": "Field is required",
+      "email": "Invalid email",
+      "minLength": "Field must have at least {min} characters",
+      "maxLength": "Field must have at most {max} characters",
+      "numeric": "Field must be numeric",
+      "phone": "Invalid phone",
+      "mobile": "Invalid mobile"
+    }
+  }
+}
