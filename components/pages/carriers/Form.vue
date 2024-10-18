@@ -10,6 +10,11 @@ const props = defineProps({
   carrier: {
     type: Object,
     required: false
+  },
+  view: {
+    type: Boolean,
+    required: false,
+    default: false
   }
 });
 
@@ -230,7 +235,8 @@ const submit = async (): Promise<any> => {
   <div class="grid grid-cols-12 gap-4">
     <div class="mb-4 col-span-12 md:col-span-6 lg:col-span-4 xl:col-span-2">
       <label for="tax_id" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.tax_id') }}</label>
-      <InputGroup>
+      <span v-if="view">{{ carrier.tax_id }}</span>
+      <InputGroup v-else>
         <InputMask v-model="carrier.tax_id" id="tax_id" type="text" mask="99.999.999/9999-99" :placeholder="$t('carriers.fields.tax_id_placeholder')" :disabled="disabled.carrier" @keydown.enter="find" :invalid="v$.tax_id.$error || errors.tax_id" @change="v$.tax_id.$touch" />
         <Button icon="pi pi-search" :loading="loading" @click="find" />
       </InputGroup>
@@ -241,7 +247,8 @@ const submit = async (): Promise<any> => {
       <div v-if="showForm" class="md:col-span-12 grid grid-cols-12 gap-4">
         <div class="mb-4 col-span-12 md:col-span-6">
           <label for="name" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.name') }}</label>
-          <InputText v-model="carrier.name" id="name" type="text" :placeholder="$t('carriers.fields.name_placeholder')" 
+          <span v-if="view">{{ carrier.name }}</span>
+          <InputText v-else v-model="carrier.name" id="name" type="text" :placeholder="$t('carriers.fields.name_placeholder')" 
             :disabled="disabled.carrier" 
             :invalid="v$.name.$error"
             @change="v$.name.$touch" />
@@ -249,12 +256,13 @@ const submit = async (): Promise<any> => {
         </div>
         <div class="mb-4 col-span-12 md:col-span-2">
           <label for="name" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.status') }}</label>
-          <ToggleButton v-model="carrier.active" :onLabel="$t('carriers.fields.active')" :offLabel="$t('carriers.fields.inactive')" />
+          <ToggleButton v-model="carrier.active" :onLabel="$t('carriers.fields.active')" :offLabel="$t('carriers.fields.inactive')" :disabled="view" />
         </div>
         <div class="mb-4 col-span-12 md:col-span-4"></div>
         <div class="mb-4 col-span-12 md:col-span-2">
           <label for="zip" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.zip') }}</label>
-          <InputGroup>
+          <span v-if="view">{{ carrier.zip }}</span>
+          <InputGroup v-else>
             <InputMask v-model="carrier.zip" id="zip" mask="99999-999" type="text" :placeholder="$t('carriers.fields.zip_placeholder')" @keydown.enter="zipValidation" :disabled="disabled.carrier"
             :loading="zipLoading"
             :invalid="v$.zip.$error"
@@ -266,46 +274,53 @@ const submit = async (): Promise<any> => {
         <div class="mb-4 col-span-12 md:col-span-11"></div>
         <div class="mb-4 col-span-12 md:col-span-4">
           <label for="address" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.address') }}</label>
-          <InputText v-model="carrier.address" id="address" type="text" :placeholder="$t('carriers.fields.address_placeholder')" :disabled="disabled.address"
+          <span v-if="view">{{ carrier.address }}</span>
+          <InputText v-else v-model="carrier.address" id="address" type="text" :placeholder="$t('carriers.fields.address_placeholder')" :disabled="disabled.address"
             :invalid="v$.address.$error"
             @change="v$.address.$touch" />
           <small v-for="error in v$.address.$errors" v-if="v$.address.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-1">
           <label for="number" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.number') }}</label>
-          <InputText v-model="carrier.number" id="number" type="text" :placeholder="$t('carriers.fields.number_placeholder')" :disabled="disabled.address && disabled.carrier"
+          <span v-if="view">{{ carrier.number }}</span>
+          <InputText v-else v-model="carrier.number" id="number" type="text" :placeholder="$t('carriers.fields.number_placeholder')" :disabled="disabled.address && disabled.carrier"
             :invalid="v$.number.$error"
             @change="v$.number.$touch" />
           <small v-for="error in v$.number.$errors" v-if="v$.number.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-4">
           <label for="address_2" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.address_2') }}</label>
-          <InputText v-model="carrier.address_2" id="address_2" type="text" :placeholder="$t('carriers.fields.address_2_placeholder')" :disabled="disabled.address && disabled.carrier" />
+          <span v-if="view">{{ carrier.address_2 }}</span>
+          <InputText v-else v-model="carrier.address_2" id="address_2" type="text" :placeholder="$t('carriers.fields.address_2_placeholder')" :disabled="disabled.address && disabled.carrier" />
         </div>
         <div class="mb-4 col-span-12 md:col-span-3">
           <label for="address_3" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.address_3') }}</label>
-          <InputText v-model="carrier.address_3" id="address_3" type="text" :placeholder="$t('carriers.fields.address_3_placeholder')" :disabled="disabled.address" 
+          <span v-if="view">{{ carrier.address_3 }}</span>
+          <InputText v-else v-model="carrier.address_3" id="address_3" type="text" :placeholder="$t('carriers.fields.address_3_placeholder')" :disabled="disabled.address" 
             :invalid="v$.address_3.$error"
             @change="v$.address_3.$touch" />
           <small v-for="error in v$.address_3.$errors" v-if="v$.address_3.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-3">
           <label for="city" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.city') }}</label>
-          <InputText v-model="carrier.city" id="city" type="text" :placeholder="$t('carriers.fields.city_placeholder')" :disabled="disabled.address" 
+          <span v-if="view">{{ carrier.city }}</span>
+          <InputText v-else v-model="carrier.city" id="city" type="text" :placeholder="$t('carriers.fields.city_placeholder')" :disabled="disabled.address" 
             :invalid="v$.city.$error"
             @change="v$.city.$touch" />
           <small v-for="error in v$.city.$errors" v-if="v$.city.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-1">
           <label for="state" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.state') }}</label>
-          <InputText v-model="carrier.state" id="state" type="text" :placeholder="$t('carriers.fields.state_placeholder')" :disabled="disabled.address" 
+          <span v-if="view">{{ carrier.state }}</span>
+          <InputText v-else v-model="carrier.state" id="state" type="text" :placeholder="$t('carriers.fields.state_placeholder')" :disabled="disabled.address" 
             :invalid="v$.state.$error"
             @change="v$.state.$touch" />
           <small v-for="error in v$.state.$errors" v-if="v$.state.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-1">
           <label for="country" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.country') }}</label>
-          <InputText v-model="carrier.country" id="country" type="text" :placeholder="$t('carriers.fields.country_placeholder')" :disabled="disabled.address" 
+          <span v-if="view">{{ carrier.country }}</span>
+          <InputText v-else v-model="carrier.country" id="country" type="text" :placeholder="$t('carriers.fields.country_placeholder')" :disabled="disabled.address" 
             :invalid="v$.country.$error"
             @change="v$.country.$touch" />
           <small v-for="error in v$.country.$errors" v-if="v$.country.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
@@ -313,55 +328,65 @@ const submit = async (): Promise<any> => {
         <div class="mb-4 col-span-12 md:col-span-7"></div>
         <div class="mb-4 col-span-12 md:col-span-6">
           <label for="contact.name" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.name') }}</label>
-          <InputText v-model="carrier.contact.name" id="contact.name" type="text" :placeholder="$t('carriers.fields.contact.name_placeholder')" :disabled="disabled.contact" 
+          <span v-if="view">{{ carrier.contact.name }}</span>
+          <InputText v-else v-model="carrier.contact.name" id="contact.name" type="text" :placeholder="$t('carriers.fields.contact.name_placeholder')" :disabled="disabled.contact" 
             :invalid="v$.contact.name.$error"
             @change="v$.contact.name.$touch" />
           <small v-for="error in v$.contact.name.$errors" v-if="v$.contact.name.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-6">
           <label for="contact.email" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.email') }}</label>
-          <InputText v-model="carrier.contact.email" id="contact.email" type="email" :placeholder="$t('carriers.fields.contact.email_placeholder')" :disabled="disabled.contact" 
+          <span v-if="view">{{ carrier.contact.email }}</span>
+          <InputText v-else v-model="carrier.contact.email" id="contact.email" type="email" :placeholder="$t('carriers.fields.contact.email_placeholder')" :disabled="disabled.contact" 
             :invalid="v$.contact.email.$error"
             @change="v$.contact.email.$touch" />
           <small v-for="error in v$.contact.email.$errors" v-if="v$.contact.email.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-6">
           <label for="contact.title" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.title') }}</label>
-          <InputText v-model="carrier.contact.title" id="contact.title" type="text" :placeholder="$t('carriers.fields.contact.title_placeholder')" :disabled="disabled.contact" 
+          <span v-if="view">{{ carrier.contact.title }}</span>
+          <InputText v-else v-model="carrier.contact.title" id="contact.title" type="text" :placeholder="$t('carriers.fields.contact.title_placeholder')" :disabled="disabled.contact" 
             :invalid="v$.contact.title.$error"
             @change="v$.contact.title.$touch" />
           <small v-for="error in v$.contact.title.$errors" v-if="v$.contact.title.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-6">
           <label for="contact.department" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.department') }}</label>
-          <InputText v-model="carrier.contact.department" id="contact.department" type="text" :placeholder="$t('carriers.fields.contact.department_placeholder')" :disabled="disabled.contact" 
+          <span v-if="view">{{ carrier.contact.department }}</span>
+          <InputText v-else v-model="carrier.contact.department" id="contact.department" type="text" :placeholder="$t('carriers.fields.contact.department_placeholder')" :disabled="disabled.contact" 
             :invalid="v$.contact.department.$error"
             @change="v$.contact.department.$touch" />
           <small v-for="error in v$.contact.department.$errors" v-if="v$.contact.department.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-6">
           <label for="contact.mobile" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.mobile') }}</label>
-          <InputMask v-model="carrier.contact.mobile" mask="(99) 99999-9999" id="contact.mobile" type="text" :placeholder="$t('carriers.fields.contact.mobile_placeholder')" :disabled="disabled.contact" 
+          <span v-if="view">{{ carrier.contact.mobile }}</span>
+          <InputMask v-else v-model="carrier.contact.mobile" mask="(99) 99999-9999" id="contact.mobile" type="text" :placeholder="$t('carriers.fields.contact.mobile_placeholder')" :disabled="disabled.contact" 
             :invalid="v$.contact.mobile.$error"
             @change="v$.contact.mobile.$touch" />
           <small v-for="error in v$.contact.mobile.$errors" v-if="v$.contact.mobile.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-6">
           <label for="contact.phone" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.phone') }}</label>
-          <InputMask v-model="carrier.contact.phone" mask="(99) 9999-9999" id="contact.phone" type="text" :placeholder="$t('carriers.fields.contact.phone_placeholder')" :disabled="disabled.contact" />
+          <span v-if="view">{{ carrier.contact.phone }}</span>
+          <InputMask v-else v-model="carrier.contact.phone" mask="(99) 9999-9999" id="contact.phone" type="text" :placeholder="$t('carriers.fields.contact.phone_placeholder')" :disabled="disabled.contact" />
         </div>
         <div class="mb-4 col-span-12 md:col-span-6">
           <label for="contact.fax" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.fax') }}</label>
-          <InputMask v-model="carrier.contact.fax" mask="(99) 9999-9999" id="contact.fax" type="text" :placeholder="$t('carriers.fields.contact.fax_placeholder')" :disabled="disabled.contact" />
+          <span v-if="view">{{ carrier.contact.fax }}</span>
+          <InputMask v-else v-model="carrier.contact.fax" mask="(99) 9999-9999" id="contact.fax" type="text" :placeholder="$t('carriers.fields.contact.fax_placeholder')" :disabled="disabled.contact" />
         </div>
       </div>
     </Transition>
     <div class="border-surface border-t opacity-50 mb-4 col-span-12" />
   </div>
   <div class="flex flex-row justify-between">
-    <Button :label="$t(!carrier.id ? 'carriers.create.buttons.save' : 'carriers.edit.buttons.save')" icon="pi pi-truck" class="!w-32" @click="submit" />
+    <NuxtLink v-if="view" :to="`/carriers/${carrier.id}/edit`">
+      <Button :label="$t('setup.options.edit')" icon="pi pi-pencil" class="!w-32" />
+    </NuxtLink>
+    <Button v-else :label="$t(!carrier.id ? 'carriers.create.buttons.save' : 'carriers.edit.buttons.save')" icon="pi pi-truck" class="!w-32" @click="submit" />
     <NuxtLink to="/carriers" class="!w-32">
-      <Button :label="$t('carriers.create.buttons.cancel')" icon="pi pi-times" class="!w-32" />
+      <Button :label="$t(view ? 'setup.options.back' : 'carriers.create.buttons.cancel')" :icon="`pi ${view ? 'pi-arrow-left' : 'pi-times'}`" class="!w-32" />
     </NuxtLink>
   </div>
 </Fluid>

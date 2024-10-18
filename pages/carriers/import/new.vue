@@ -3,8 +3,8 @@ const route = useRoute();
 const router = useRouter();
 const importStore = useImportStore();
 const carrierStore = useCarrierStore();
-const $primevue = usePrimeVue();
 const t = useNuxtApp().$i18n.t;
+const { $toast } = useNuxtApp();
 
 const loading = computed(() => importStore.isLoading);
 const carriersList = computed(() => carrierStore.carrierList);
@@ -13,6 +13,7 @@ const totalSizePercent = ref(0);
 const files = ref([]);
 const carrier = ref({});
 const error = ref([]);
+const chooseCallbackButton = ref();
 
 const links = breadcrump(route.path);
 
@@ -32,21 +33,6 @@ const onRemoveTemplatingFile = (file, removeFileCallback, index) => {
     removeFileCallback(index);
     totalSize.value -= parseInt(formatSize(file.size));
     totalSizePercent.value = totalSize.value / 10;
-};
-
-const formatSize = (bytes) => {
-  const k = 1024;
-  const dm = 3;
-  const sizes = $primevue?.config.locale.fileSizeTypes;
-
-  if (bytes === 0) {
-    return `0 ${sizes[0]}`;
-  }
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-
-  return `${formattedSize} ${sizes[i]}`;
 };
 
 const nameValid = (name: string, type: string) => {
@@ -75,16 +61,23 @@ const rowClass = (data: any): any => {
   return [{ '!bg-red-500 !text-primary-contrast': nameValid(data.name, 'row') }];
 };
 
+const openWindow = (): void => {
+  chooseCallbackButton.value.rootEl.click();
+};
+
 const submit = (): void => {
   const formData = new FormData();
-  formData.append('carrier_id', carrier.value.id);
+  formData.append('carrier_id', carrier.value);
   files.value.forEach((file) => {
     formData.append('files[]', file);
   });
 
-  console.log(formData);
-
-  // importStore.import(formData);
+  importStore.scheduleImport(formData).then((response) => {
+    $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('carriers.import.new.message.success'), life: 5000 });
+    router.push('/carriers/import');
+  }).catch((error) => {
+    $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error'), detail: t('carriers.import.new.message.error'), life: 5000 });
+  });
 }
 </script>
 
@@ -148,12 +141,12 @@ const submit = (): void => {
                                 <h5>{{ $t('carriers.import.new.table.title') }}</h5>
                               </div>
                               <div class="flex gap-2">
-                                  <Button @click="chooseCallback()" icon="pi pi-file-excel" rounded outlined severity="secondary"></Button>
+                                  <Button @click="chooseCallback()" ref="chooseCallbackButton" icon="pi pi-file-excel" rounded outlined severity="secondary"></Button>
                                   <Button @click="clearCallback()" icon="pi pi-times" rounded outlined severity="danger" :disabled="!files || files.length === 0"></Button>
                               </div>
                             </div>
                         </template>
-                        <template #content="{ files, uploadedFiles, removeUploadedFileCallback, removeFileCallback }">
+                        <template #content="{ files, removeUploadedFileCallback, removeFileCallback }">
                           <div class="flex flex-col gap-8 pt-4">
                             <div v-if="files.length > 0">
                               <div class="flex flex-wrap gap-4">
@@ -189,8 +182,8 @@ const submit = (): void => {
                             </div>
                           </div>
                         </template>
-                        <template #empty>
-                          <div class="flex items-center justify-center flex-col">
+                        <template #empty="">
+                          <div class="flex items-center justify-center flex-col cursor-pointer" @click="openWindow">
                             <i class="pi pi-cloud-upload !border-2 !rounded-full !p-8 !text-4xl !text-muted-color" />
                             <p class="mt-6 mb-0"></p>
                           </div>

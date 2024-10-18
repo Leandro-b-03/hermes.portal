@@ -88,7 +88,7 @@ const onPageChange = (event: { first: number }): void =>{
             </div>
             <div>
               <ConfirmDialog></ConfirmDialog>
-              <DataTable :value="carriers?.data" v-model:expandedRows="expandedRows" ref="dt" :loading="loading" sortMode="multiple" dataKey="carrier.id">
+              <DataTable :value="carriers?.data" v-model:expandedRows="expandedRows" ref="dt" :loading="loading" sortMode="multiple" dataKey="id">
                 <template #header>
                   <div v-if="carriers?.data?.length > 0" class="flex justify-end">
                     <div class="w-30">
@@ -97,9 +97,9 @@ const onPageChange = (event: { first: number }): void =>{
                   </div>
                 </template>
                 <Column expander style="width: 5rem" />
-                <Column field="tax_id" :header="$t('carriers.import.tax_id')" sortable />
-                <Column field="name" :header="$t('carriers.import.name')" sortable />
-                <Column field="carrier_freight_table" :header="$t(`carriers.index.table.zip`)">
+                <Column field="tax_id" :header="$t('setup.tax_id')" sortable />
+                <Column field="name" :header="$t('setup.name')" sortable />
+                <Column field="carrier_freight_table" :header="$t(`carriers.import.qtd_csv`)">
                   <template #body="slotProps">
                     <span>{{ slotProps.data.carrier_freight_table.length }}</span>
                   </template>
@@ -112,12 +112,19 @@ const onPageChange = (event: { first: number }): void =>{
                           <i class="pi" :class="(slotProps.data.error_on_import && !slotProps.data.imported_at) ? 'pi-exclamation-triangle text-red-500' : slotProps.data.imported_at ? 'pi-check text-green-500' : 'pi-hourglass text-yellow-600'"></i>
                         </template>
                       </column>
-                      <Column field="uuid" :header="$t('carriers.import.')" sortable></Column>
-                      <Column field="freight_type" :header="$t('carriers.import.')" sortable></Column>
-                      <Column field="freight_name" :header="$t('carriers.import.')" sortable></Column>
-                      <Column field="file_name" :header="$t('carriers.import.')" sortable></Column>
-                      <Column field="created_at" :header="$t('carriers.import.')" sortable></Column>
-                      <Column field="updated_at" :header="$t('carriers.import.')" sortable></Column>
+                      <Column field="uuid" :header="$t('carriers.fields.uuid')" sortable></Column>
+                      <Column field="freight_type" :header="$t('carriers.fields.freight_type')" sortable></Column>
+                      <Column field="freight_name" :header="$t('carriers.fields.freight_name')" sortable></Column>
+                      <Column field="file_name" :header="$t('carriers.fields.file_name')" sortable></Column>
+                      <Column field="created_at" :header="$t('carriers.fields.created_at')" sortable></Column>
+                      <Column field="updated_at" :header="$t('carriers.fields.created_at')" sortable></Column>
+                      <Column>
+                        <template #body="slotProps">
+                          <NuxtLink :to="`/carriers/import/${slotProps.data.id}/view`" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">
+                            <Button v-tooltip.top="$t('setup.tables.view')" icon="pi pi-eye" text rounded />
+                          </NuxtLink>
+                        </template>
+                      </Column>
                     </DataTable>
                   </div>
               </template>

@@ -1,0 +1,196 @@
+<script setup lang="ts">
+const route = useRoute();
+const importStore = useImportStore();
+
+const t = useNuxtApp().$i18n.t;
+
+const loading = computed(() => importStore.isLoading);
+const import_ = computed(() => importStore.carrierImport);
+const rowsBy = ref(['cep_ini', 'cep_fim']);
+
+const links = ref();
+
+watch(await import_, async () => {
+  const breadcrumbs = computed(() => route.path.replace(/carriers\/import\/\d+\/view/, `carriers/import/name-${import_.value.file_name}/view`));
+  links.value = breadcrump(breadcrumbs.value);
+});
+
+onMounted(async () => {
+  await importStore.fetchDataById(route.params.id);
+});
+
+const labelSetup = (label: string, value: boolean = false): string => {
+  switch (label) {
+    case 'data_ini':
+      return 'date_ini';
+    case 'data_fim':
+      return 'date_end';
+    case 'tipo_tabela':
+    if (value) return 'freight_table';
+      return 'freight_table.title';
+    case 'tipo_empresa':
+    if (value) return 'company_type';
+      return 'company_type.title';
+    case 'alerta':
+      return 'alert';
+    default:
+      return label;
+  }
+};
+
+const valueSetup = (value: string, label: string): string => {
+  const type = typeof value;
+  if (type === 'string') {
+    if (!isNaN(Number(value)) && (label.includes('empresa') || label.includes('tabela'))) { // Check if the string can be parsed as a number
+      return t(`carriers.import.setup.${labelSetup(label, true) + `.${value}`}`);
+    } else if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') { // Check for boolean strings
+      return value === 'true' ? t('carriers.import.setup.yes') : t('carriers.import.setup.no');
+    } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) { // Check for date format (dd/mm/yyyy)
+      return formatDate(new Date(value), true).toString();
+    }
+  }
+  
+  return value;
+};
+</script>
+
+<template>
+  <div class="p-8 flex flex-col flex-auto">
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+        <Transition name="fade" mode="out-in">
+          <Skeleton v-if="loading" height="3.4rem" class="rounded-none" />
+          <ul v-else
+          class="list-none p-0 m-0 bg-surface-0 dark:bg-surface-900 flex font-medium overflow-y-hidden overflow-x-auto">
+          <li v-for="(link, index) in links" :key="index" class="relative p-4">
+            <PagesBreadcrump :name="link" :index="index" />
+          </li>
+        </ul>
+      </Transition>
+      
+      <div class="bg-surface-50 dark:bg-surface-950 pt-2">
+        <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
+          <div class="mb-2 flex items-center justify-between">
+            <div class="flex items-center">
+              <i class="pi pi-file-excel text-surface-500 dark:text-surface-300 mr-2 text-xl" />
+              <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ import_?.file_name }}</span>
+            </div>
+            <div>
+              <Button v-if="items" v-tooltip.top="$t('setup.options.title')" icon="pi pi-ellipsis-v" text rounded @click="$refs.menu.toggle($event)" />
+              <Menu ref="menu" :popup="true" :model="items" >
+                <template #start>
+                  <li class="pl-3 pt-3 list-none">
+                    <span class="text-md font-semibold text-surface-500">{{ $t('setup.options.title') }}</span>
+                  </li>
+                </template>
+                <template #item="{item, props}">
+                  <li class="p-2 cursor-pointer" @click="item.function">
+                    <i class="pi pi-fw text-surface-500 dark:text-surface-300 mr-2" :class="item.icon" />
+                    <span class="text-surface-900 dark:text-surface-0">{{ $t(`setup.${item.label}`) }}</span>
+                  </li>
+                </template>
+              </Menu>
+            </div>
+          </div>
+          <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.import.subtitle') }}
+          </div>
+          <div>
+            <div class="grid grid-cols-12 gap-4 grid-nogutter border-t border-surface pt-2">
+              <div class="col-span-12 md:col-span-6 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.fields.name') }}</div>
+                <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">{{ import_?.carrier.name }}</div>
+              </div>
+              <div class="col-span-12 md:col-span-6 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.fields.tax_id') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">{{ import_?.carrier.tax_id }}</div>
+              </div>
+              <div class="col-span-12 md:col-span-4 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.import.uuid') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">{{ import_?.uuid }}</div>
+              </div>
+              <div class="col-span-12 md:col-span-4 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.import.status') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">
+                  <Tag :value="import_?.imported_at ? $t('setup.status.1') : $t('setup.status.0')" :severity="import_?.imported_at ? 'success' : 'error'" />
+                </div>
+              </div>
+              <div v-if="import_?.imported_at" class="col-span-12 md:col-span-4 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.import.imported') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">{{ formatDate(import_?.imported_at, true) }}</div>
+              </div>
+              <div v-if="import_?.error_at" class="col-span-12 md:col-span-4 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.import.error') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">{{ formatDate(import_?.error_at, true) }}</div>
+              </div>
+              <div v-if="import_?.error_at" class="col-span-12 p-4 border-t border-surface">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.import.error_message') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0 leading-normal">
+                  {{ import_?.error_message }}
+                </div>
+              </div>
+              <div class="col-span-12 md:col-span-4 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.import.type') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">{{ import_?.freight_type }}</div>
+              </div>
+              <div class="col-span-12 md:col-span-4 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.import.model') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">{{ import_?.freight_name }}</div>
+              </div>
+              <div class="col-span-12 md:col-span-4 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('carriers.import.size') }}</div>
+                  <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                <div v-else class="text-surface-900 dark:text-surface-0">{{ formatSize(import_?.file_size) }}</div>
+              </div>
+              <Panel :header="$t('carriers.import.setup.title')" toggleable class="col-span-12" collapsed>
+                <div class="grid grid-cols-12 gap-4 grid-nogutter border-t border-surface pt-2">
+                  <div class="col-span-12 p-4">
+                    <div class="text-surface-500 dark:text-surface-300 font-medium mb-2"></div>
+                    <div class="text-surface-900 dark:text-surface-0 leading-normal">
+                      {{ $t('carriers.import.setup.subtitle') }}
+                    </div>
+                  </div>
+                  <div v-for="(value, key) in import_?.setup" class="col-span-12 md:col-span-4 p-4">
+                    <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t(`carriers.import.setup.${labelSetup(key)}`) }}</div>
+                      <Skeleton v-if="loading" height="1.2rem" width="300px" />
+                    <div v-else class="text-surface-900 dark:text-surface-0 leading-normal">
+                      {{ valueSetup(value, key) }}
+                    </div>
+                  </div>
+                </div>
+              </Panel>
+              <div class="col-span-12 p-4">
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-4">{{ $t('carriers.import.file') }}</div>
+                <DataTable :value="import_?.rows" rowGroupMode="rowspan" :groupRowsBy="rowsBy" :loading="loading">
+                  <Column field="#" header="#">
+                    <template #body="{ data, index }">
+                      <span>{{ index + 1 }}</span>
+                    </template>
+                  </Column>
+                  <Column field="cep_ini" :header="$t('carriers.import.table.header.zip_ini')" sortable />
+                  <Column field="cep_fim" :header="$t('carriers.import.table.header.zip_end')" sortable />
+                  <Column field="prazo" :header="$t('carriers.import.table.header.days')" sortable />
+                  <Column field="peso_ini" :header="$t('carriers.import.table.header.weight_ini')" sortable />
+                  <Column field="peso_fim" :header="$t('carriers.import.table.header.weight_end')" sortable />
+                  <Column field="valor" :header="$t('carriers.import.table.header.price')" sortable />
+                  <Column field="valor_extra_por_peso" :header="$t('carriers.import.table.header.extra_per_weight')" sortable />
+                  <Column field="max_vol" :header="$t('carriers.import.table.header.max_vol')" sortable />
+                  <Column field="pedagio" :header="$t('carriers.import.table.header.road_fee')" sortable />
+                </DataTable>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</template>

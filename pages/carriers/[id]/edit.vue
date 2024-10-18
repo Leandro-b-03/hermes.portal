@@ -2,7 +2,7 @@
 const route = useRoute();
 const carrierStore = useCarrierStore();
 
-const loading = ref(true);
+const loading = computed(() => carrierStore.isLoading);
 const carrier = computed(() => carrierStore.carrier);
 
 onMounted(async () => {
@@ -14,8 +14,6 @@ const links = ref();
 watch(carrier, () => {
   const breadcrumbs = computed(() => route.path.replace(/carriers\/\d+\/edit/, `carriers/name-${carrier.value.name}/edit`));
   links.value = breadcrump(breadcrumbs.value);
-
-  loading.value = false;
 });
 </script>
 

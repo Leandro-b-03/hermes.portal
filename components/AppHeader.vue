@@ -21,6 +21,8 @@ const onThemeToggler = (): void => {
 
   root.classList.toggle('p-dark');
   button.value.iconClass = button.value.iconClass === 'pi-moon' ? 'pi-sun' : 'pi-moon';
+
+  localStorage.setItem('theme', root.classList.contains('p-dark') ? 'dark' : 'light');
 };
 </script>
 

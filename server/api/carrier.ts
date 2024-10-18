@@ -5,8 +5,10 @@ export default defineEventHandler(async (event) => {
   const { apiCall } = apiHandler();
   const method = event.node.req.method;
 
+  const hasFiles = event.node.req.headers['content-type']?.includes('multipart/form-data');
+
   // Use a single object to hold both body and query parameters
-  const data = method === 'GET' ? getQuery(event) : await readBody(event); 
+  const data = method === 'GET' ? getQuery(event) : hasFiles ? await readFormData(event) : await readBody(event);
 
   try {
     switch (method) {
@@ -32,6 +34,9 @@ async function handlePostRequest(data: any, apiCall: any) {
     return (await apiCall('POST', '/v1/carrier/find', data)).carrier;
   } else if (data.action === 'create') {
     return (await apiCall('POST', '/v1/carrier', data)).carrier;
+  } else if (data.get('action') === 'import_csv') {
+    console.log(data);
+    return (await apiCall('POST', '/v1/carrier/import', data)).import;
   }
 }
 
@@ -71,6 +76,10 @@ async function handleGetRequest(data: any, apiCall: any) {
   } else if (data.action === 'export') {
     return await apiCall('GET', `/v1/carrier/export`, { token: data.token }, null, true);
   } else if (data.action === 'import_list') {
-    return (await apiCall('GET', `/v1/carrier/import`, { token: data.token })).imports;
+    if (data.id) {
+      return (await apiCall('GET', `/v1/carrier/import/${data.id}`, { token: data.token })).import;
+    } else {
+      return (await apiCall('GET', `/v1/carrier/import`, { token: data.token })).imports;
+    }
   }
 }

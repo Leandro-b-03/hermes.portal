@@ -196,7 +196,11 @@ const deleteCarrier = (id: number): void => {
                   </div>
                 </template>
                 <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
-                <Column field="name" :header="$t(`carriers.index.table.name`)" />
+                <Column field="name" :header="$t(`carriers.index.table.name`)">
+                  <template #body="slotProps">
+                    <NuxtLink :to="`/carriers/${slotProps.data.id}/view`">{{ slotProps.data.name }}</NuxtLink>
+                  </template>
+                </Column>
                 <Column field="tax_id" :header="$t(`carriers.index.table.tax_id`)">
                   <template #body="slotProps">
                     <span>{{ slotProps.data.tax_id }}</span>
