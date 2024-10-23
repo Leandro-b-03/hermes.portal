@@ -1,9 +1,9 @@
-export function formatCurrency(value: any): string {
+export function formatCurrency(value: any, monthly: boolean = false): string {
   if (value !== 0 && value !== '0.0')
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(value) + ' / mês';
+    }).format(value) + `${monthly ? ' / mês' : ''}`;
   else
     return 'Grátis';
 }
@@ -75,4 +75,9 @@ export function formatSize(bytes): string {
   const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
 
   return `${formattedSize} ${sizes[i]}`;
+};
+
+export function formatZipCode(zipCode: string): string {
+  zipCode = zipCode.length !== 8 ? `0${zipCode}` : zipCode;
+  return zipCode.replace(/^(\d{5})(\d{3})$/, '$1-$2');
 };

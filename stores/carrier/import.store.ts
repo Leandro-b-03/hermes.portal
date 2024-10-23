@@ -28,6 +28,7 @@ export const useImportStore = defineStore({
       try {
         params = params ? `${params}&action=import_list&token=${sessionStorage.sessionId}` 
                 : `action=import_list&token=${sessionStorage.sessionId}`;
+                console.log(params);
         const data = await $fetch<any[]>(`/api/carrier?${params}`, { method: "GET" });
         this.setimports(data);
       } catch (error: any) {

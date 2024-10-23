@@ -74,19 +74,6 @@ const showContactInfo = (carrier: any): void => {
   modal.value.contactInfo.data = carrier;
 };
 
-const onPageChange = (event: { first: number }): void =>{
-  scrollToTop();
-  const newPage = event.page + 1; // PrimeVue pages are 0-indexed, so add 1
-  const newPerPage = event.rows;
-  router.push({
-    query: {
-      ...router.currentRoute.value.query,
-      page: newPage,
-      per_page: newPerPage
-    }
-  });
-};
-
 const edit = (id: number): void => {
   router.push({ path: `/carriers/${id}/edit` });
 };
@@ -209,7 +196,7 @@ const deleteCarrier = (id: number): void => {
                 <Column field="address" :header="$t(`carriers.index.table.address`)">
                   <template #body="slotProps">
                     <span class="cursor-pointer"
-                    v-tooltip.top="slotProps.data.address + ' - ' + slotProps.data.address_2 + ', ' + slotProps.data.city + ' - ' + slotProps.data.state + ', ' + slotProps.data.zip">
+                    v-tooltip.top="slotProps.data.address + ', ' + slotProps.data.number + ', ' + slotProps.data.address_2 + ' - ' + slotProps.data.address_3 + ', ' + slotProps.data.city + ' - ' + slotProps.data.state + ', ' + slotProps.data.zip">
                       {{ slotProps.data.address }}
                     </span>
                   </template>
@@ -242,14 +229,7 @@ const deleteCarrier = (id: number): void => {
                 </Column>
                 <template #empty>{{ $t('setup.no_results') }}</template>
               </DataTable>
-              <Paginator v-if="carriers.data?.length > 0" class="border-b border-slate-200" :totalRecords="carriers?.total" :rows="carriers?.per_page" :first="carriers?.from" :last="carriers?.to"
-                :rowsPerPageOptions="[10, 25, 50, 100]" @page="onPageChange">
-                <template #start="slotProps">
-                  {{ `${$t('setup.tables.total')}: ${carriers?.total}` }}
-                </template>
-                <template #end>
-                </template>
-              </Paginator>
+              <PagesPaginatorc v-if="carriers.total > 0" v-model:totalRecords="carriers.total" v-model:rows="carriers.per_page" v-model:first="carriers.from" v-model:last="carriers.to" />
             </div>
           </div>
         </div>

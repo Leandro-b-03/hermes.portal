@@ -201,14 +201,18 @@
       "extra_per_weight_placeholder": "0.00",
       "extra_per_weight_error_required": "Extra por peso é obrigatório",
       "extra_per_weight_error_invalid": "Extra por peso inválido",
+      "exceed_weight": "Exceder Peso",
+      "exceed_weight_placeholder": "0.00",
+      "exceed_weight_error_required": "Exceder Peso é obrigatório",
+      "exceed_weight_error_invalid": "Exceder Peso inválido",
       "max_vol": "Volume Máximo",
       "max_vol_placeholder": "0.00",
       "max_vol_error_required": "Volume Máximo é obrigatório",
       "max_vol_error_invalid": "Volume Máximo inválido",
-      "road_fee": "Pedágio",
-      "road_fee_placeholder": "0.00",
-      "road_fee_error_required": "Pedágio é obrigatório",
-      "road_fee_error_invalid": "Pedágio inválido",
+      "toll": "Pedágio",
+      "toll_placeholder": "0.00",
+      "toll_error_required": "Pedágio é obrigatório",
+      "toll_error_invalid": "Pedágio inválido",
       "uuid": "UUID",
       "uuid_placeholder": "00000000-0000-0000-0000-000000000000",
       "uuid_error_required": "UUID é obrigatório",
@@ -343,8 +347,9 @@
           "weight_end": "Peso Final",
           "days": "Prazo",
           "extra_per_weight": "Extra por peso",
+          "exceed_weight": "Exceder Peso",
           "max_vol": "Volume Máximo",
-          "road_fee": "Pedágio"
+          "toll": "Pedágio"
         }
       },
       "qtd_csv": "Quantidade de arquivos .csv",
@@ -358,13 +363,27 @@
       "setup": {
         "title": "Configuração da Tabela de Frete",
         "subtitle": "Esses são as configurações da tabela de frete.",
+        "carrier": "Transportadora",
         "gris": "GRIS",
-        "advalorem": "Ad Valorem",
+        "ad_valorem": "Ad Valorem",
         "iss": "ISS",
         "icms": "ICMS",
         "alert": "Alerta de expiração da tabela",
         "date_ini": "Data Inicial",
         "date_end": "Data Final",
+        "modal": "Modal",
+        "calculation_type": "Tipo de Cálculo",
+        "calculation_level": "Nível de Cálculo",
+        "toll": "Pedágio",
+        "vehicle_type": "Tipo de Veículo",
+        "boarding_limit": "Limite de Embarque",
+        "valor_quilo_excedente": "Valor por quilo excedente",
+        "limite_embarque": "Limite de Embarque",
+        "exceed_weight_value": "Valor por quilo excedente",
+        "attempt": "Tentativa",
+        "daily_order": "Pedido Diário",
+        "cubing_factor": "Fator de Cubagem",
+        "order_type": "Tipo de Pedido",
         "yes": "Sim",
         "no": "Não",
         "freight_table": {
@@ -376,8 +395,8 @@
         },
         "company_type": {
           "title": "Tipo de Empresa",
-          "0": "Empresa",
-          "1": "CD"
+          "1": "Empresa",
+          "2": "CD"
         }
       }
     }

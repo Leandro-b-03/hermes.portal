@@ -21,18 +21,46 @@ onMounted(async () => {
 
 const labelSetup = (label: string, value: boolean = false): string => {
   switch (label) {
-    case 'data_ini':
+    case 'vigencia_inicio':
       return 'date_ini';
-    case 'data_fim':
+    case 'vigencia_fim':
       return 'date_end';
     case 'tipo_tabela':
     if (value) return 'freight_table';
       return 'freight_table.title';
-    case 'tipo_empresa':
+    case 'empresa_cd':
     if (value) return 'company_type';
       return 'company_type.title';
-    case 'alerta':
+    case 'alerta_qtd_meses_vencer':
       return 'alert';
+    case 'cep_ini':
+      return 'zip_ini';
+    case 'cep_fim':
+      return 'zip_end';
+    case 'prazo_2':
+      return 'days';
+    case 'transportadora':
+      return 'carrier';
+    case 'tipo_veiculo':
+      return 'vehicle_type';
+    case 'qt_pedido_dia':
+      return 'daily_order';
+    case 'fator_cubagem':
+      return 'cubing_factor';
+    case 'tentativa_2':
+      return 'attempt';
+    case 'tipo_calculo':
+      return 'calculation_type';
+    case 'nivel_calculo':
+      return 'calculation_level';
+    case 'pedagio':
+      return 'toll';
+    case 'valor_quilo_excedente':
+      return 'exceed_weight_value';
+    case 'limite_embarque':
+      return 'boarding_limit';
+    case 'tipo_pedido':
+      return 'order_type';
     default:
       return label;
   }
@@ -46,7 +74,17 @@ const valueSetup = (value: string, label: string): string => {
     } else if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') { // Check for boolean strings
       return value === 'true' ? t('carriers.import.setup.yes') : t('carriers.import.setup.no');
     } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) { // Check for date format (dd/mm/yyyy)
-      return formatDate(new Date(value), true).toString();
+      const [day, month, year] = value.split('/');
+      const parsedDate = new Date(`${year}-${month}-${Number(day) + 1}`);
+      return formatDate(parsedDate, false).toString();
+    } else if (label.includes('valor') || label.includes('pedagio') || label.includes('frete') || label.includes('extra')) {
+      return formatCurrency(value);
+    } else if (label.includes('cep') || label.includes('cep')) {
+      return formatZipCode(value);
+    } else if (label.includes('ad_valorem') || label.includes('percentual') || label.includes('icms') || label.includes('iss') || label.includes('gris')) {
+      return `${value}%`;
+    } else {
+      return value;
     }
   }
   
@@ -175,15 +213,34 @@ const valueSetup = (value: string, label: string): string => {
                       <span>{{ index + 1 }}</span>
                     </template>
                   </Column>
-                  <Column field="cep_ini" :header="$t('carriers.import.table.header.zip_ini')" sortable />
-                  <Column field="cep_fim" :header="$t('carriers.import.table.header.zip_end')" sortable />
-                  <Column field="prazo" :header="$t('carriers.import.table.header.days')" sortable />
+                  <Column field="cep_ini" :header="$t('carriers.import.table.header.zip_ini')" sortable>
+                    <template #body="{ data }">
+                      <span>{{ data.cep_ini ? formatZipCode(data.cep_ini) : '-' }}</span>
+                    </template>
+                  </Column>
+                  <Column field="cep_fim" :header="$t('carriers.import.table.header.zip_end')" sortable>
+                    <template #body="{ data }">
+                      <span>{{ data.cep_fim ? formatZipCode(data.cep_fim) : '-' }}</span>
+                    </template>
+                  </Column>
+                  <Column field="prazo_2" :header="$t('carriers.import.table.header.days')" sortable />
                   <Column field="peso_ini" :header="$t('carriers.import.table.header.weight_ini')" sortable />
                   <Column field="peso_fim" :header="$t('carriers.import.table.header.weight_end')" sortable />
-                  <Column field="valor" :header="$t('carriers.import.table.header.price')" sortable />
-                  <Column field="valor_extra_por_peso" :header="$t('carriers.import.table.header.extra_per_weight')" sortable />
-                  <Column field="max_vol" :header="$t('carriers.import.table.header.max_vol')" sortable />
-                  <Column field="pedagio" :header="$t('carriers.import.table.header.road_fee')" sortable />
+                  <Column field="frete_peso" :header="$t('carriers.import.table.header.price')" sortable>
+                    <template #body="{ data }">
+                      <span>{{ data.frete_peso ? formatCurrency(data.frete_peso) : '-' }}</span>
+                    </template>
+                  </Column>
+                  <Column field="valor_extra_por_peso" :header="$t('carriers.import.table.header.extra_per_weight')" sortable>
+                    <template #body="{ data }">
+                      <span>{{ data.valor_extra_por_peso ? formatCurrency(data.valor_extra_por_peso) : '-' }}</span>
+                    </template>
+                  </Column>
+                  <Column field="faixa_quilo_excedente" :header="$t('carriers.import.table.header.exceed_weight')" sortable>
+                    <template #body="{ data }">
+                      <span>{{ data.faixa_quilo_excedente ? data.faixa_quilo_excedente : '-' }}</span>
+                    </template>
+                  </Column>
                 </DataTable>
               </div>
             </div>

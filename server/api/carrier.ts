@@ -79,7 +79,15 @@ async function handleGetRequest(data: any, apiCall: any) {
     if (data.id) {
       return (await apiCall('GET', `/v1/carrier/import/${data.id}`, { token: data.token })).import;
     } else {
-      return (await apiCall('GET', `/v1/carrier/import`, { token: data.token })).imports;
+      
+    const queryParams = new URLSearchParams({
+      page: data.page || '1',
+      per_page: data.per_page || '10',
+      order_by: data.order_by || 'desc',
+      filter: data.filter || '',
+      'fields[]': data.fields || '',
+    });
+    return (await apiCall('GET', `/v1/carrier/import?${queryParams}`, { token: data.token })).imports;
     }
   }
 }
