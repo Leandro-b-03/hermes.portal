@@ -192,7 +192,7 @@ const submit = (): void => {
                   </div>
                 </div>
                 <div class="flex flex-row justify-between">
-                  <Button :label="$t('carriers.import.buttons.save')" icon="pi pi-upload" class="!w-32" @click="submit" />
+                  <Button :label="$t('carriers.import.buttons.save')" icon="pi pi-upload" class="!w-32" @click="submit" :loading="loading" />
                   <NuxtLink to="/carriers/import" class="!w-32">
                     <Button :label="$t('carriers.import.buttons.cancel')" icon="pi pi-times" class="!w-32" />
                   </NuxtLink>
