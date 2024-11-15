@@ -6,7 +6,7 @@ const importStore = useImportStore();
 const loading = computed(() => importStore.isLoading);
 const carriers = computed(() => importStore.data);
 const query = computed(() => new URLSearchParams(route.query).toString());
-const expandedRows = ref({});
+const expandedRows = sessionStorage.getItem('expandedRows') ? ref(JSON.parse(sessionStorage.getItem('expandedRows'))) : ref({});
 const links = breadcrump(route.path);
 const filter = route.query.filter?.toString() || '';
 const fields = ref([
@@ -31,6 +31,16 @@ onMounted(async () => {
 watch(() => route.query, async () => {
   await importStore.fetchData(query.value);
 });
+
+const onRowExpand = (event) => {
+  sessionStorage.setItem('expandedRows', JSON.stringify(expandedRows.value));
+};
+
+const onRowCollapse = (event) => {
+  sessionStorage.setItem('expandedRows', JSON.stringify(expandedRows.value));
+};
+
+console.log('expandedRows', expandedRows.value);
 </script>
 
 <template>
@@ -79,7 +89,7 @@ watch(() => route.query, async () => {
             </div>
             <div>
               <ConfirmDialog></ConfirmDialog>
-              <DataTable :value="carriers?.data" v-model:expandedRows="expandedRows" ref="dt" :loading="loading" sortMode="multiple" dataKey="id">
+              <DataTable :value="carriers?.data" v-model:expandedRows="expandedRows" @rowExpand="onRowExpand" @rowCollapse="onRowCollapse" ref="dt" :loading="loading" sortMode="multiple" dataKey="id">
                 <template #header>
                   <div v-if="carriers?.data?.length > 0" class="flex justify-end">
                     <div class="w-30">
