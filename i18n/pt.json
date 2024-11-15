@@ -56,6 +56,11 @@
     "edit": "Editar",
     "new": "Novo"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Bem vindo ao Hermes TMS, aqui você pode visualizar as informações mais importantes do seu negócio.",
+    "text": "Veja como está a saúde do seu negócio"
+  },
   "carriers": {
     "fields": {
       "name": "Nome",
@@ -355,7 +360,13 @@
       "qtd_csv": "Quantidade de arquivos .csv",
       "uuid": "UUID",
       "imported": "Importado",
-      "error": "Erro",
+      "error": {
+        "title": "Erro",
+        "404": {
+          "title": "Arquivo não encontrado",
+          "message": "Houve um erro e o arquivo não foi encontrado, por favor, contate o suporte."
+        }
+      },
       "status": "Status",
       "model": "Modalidade",
       "type": "Tipo",
@@ -401,7 +412,11 @@
       }
     }
   },
-  "dashboard": "Dashboard",
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Gerencie as configurações do sistema.",
+    "text": "Aqui você pode configurar o sistema de acordo com as suas necessidades."
+  },
   "customers": "Clientes",
   "reports": "Relatórios",
   "revenue": "Receita",
@@ -411,10 +426,19 @@
   "events": "Eventos",
   "options": "Opções",
   "orders": "Ordens",
-  "settings": "Configurações",
   "setup": {
     "success": "Sucesso",
-    "error": "Erro",
+    "error": {
+      "title": "Erro",
+      "404": {
+        "title": "Página não encontrada",
+        "message": "Houve um erro e a página não foi encontrada, por favor, verifique o caminho."
+      },
+      "500": {
+        "title": "Erro interno do servidor",
+        "message": "Houve um erro interno no servidor, por favor, contate o suporte."
+      }
+    },
     "tax_id": "CNPJ",
     "name": "Nome",
     "no_results": "Nenhum resultado encontrado",
@@ -446,6 +470,11 @@
       "of": "de",
       "total": "Total",
       "view": "Visualizar"
+    },
+    "ticket": {
+      "title": "Abra um ticket",
+      "subtitle": "Preencha os campos abaixo para abrir um ticket.",
+      "text": "Aqui você pode abrir um ticket para o suporte."
     },
     "validations": {
       "required": "Campo é obrigatório",

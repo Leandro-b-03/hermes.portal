@@ -1,11 +1,12 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 
 const t = useNuxtApp().$i18n.t;
 
 definePageMeta({
-  layout: 'none'
+  layout: 'none',
 });
 
 const button = ref({
@@ -23,6 +24,12 @@ const error = ref({
   password: false,
   message: '',
 });
+
+const userAuthenticated = computed(() => authStore.isAuthenticated);
+
+if (userAuthenticated.value) {
+  router.push('/dashboard');
+}
 
 const onLogin = async (): Promise<void> => {
   if (!user.value.email) {
@@ -42,6 +49,10 @@ const onLogin = async (): Promise<void> => {
     if (response) {
       error.value.email = false;
       error.value.password = false;
+      if (route.query.redirect) {
+        router.back();
+      }
+
       router.push('/dashboard');
     } else {
       error.value.email = true;
@@ -105,11 +116,11 @@ const onThemeToggler = (): void => {
       <div class="flex flex-col gap-6 w-full">
         <div class="flex flex-col gap-2">
           <label for="email">{{ $t('login.email') }}</label>
-          <InputText id="email" v-model="user.email" :placeholder="$t('login.email_placeholder')" class="dark:!bg-surface-900" :invalid="error.email" />
+          <InputText id="email" v-model="user.email" :placeholder="$t('login.email_placeholder')" class="dark:!bg-surface-900" :invalid="error.email" @keydown="error.email = false" />
         </div>
         <div class="flex flex-col gap-2">
           <label for="password">{{ $t('login.password') }}</label>
-          <Password :feedback="false" toggleMask id="password" v-model="user.password" :placeholder="$t('login.password_placeholder')" class="dark:!bg-surface-900 pw-input-full" :invalid="error.password" pt:pcInput:class="w-full" pt:pcInput:id="teste" />
+          <Password :feedback="false" toggleMask id="password" v-model="user.password" :placeholder="$t('login.password_placeholder')" class="dark:!bg-surface-900 pw-input-full" :invalid="error.password" pt:pcInput:class="w-full" pt:pcInput:id="password" @keyup="error.password = false" @keyup.enter="onLogin" />
         </div>
       </div>
       <div class="flex items-center justify-between w-full">

@@ -22,6 +22,9 @@ export const useAuthStore = defineStore({
     setAuthUser(user: IUser | null): void {
       this.authUser = user;
     },
+    setLoading(loading: boolean): void {
+      this.isLoading = loading;
+    },
     async login(user_data: []): Promise<any> {
       console.log('user_data', user_data);
       this.isLoading = true;

@@ -8,7 +8,7 @@ const user = computed(() => authStore.authUser);
 
 const sidebarLinks = ref([{
   name: 'dashboard',
-  icon: 'pi pi-objects-column',
+  icon: 'pi pi-chart-bar',
   url: '/dashboard',
 },
 {

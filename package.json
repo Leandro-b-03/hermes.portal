@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "npm cache clean --force && NODE_TLS_REJECT_UNAUTHORIZED=0 nuxt dev --https --ssl-cert cert.pem --ssl-key key.pem",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"

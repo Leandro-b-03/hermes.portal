@@ -46,6 +46,7 @@ export const useImportStore = defineStore({
         this.setImport(carrierImport);
       } catch (error: any) {
         this.error = error.data.message || "An error occurred while fetching carrier import";
+        this.setImport(null);
         return Promise.reject(this.error);
       } finally {
         this.isLoading = false;

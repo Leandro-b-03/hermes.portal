@@ -10,7 +10,7 @@ const rowsBy = ref(['cep_ini', 'cep_fim']);
 
 const links = ref();
 
-watch(await import_, async () => {
+watch(import_, async () => {
   const breadcrumbs = computed(() => route.path.replace(/carriers\/import\/\d+\/view/, `carriers/import/name-${import_.value.file_name}/view`));
   links.value = breadcrump(breadcrumbs.value);
 });
@@ -107,7 +107,7 @@ const valueSetup = (value: string, label: string): string => {
       </Transition>
       
       <div class="bg-surface-50 dark:bg-surface-950 pt-2">
-        <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
+        <div v-if="import_ != null || loading" class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
           <div class="mb-2 flex items-center justify-between">
             <div class="flex items-center">
               <i class="pi pi-file-excel text-surface-500 dark:text-surface-300 mr-2 text-xl" />
@@ -128,6 +128,7 @@ const valueSetup = (value: string, label: string): string => {
                   </li>
                 </template>
               </Menu>
+              <Button :label="$t('setup.options.back')" icon="pi pi-arrow-left" class="!w-32" @click="$router.back()" />
             </div>
           </div>
           <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.import.subtitle') }}
@@ -245,7 +246,11 @@ const valueSetup = (value: string, label: string): string => {
               </div>
             </div>
           </div>
+          <div class="flex justify-start mt-4">
+            <Button :label="$t('setup.options.back')" icon="pi pi-arrow-left" class="!w-32" @click="$router.back()" />
+          </div>
         </div>
+        <PagesError v-if="!loading && import_ == null" :statusCode="500" title="carriers.import.error.404.title" message="carriers.import.error.404.message" />
       </div>
     </div>
   </div>
