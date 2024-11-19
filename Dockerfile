@@ -32,8 +32,8 @@ RUN npm install @resvg/resvg-js
 RUN cargo install wasm-pack
 
 # Install dependencies (including devDependencies for Vite)
-RUN npm install
-RUN npm audit fix
+# RUN npm install
+# RUN npm audit fix
 
 # Copy the rest of the source code
 COPY . .
@@ -42,5 +42,5 @@ COPY . .
 EXPOSE 5173
 
 # Define the default command to run your app (adjust if needed)
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173", "--no-open"]
+CMD ["./entrypoint.sh"]
 # CMD ["tail", "-f", "/dev/null"]

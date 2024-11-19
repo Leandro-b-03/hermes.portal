@@ -8,7 +8,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-12 lg:px-20 -mt-16">
+  <div class="bg-surface-50 dark:bg-surface-950 px-6 py-20 md:px-12 lg:px-20 -mt-16 error">
     <div class="shadow rounded-border bg-surface-0 dark:bg-surface-900 px-6 md:px-12 py-12">
       <div class="border-l-2 border-primary">
         <span class="bg-white dark:bg-surface-900 text-primary font-bold text-2xl inline-block px-4">{{ props.statusCode }}</span>

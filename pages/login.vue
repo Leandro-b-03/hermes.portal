@@ -22,6 +22,7 @@ const user = ref({
 const error = ref({
   email: false,
   password: false,
+  showMessage: false,
   message: '',
 });
 
@@ -55,13 +56,13 @@ const onLogin = async (): Promise<void> => {
 
       router.push('/dashboard');
     } else {
-      error.value.email = true;
-      error.value.password = true;
+      error.value.email = false;
+      error.value.password = false;
       error.value.message = t('login.errors.invalid_user_pass');
     }
   }).catch(() => {
-    error.value.email = true;
-    error.value.password = true;
+    error.value.email = false;
+    error.value.password = false;
     error.value.message = t('login.errors.500');
   });
 };
@@ -109,18 +110,18 @@ const onThemeToggler = (): void => {
         <div class="h-[1px] flex-1 bg-surface-200 dark:bg-surface-800" />
       </div>
       <Transition name="fade">
-        <Message class="w-full" severity="error" closable v-if="error.email || error.password">
+        <Message class="w-full" severity="error" closable v-if="error.showMessage">
           {{ error.message }}
         </Message>
       </Transition>
       <div class="flex flex-col gap-6 w-full">
         <div class="flex flex-col gap-2">
           <label for="email">{{ $t('login.email') }}</label>
-          <InputText id="email" v-model="user.email" :placeholder="$t('login.email_placeholder')" class="dark:!bg-surface-900" :invalid="error.email" @keydown="error.email = false" />
+          <InputText id="email" v-model="user.email" :placeholder="$t('login.email_placeholder')" class="dark:!bg-surface-900" :invalid="error.email" @keyup.enter="onLogin" />
         </div>
         <div class="flex flex-col gap-2">
           <label for="password">{{ $t('login.password') }}</label>
-          <Password :feedback="false" toggleMask id="password" v-model="user.password" :placeholder="$t('login.password_placeholder')" class="dark:!bg-surface-900 pw-input-full" :invalid="error.password" pt:pcInput:class="w-full" pt:pcInput:id="password" @keyup="error.password = false" @keyup.enter="onLogin" />
+          <Password :feedback="false" toggleMask id="password" v-model="user.password" :placeholder="$t('login.password_placeholder')" class="dark:!bg-surface-900 pw-input-full" :invalid="error.password" pt:pcInput:class="w-full" pt:pcInput:id="password" @keyup.enter="onLogin" />
         </div>
       </div>
       <div class="flex items-center justify-between w-full">

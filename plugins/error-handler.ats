@@ -1,0 +1,11 @@
+// export default defineNuxtPlugin(nuxtApp => {
+//   nuxtApp.hook('vue:error', (err) => {
+//     throw createError({
+//       statusCode: 500,
+//       data: {
+//         title: 'setup.error.500.title',
+//         message:'setup.error.500.message'
+//       }
+//     })
+//   });
+// });

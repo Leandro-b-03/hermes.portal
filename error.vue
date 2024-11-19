@@ -9,29 +9,28 @@ const props = defineProps({
   error: Object as () => NuxtError
 });
 
+const statusCode = props.error?.statusCode;
+const title = ref('');
+const message = ref('');
+
 if (props.error?.statusCode === 404) {
-  console.log('404 error');
-  props.error.name = 'setup.error.404.title';
-  props.error.statusMessage = 'setup.error.404.message';
+  title.value = 'setup.error.404.title';
+  message.value = 'setup.error.404.message';
 }
 
 if (props.error?.statusCode === 500) {
-  console.log('500 error');
-  props.error.name = 'setup.error.500.title';
-  props.error.statusMessage = 'setup.error.500.message';
+  title.value = 'setup.error.500.title';
+  message.value = 'setup.error.500.message';
 }
 
 if (props.error?.data?.message) {
-  console.log('error message:', props.error.data.message);
-  props.error.name = props.error.data.name;
-  props.error.statusMessage = props.error.data.message;
+  title.value = props.error.data.name;
+  message.value = props.error.data.message;
 }
-
-console.log(props.error);
 </script>
 
 <template>
   <NuxtLayout>
-    <PagesError :statusCode="error?.statusCode" :title="error?.name" :message="error?.statusMessage" />
+    <PagesError :statusCode="statusCode" :title="title" :message="message" />
   </NuxtLayout>
 </template>

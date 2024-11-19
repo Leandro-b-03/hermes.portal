@@ -21,7 +21,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       }
     }
   } catch (error) {
-    if (error.status == 401) {
+    if (error.status == 401 || error.status == 403 || error.status == 500) {
       if (to.path !== '/login') {
         return navigateTo('/login', { external: true });
       }

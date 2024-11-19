@@ -36,7 +36,9 @@
       "import": "Importar tabela de frete"
     },
     "orders": "Ordens",
-    "settings": "Configurações"
+    "profile": "Editar Perfil",
+    "settings": "Configurações",
+    "logout": "Sair"
   },
   "breadcrumb": {
     "dashboard": "Dashboard",

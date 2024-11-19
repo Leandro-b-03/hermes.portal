@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const route = useRoute();
-const router = useRouter();
 const importStore = useImportStore();
+
+const items = ref(false);
 
 const loading = computed(() => importStore.isLoading);
 const carriers = computed(() => importStore.data);
