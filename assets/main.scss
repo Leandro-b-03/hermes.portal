@@ -137,7 +137,6 @@ body {
  {
   opacity: 0;
   transform: translateY(-20px);
- 
 }
 
 .rotate-90 {
@@ -197,5 +196,9 @@ body {
 }
 
 .slim #app-sidebar ul li ul li span {
+  display: block;
+}
+
+.menu-active {
   display: block;
 }

@@ -61,6 +61,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@nuxtjs/i18n',
+    '@morev/vue-transitions/nuxt',
   ],
   primevue: {
     options: {  

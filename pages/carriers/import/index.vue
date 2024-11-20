@@ -7,7 +7,10 @@ const items = ref(false);
 const loading = computed(() => importStore.isLoading);
 const carriers = computed(() => importStore.data);
 const query = computed(() => new URLSearchParams(route.query).toString());
-const expandedRows = sessionStorage.getItem('expandedRows') ? ref(JSON.parse(sessionStorage.getItem('expandedRows'))) : ref({});
+const expandedRows = ref({});
+if (import.meta.client) {
+  expandedRows.value = localStorage.getItem('expandedRows') ? JSON.parse(localStorage.getItem('expandedRows')) : {};
+}
 const links = breadcrump(route.path);
 const filter = route.query.filter?.toString() || '';
 const fields = ref([
@@ -33,15 +36,17 @@ watch(() => route.query, async () => {
   await importStore.fetchData(query.value);
 });
 
-const onRowExpand = (event) => {
-  sessionStorage.setItem('expandedRows', JSON.stringify(expandedRows.value));
+  const onRowExpand = (event: any) => {
+  if (import.meta.client) {
+    localStorage.setItem('expandedRows', JSON.stringify(expandedRows.value));
+  }
 };
 
-const onRowCollapse = (event) => {
-  sessionStorage.setItem('expandedRows', JSON.stringify(expandedRows.value));
+const onRowCollapse = (event: any) => {
+  if (import.meta.client) {
+    localStorage.setItem('expandedRows', JSON.stringify(expandedRows.value));
+  }
 };
-
-console.log('expandedRows', expandedRows.value);
 </script>
 
 <template>

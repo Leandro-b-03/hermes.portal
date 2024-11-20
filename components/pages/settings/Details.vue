@@ -1,46 +1,80 @@
 <script setup lang="ts">
+const shipperStore = useShipperStore();
+
+const props = defineProps<{
+  edit: boolean;
+}>();
+
+const shipper = computed(() => shipperStore.shipper);
+const showContactInfo = ref(false);
+
+onMounted(() => {
+  shipperStore.getShipper();
+});
 </script>
 
 <template>
   <div class="grid grid-cols-12 gap-4 grid-nogutter border-t border-surface pt-2">
     <div class="col-span-12 md:col-span-6 p-4">
-      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">Name</div>
-      <div class="text-surface-900 dark:text-surface-0">Elliot Alderson</div>
+      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('settings.details.company') }}</div>
+      <div class="text-surface-900 dark:text-surface-0">{{ `${shipper?.name}/${shipper?.fantasy_name}` }}</div>
     </div>
     <div class="col-span-12 md:col-span-6 p-4">
-      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">Email</div>
-      <div class="text-surface-900 dark:text-surface-0">elliot.alderson@email.com</div>
+      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('setup.tax_id') }}</div>
+      <div class="text-surface-900 dark:text-surface-0">{{ shipper?.tax_id }}</div>
     </div>
     <div class="col-span-12 md:col-span-6 p-4">
-      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">Applied Position</div>
-      <div class="text-surface-900 dark:text-surface-0">Front-End Developer</div>
+      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('settings.details.address_complete') }}</div>
+      <div class="text-surface-900 dark:text-surface-0">{{ `${shipper?.address}, ${shipper?.number} - Complemento: ${shipper?.address_2 ? shipper?.address_2 : '-'}, ${shipper?.address_3} - ${shipper?.state}, ${shipper?.country} - ${shipper?.zip_code}` }}</div>
     </div>
     <div class="col-span-12 md:col-span-6 p-4">
-      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">Salary Expectation</div>
-      <div class="text-surface-900 dark:text-surface-0">$150,000</div>
+      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('settings.details.contact_name') }}</div>
+      <div class="text-surface-900 dark:text-surface-0 cursor-pointer" @click="showContactInfo = true">{{ shipper?.contact_name }}</div>
     </div>
     <div class="col-span-12 p-4">
-      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">Bio</div>
-      <div class="text-surface-900 dark:text-surface-0 leading-normal">
-        Faucibus pulvinar elementum integer enim neque volutpat ac tincidunt vitae. Commodo odio aenean sed adipiscing diam donec adipiscing tristique. Eget felis eget nunc lobortis mattis aliquam faucibus purus in.
-      </div>
+      <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('settings.details.matrix.title') }}</div>
+      <div class="text-surface-900 dark:text-surface-0 leading-normal">{{ shipper?.shipper_matrix_id ? $t('settings.details.matrix.branch ') : $t('settings.details.matrix.matrix') }}</div>
     </div>
-    <div class="col-span-12 p-4">
-      <div class="text-surface-500 dark:text-surface-300 font-medium mb-4">Files</div>
-      <div class="flex md:items-center md:justify-between border-t border-surface p-4 flex-col md:flex-row">
-        <div class="flex items-center">
-          <span class="block pi pi-file mr-2" />
-          <span class="text-surface-900 dark:text-surface-0">resume_en.pdf</span>
-        </div>
-        <Button icon="pi pi-download" label="Download" class="mt-2 md:mt-0" outlined />
-      </div>
-      <div class="flex md:items-center md:justify-between border-t border-b border-surface p-4 flex-col md:flex-row">
-        <div class="flex items-center">
-          <span class="block pi pi-file mr-2" />
-          <span class="text-surface-900 dark:text-surface-0">cover_letter_en.pdf</span>
-        </div>
-        <Button icon="pi pi-download" label="Download" class="mt-2 md:mt-0" outlined />
-      </div>
   </div>
-</div>
+
+  <Dialog v-model:visible="showContactInfo" modal :header="$t('settings.details.contact.header')" class="min-w-[30rem]">
+    <ul class="list-none p-0 m-0 border-t border-surface">
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.name') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">{{ shipper?.contact_name }}</div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap">
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.contact_title') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12 leading-normal">{{ shipper?.contact_title }}</div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.department') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">{{ shipper?.contact_department }}</div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap">
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.email') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
+                <a :href="`mailto:${shipper?.contact_email}`" target="_blank"><Tag class="mr-2" :value="shipper?.contact_email" :rounded="true" /></a>
+            </div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.phone') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
+            <Tag :value="`${shipper?.contact_phone}`" severity="info" :rounded="true" />
+          </div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.mobile') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
+            <Tag :value="`${shipper?.contact_mobile}`" severity="success" :rounded="true" />
+          </div>
+        </li>
+        <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.fax') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
+            <Tag :value="`${shipper?.contact_fax}`" severity="warning" :rounded="true" />
+          </div>
+        </li>
+    </ul>
+  </Dialog>
 </template>

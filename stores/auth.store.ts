@@ -26,7 +26,6 @@ export const useAuthStore = defineStore({
       this.isLoading = loading;
     },
     async login(user_data: []): Promise<any> {
-      console.log('user_data', user_data);
       this.isLoading = true;
       this.error = null;
 
@@ -112,6 +111,14 @@ export const useAuthStore = defineStore({
       sessionStorage.authenticated = false;
 
       return response;
+    },
+    hasPermission(permission: string): boolean {  
+      // Otherwise, check if the user has the specific permission
+      const userPermissions = this.authUser.roles[0].permissions.map(p => p.name)
+      if (!userPermissions) return false;
+      
+      if (userPermissions.includes('Admin')) return true;
+      return userPermissions.includes(permission)
     },
   },
 });

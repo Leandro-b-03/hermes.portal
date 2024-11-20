@@ -417,7 +417,19 @@
   "settings": {
     "title": "Configurações",
     "subtitle": "Gerencie as configurações do sistema.",
-    "text": "Aqui você pode configurar o sistema de acordo com as suas necessidades."
+    "text": "Aqui você pode configurar o sistema de acordo com as suas necessidades.",
+    "details": {
+      "title": "Detalhes",
+      "subtitle": "Detalhes da empresa",
+      "company": "Empresa",
+      "address_complete": "Endereço",
+      "contact_name":"Nome do contato",
+      "matrix": {
+        "title": "Matriz/Filial",
+        "matrix": "Matriz",
+        "branch": "Filial"
+      }
+    }
   },
   "customers": "Clientes",
   "reports": "Relatórios",
