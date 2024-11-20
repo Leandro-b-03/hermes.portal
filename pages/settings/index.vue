@@ -5,9 +5,18 @@ const shipperStore = useShipperStore();
 const authStore = useAuthStore();
 const t = useNuxtApp().$i18n.t;
 
-const selectedMenu = computed(() => route.query.menu || 'details');
+const selectedMenu = ref('details');
 const shipper = computed(() => shipperStore.shipper);
 const editMode = ref(false);
+
+const permissions = ref({
+  shipper: {
+    edit: false,
+  },
+  users: {
+    edit: false,
+  },
+})
 
 const menu = ref([
   {
@@ -35,11 +44,16 @@ const changeQuery = (menu: {}) => {
 };
 
 onMounted(() => {
-  routeContent(selectedMenu.value.toString());
+  if (!!route.query.menu) {
+    selectedMenu.value = route.query.menu as string;
+  }
+
+  routeContent(selectedMenu.value);
 });
 
-watch(() => selectedMenu.value, () => {
-  routeContent(selectedMenu.value.toString());
+watch(() => !!route.query.menu, () => {
+  selectedMenu.value = route.query.menu as string;
+  routeContent(selectedMenu.value);
 });
 
 const title = ref('');
@@ -52,6 +66,7 @@ const routeContent = (value: string): void => {
       icon.value = 'pi pi-info-circle';
       title.value = 'settings.details.title';
       subtitle.value = 'settings.details.subtitle';
+      permissions.value.shipper.edit = authStore.hasPermission('Shipper.Editor');
       break;
     case 'users':
       icon.value = 'pi pi-users';
@@ -83,7 +98,7 @@ const routeContent = (value: string): void => {
                 <a v-if="selectedMenu !== 'details'" v-tooltip.top="$t('setup.options.add')" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">
                   <i class="pi pi-plus"></i>
                 </a>
-                <Button v-if="selectedMenu === 'details' && authStore.hasPermission('Shipper.Editor')" v-tooltip.top="$t('setup.options.edit')" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editMode = !editMode" />
+                <Button v-if="selectedMenu === 'details' && permissions.shipper.edit" v-tooltip.top="$t('setup.options.edit')" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editMode = !editMode" />
               </div>
             </div>
             <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t(subtitle) }}
