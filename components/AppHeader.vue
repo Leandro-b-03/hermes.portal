@@ -3,6 +3,7 @@ const authStore = useAuthStore();
 const loading = ref(true);
 
 const user = computed(() => authStore.authUser);
+const op = ref();
 
 const button = ref({
   iconClass: 'pi-moon',
@@ -24,10 +25,14 @@ const onThemeToggler = (): void => {
 
   localStorage.setItem('theme', root.classList.contains('p-dark') ? 'dark' : 'light');
 };
+
+const toggle = (event: any) => {
+  op.value.toggle(event);
+};
 </script>
 
 <template>
-  <header class="header min-w-full pl-[280px] relative lg:fixed top-0 left-0 z-20">
+  <header class="header min-w-full lg:pl-[280px] relative lg:fixed top-0 left-0 z-20">
     <div class="h-[60px] flex justify-between items-center px-8 bg-surface-0 dark:bg-surface-950 shadow border-b border-surface">
       <div class="flex">
         <a v-ripple v-styleclass="{
@@ -41,10 +46,10 @@ const onThemeToggler = (): void => {
           <i class="pi pi-bars text-4xl" />
         </a>
 
-        <IconField icon-position="left">
+        <!-- <IconField icon-position="left">
           <InputIcon class="pi pi-search" />
           <InputText :placeholder="$t('search')" class="!border-0 !shadow-none !w-40 sm:!w-80" />
-        </IconField>
+        </IconField> -->
       </div>
       <a v-ripple v-styleclass="{
         selector: '@next',
@@ -82,8 +87,26 @@ const onThemeToggler = (): void => {
           </a>
         </li>
         <li class="border-t border-surface lg:border-t-0">
-          <a v-tooltip.left="user?.name"
+          <a v-tooltip.left="user?.name" @click="toggle"
             class="flex p-4 lg:px-4 lg:py-2 items-center hover:bg-surface-100 dark:hover:bg-surface-700 font-medium rounded-border cursor-pointer duration-150 transition-colors">
+            <Popover ref="op" appendTo="body" class="profile">
+              <ul class="list-none p-2 m-0 origin-bottom animate-duration-150 overflow-hidden animate-ease-in-out" >
+                <li>
+                  <NuxtLink to="/profile"
+                    class="flex items-center cursor-pointer p-4 rounded-border hover:bg-surface-800 text-surface-500 hover:text-white duration-150 transition-colors">
+                    <i class="pi pi-user mr-2" />
+                    <span class="font-medium">{{ $t('sidebar.profile') }}</span>
+                  </NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink @click="logout"
+                    class="flex items-center cursor-pointer p-4 rounded-border hover:bg-surface-800 text-surface-500 hover:text-white duration-150 transition-colors">
+                    <i class="pi pi-sign-out mr-2" />
+                    <span class="font-medium">{{ $t('sidebar.logout') }}</span>
+                  </NuxtLink>
+                </li>
+              </ul>
+            </Popover>
             <Skeleton v-if="loading" class="mr-4 lg:mr-0 rounded" width="2rem" height="2rem" />
             <img v-else
               :src="user?.user_info?.photo_url" :alt="user?.name"

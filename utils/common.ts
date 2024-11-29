@@ -78,6 +78,10 @@ export function formatSize(bytes): string {
 };
 
 export function formatZipCode(zipCode: string): string {
+  if (!zipCode) {
+    return '00000-000';
+  }
+  
   zipCode = zipCode.length !== 8 ? `0${zipCode}` : zipCode;
   return zipCode.replace(/^(\d{5})(\d{3})$/, '$1-$2');
 };

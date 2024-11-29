@@ -22,7 +22,7 @@ export const useShipperStore = defineStore({
     setLoading(loading: boolean): void {
       this.isLoading = loading;
     },
-    async getShipper(): Promise<any> {
+    async getUserShipper(): Promise<any> {
       this.isLoading = true;
       this.error = null;
       try {
@@ -37,5 +37,20 @@ export const useShipperStore = defineStore({
         this.isLoading = false;
       }
     },
+    async update(shipper: IShipper): Promise<any> {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const params = `action=update_shipper&token=${sessionStorage.sessionId}`;
+        const updatedShipper = await $fetch(`/api/shipper?${params}`, { method: 'PUT', body: JSON.stringify(shipper) });
+        this.setShipper(updatedShipper);
+        return updatedShipper;
+      } catch (error: any) {
+        this.error = error.response.data.error || 'An error occurred during login';
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    }
   }
 });

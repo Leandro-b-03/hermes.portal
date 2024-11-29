@@ -1,6 +1,24 @@
 <script setup lang="ts">
+const route = useRoute();
+
+const transition = ref(true);
+
 if (import.meta.client)
   localStorage.getItem('theme') === 'dark' && document.getElementsByTagName('html')[0].classList.add('p-dark');
+
+onMounted(() => {
+  setTimeout(() => {
+    transition.value = false;
+  }, 200);  
+})
+
+watch(() => route.path, () => {
+  transition.value = true;
+
+  setTimeout(() => {
+    transition.value = false;
+  }, 200);
+});
 </script>
 
 <template>
@@ -17,7 +35,14 @@ if (import.meta.client)
       </template>
     </Toast>
     <NuxtLayout>
-      <NuxtPage />
+      <TransitionFade group>
+        <div v-if="transition" class="h-screen w-full flex items-center justify-center">
+          <div class="loading-container">
+            <div class="loading-ring"></div>
+          </div>
+        </div>
+        <NuxtPage v-else />
+      </TransitionFade>
     </NuxtLayout>
   </div>
 </template>

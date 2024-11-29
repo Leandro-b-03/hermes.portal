@@ -423,7 +423,7 @@
       "subtitle": "Detalhes da empresa",
       "company": "Empresa",
       "address_complete": "Endereço",
-      "contact_name":"Nome do contato",
+      "contact_name":"Contato da empresa",
       "matrix": {
         "title": "Matriz/Filial",
         "matrix": "Matriz",
@@ -441,6 +441,10 @@
   "options": "Opções",
   "orders": "Ordens",
   "setup": {
+    "buttons": {
+      "cancel": "Cancelar",
+      "save": "Salvar"
+    },
     "success": "Sucesso",
     "error": {
       "title": "Erro",

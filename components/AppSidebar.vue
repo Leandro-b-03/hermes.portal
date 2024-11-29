@@ -174,24 +174,10 @@ watch((user), () => {
             }"
           >
           <li>
-            <NuxtLink to="/profile"
-              class="flex items-center cursor-pointer p-4 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
-              <i class="pi pi-user mr-2" />
-              <span class="font-medium">{{ $t('sidebar.profile') }}</span>
-            </NuxtLink>
-          </li>
-          <li>
             <NuxtLink :to="`/settings`"
               class="flex items-center cursor-pointer p-4 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
               <i class="pi pi-cog mr-2" />
               <span class="font-medium">{{ $t('sidebar.settings') }}</span>
-            </NuxtLink>
-          </li>
-          <li>
-            <NuxtLink @click="logout"
-              class="flex items-center cursor-pointer p-4 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
-              <i class="pi pi-sign-out mr-2" />
-              <span class="font-medium">{{ $t('sidebar.logout') }}</span>
             </NuxtLink>
           </li>
         </ul>

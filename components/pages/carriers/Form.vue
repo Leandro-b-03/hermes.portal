@@ -31,7 +31,7 @@ const carrier = reactive({
   number: '',
   city: '',
   state: '',
-  zip: '',
+  zip_code: '',
   country: '',
   contact: reactive({
     id: '',
@@ -46,6 +46,7 @@ const carrier = reactive({
   }),
   active: true,
 });
+
 const errors = reactive({
   tax_id: false,
   tax_id_message: '',
@@ -80,7 +81,7 @@ const schema = computed(() => {
       required: required,
       minLength: minLength(2),
     },
-    zip: { 
+    zip_code: { 
       required: required,
       minLength: minLength(8),
     },
@@ -136,7 +137,7 @@ watch((loading), async () => {
     carrier.number = props.carrier?.number || '';
     carrier.city = props.carrier?.city || '';
     carrier.state = props.carrier?.state || '';
-    carrier.zip = props.carrier?.zip || '';
+    carrier.zip_code = props.carrier?.zip || '';
     carrier.country = props.carrier?.country || '';
     carrier.contact.id = props.carrier?.carrier_contact[0]?.id || '';
     carrier.contact.shipper_id = props.carrier?.carrier_contact[0]?.shipper_id || '';
@@ -163,7 +164,7 @@ const find = async (): Promise<any> => {
     showForm.value = true;
     carrier.id = response?.id;
     carrier.name = response?.name;
-    carrier.zip = response?.zip;
+    carrier.zip_code = response?.zip_code;
     carrier.address = response?.address;
     carrier.address_2 = response?.address_2;
     carrier.address_3 = response?.address_3;
@@ -191,9 +192,9 @@ const find = async (): Promise<any> => {
 }
 
 const zipValidation = async (): Promise<any> => {
-  if (carrier.zip.length === 9) {
+  if (carrier.zip_code.length === 9) {
     zipLoading.value = true;
-    const zip = carrier.zip.replace('-', '');
+    const zip = carrier.zip_code.replace('-', '');
     const { data, status, error, refresh, clear } = await useAsyncData('cep', () => 
       $fetch(`https://opencep.com/v1/${zip}`)
     );
@@ -260,16 +261,16 @@ const submit = async (): Promise<any> => {
         </div>
         <div class="mb-4 col-span-12 md:col-span-4"></div>
         <div class="mb-4 col-span-12 md:col-span-2">
-          <label for="zip" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.zip') }}</label>
-          <span v-if="view">{{ carrier.zip }}</span>
+          <label for="zip_code" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.zip') }}</label>
+          <span v-if="view">{{ carrier.zip_code }}</span>
           <InputGroup v-else>
-            <InputMask v-model="carrier.zip" id="zip" mask="99999-999" type="text" :placeholder="$t('carriers.fields.zip_placeholder')" @keydown.enter="zipValidation" :disabled="disabled.carrier"
+            <InputMask v-model="carrier.zip_code" id="zip_code" mask="99999-999" type="text" :placeholder="$t('carriers.fields.zip_placeholder')" @keydown.enter="zipValidation" :disabled="disabled.carrier"
             :loading="zipLoading"
-            :invalid="v$.zip.$error"
-            @change="v$.zip.$touch" />
+            :invalid="v$.zip_code.$error"
+            @change="v$.zip_code.$touch" />
             <Button icon="pi pi-search" @click="zipValidation" />
           </InputGroup>
-          <small v-for="error in v$.zip.$errors" v-if="v$.name.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
+          <small v-for="error in v$.zip_code.$errors" v-if="v$.name.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
         </div>
         <div class="mb-4 col-span-12 md:col-span-11"></div>
         <div class="mb-4 col-span-12 md:col-span-4">
@@ -384,7 +385,7 @@ const submit = async (): Promise<any> => {
     <NuxtLink v-if="view" :to="`/carriers/${carrier.id}/edit`">
       <Button :label="$t('setup.options.edit')" icon="pi pi-pencil" class="!w-32" />
     </NuxtLink>
-    <Button v-else :label="$t(!carrier.id ? 'carriers.create.buttons.save' : 'carriers.edit.buttons.save')" icon="pi pi-truck" class="!w-32" @click="submit" />
+    <Button v-else :label="$t(!carrier.id ? 'carriers.create.buttons.save' : 'carriers.edit.buttons.save')" icon="pi pi-truck" class="!w-32" @click="submit" :loading="loading" />
     <NuxtLink to="/carriers" class="!w-32">
       <Button :label="$t(view ? 'setup.options.back' : 'carriers.create.buttons.cancel')" :icon="`pi ${view ? 'pi-arrow-left' : 'pi-times'}`" class="!w-32" />
     </NuxtLink>

@@ -80,6 +80,10 @@ const routeContent = (value: string): void => {
       break;
   }
 }
+
+const cancelEdit = () => {
+  editMode.value = false;
+}
 </script>
 
 <template>
@@ -98,13 +102,13 @@ const routeContent = (value: string): void => {
                 <a v-if="selectedMenu !== 'details'" v-tooltip.top="$t('setup.options.add')" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">
                   <i class="pi pi-plus"></i>
                 </a>
-                <Button v-if="selectedMenu === 'details' && permissions.shipper.edit" v-tooltip.top="$t('setup.options.edit')" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editMode = !editMode" />
+                <Button v-if="selectedMenu === 'details' && permissions.shipper.edit" :disabled="editMode" v-tooltip.top="$t('setup.options.edit')" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editMode = !editMode" />
               </div>
             </div>
             <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t(subtitle) }}
             </div>
             <div>
-              <PagesSettingsDetails v-if="selectedMenu === 'details'" :edit="editMode" />
+              <PagesSettingsDetails v-if="selectedMenu === 'details'" :edit="editMode" @cancel-edit="cancelEdit" />
             </div>
           </div>
         </div>

@@ -113,11 +113,12 @@ export const useAuthStore = defineStore({
       return response;
     },
     hasPermission(permission: string): boolean {  
+      if (this.authUser?.roles[0].name === 'admin') return true;
+      
       // Otherwise, check if the user has the specific permission
       const userPermissions = this.authUser.roles[0].permissions.map(p => p.name)
       if (!userPermissions) return false;
-      
-      if (userPermissions.includes('Admin')) return true;
+
       return userPermissions.includes(permission)
     },
   },
