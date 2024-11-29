@@ -19,8 +19,7 @@ const transition = ref(false);
 const disabled = ref({
   address: true,
 });
-const shipper = reactive({ ...shipperLoad.value });
-const zipCode = ref('');
+const shipper = reactive({});
 const schema = computed(() => {
   return {
     name: { 
@@ -44,7 +43,7 @@ const schema = computed(() => {
     },
     city: { 
       required: required,
-      minLength: minLength(3),
+      minLength: minLength(2),
     },
     state: { 
       required: required,
@@ -58,27 +57,25 @@ const schema = computed(() => {
       required: required,
       minLength: minLength(3),
     },
-    contact: {
-      name: {
-        required: required,
-        minLength: minLength(3),
-      },
-      email: { 
-        required: required,
-        email: email,
-      },
-      title: { 
-        required: required,
-        minLength: minLength(2),
-      },
-      department: { 
-        required: required,
-        minLength: minLength(2),
-      },
-      mobile: { 
-        required: required,
-        minLength: minLength(10),
-      },
+    contact_name: {
+      required: required,
+      minLength: minLength(3),
+    },
+    contact_email: { 
+      required: required,
+      email: email,
+    },
+    contact_title: { 
+      required: required,
+      minLength: minLength(2),
+    },
+    contact_department: { 
+      required: required,
+      minLength: minLength(2),
+    },
+    contact_mobile: { 
+      required: required,
+      minLength: minLength(10),
     },
   };
 });
@@ -86,13 +83,14 @@ const v$ = useVuelidate(schema, shipper);
 
 onMounted(() => {
   shipperStore.getUserShipper();
-  zipCode.value = formatZipCode(shipper.zip_code?.toString());
+
+  transformReactive(shipperLoad.value, shipper);
 });
 
 watch(() => props.edit, () => {
   transition.value = true;
-  shipper.value = {...shipperLoad.value };
-  zipCode.value = formatZipCode(shipper.zip_code?.toString());
+
+  transformReactive(shipperLoad.value, shipper);
 
   setTimeout(() => {
     transition.value = false;
@@ -102,14 +100,11 @@ watch(() => props.edit, () => {
 const zipValidation = async (): Promise<any> => {
   if (shipper.zip_code.length === 9) {
     zipLoading.value = true;
-    const zip = shipper.zip_code.replace('-', '');
-    const { data, status, error, refresh, clear } = await useAsyncData('cep', () => 
-      $fetch(`https://opencep.com/v1/${zip}`)
-    );
+    const data = loadZipCode(shipper.zip_code);
 
     disabled.value.address = true;
 
-    if (status.value === 'success') {
+    if (data !== null) {
       shipper.address = data.value.logradouro;
       shipper.address_3 = data.value.bairro;
       shipper.city = data.value.localidade;
@@ -130,10 +125,11 @@ const save = async (): Promise<any> => {
     }
 
     shipperStore.update(shipper).then((response) => {
-      $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('carriers.edit.message.success'), life: 5000 });
+      $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('shipper.edit.message.success'), life: 5000 });
       emit('cancelEdit', false);
     }).catch((error) => {
-      $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('setup.error'), detail: t('carriers.edit.message.error'), life: 5000 });
+      console.log(error);
+      $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('setup.error'), detail: t('shipper.edit.message.error'), life: 5000 });
     });
   });
 }
@@ -172,10 +168,9 @@ const cancel = (): void => {
               <div class="mb-4 col-span-12 lg:col-span-2">
               <label for="zip_code" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.zip') }}</label>
               <InputGroup>
-                <InputMask v-model="zipCode" id="zip_code" mask="99999-999" type="text" :placeholder="$t('carriers.fields.zip_placeholder')" @keydown.enter="zipValidation" 
+                <InputMask v-model="shipper.zip_code" id="zip_code" mask="99999-999" type="text" :placeholder="$t('carriers.fields.zip_placeholder')" @keydown.enter="zipValidation" 
                 :loading="zipLoading"
                 :invalid="v$.zip_code.$error"
-                @keydown="shipper.zip_code = zipCode"
                 @change="v$.zip_code.$touch" />
                 <Button icon="pi pi-search" @click="zipValidation" />
               </InputGroup>
@@ -245,37 +240,37 @@ const cancel = (): void => {
               <div class="mb-4 col-span-12 md:col-span-6">
                 <label for="contact.name" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.name') }}</label>
                 <InputText v-model="shipper.contact_name" id="contact.name" type="text" :placeholder="$t('carriers.fields.contact.name_placeholder')" class="w-full"
-                  :invalid="v$.contact.name.$error"
-                  @change="v$.contact.name.$touch" />
-                <small v-for="error in v$.contact.name.$errors" v-if="v$.contact.name.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
+                  :invalid="v$.contact_name.$error"
+                  @change="v$.contact_name.$touch" />
+                <small v-for="error in v$.contact_name.$errors" v-if="v$.contact_name.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
               </div>
               <div class="mb-4 col-span-12 md:col-span-6">
                 <label for="contact.email" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.email') }}</label>
                 <InputText v-model="shipper.contact_email" id="contact.email" type="email" :placeholder="$t('carriers.fields.contact.email_placeholder')" class="w-full"
-                  :invalid="v$.contact.email.$error"
-                  @change="v$.contact.email.$touch" />
-                <small v-for="error in v$.contact.email.$errors" v-if="v$.contact.email.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
+                  :invalid="v$.contact_email.$error"
+                  @change="v$.contact_email.$touch" />
+                <small v-for="error in v$.contact_email.$errors" v-if="v$.contact_email.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
               </div>
               <div class="mb-4 col-span-12 md:col-span-6">
                 <label for="contact.title" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.title') }}</label>
                 <InputText v-model="shipper.contact_title" id="contact.title" type="text" :placeholder="$t('carriers.fields.contact.title_placeholder')" class="w-full"
-                  :invalid="v$.contact.title.$error"
-                  @change="v$.contact.title.$touch" />
-                <small v-for="error in v$.contact.title.$errors" v-if="v$.contact.title.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
+                  :invalid="v$.contact_title.$error"
+                  @change="v$.contact_title.$touch" />
+                <small v-for="error in v$.contact_title.$errors" v-if="v$.contact_title.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
               </div>
               <div class="mb-4 col-span-12 md:col-span-6">
                 <label for="contact.department" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.department') }}</label>
                 <InputText v-model="shipper.contact_department" id="contact.department" type="text" :placeholder="$t('carriers.fields.contact.department_placeholder')" class="w-full"
-                  :invalid="v$.contact.department.$error"
-                  @change="v$.contact.department.$touch" />
-                <small v-for="error in v$.contact.department.$errors" v-if="v$.contact.department.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
+                  :invalid="v$.contact_department.$error"
+                  @change="v$.contact_department.$touch" />
+                <small v-for="error in v$.contact_department.$errors" v-if="v$.contact_department.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
               </div>
               <div class="mb-4 col-span-12 md:col-span-6">
                 <label for="contact.mobile" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.mobile') }}</label>
                 <InputMask v-model="shipper.contact_mobile" mask="(99) 99999-9999" id="contact.mobile" type="text" :placeholder="$t('carriers.fields.contact.mobile_placeholder')" class="w-full" 
-                  :invalid="v$.contact.mobile.$error"
-                  @change="v$.contact.mobile.$touch" />
-                <small v-for="error in v$.contact.mobile.$errors" v-if="v$.contact.mobile.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
+                  :invalid="v$.contact_mobile.$error"
+                  @change="v$.contact_mobile.$touch" />
+                <small v-for="error in v$.contact_mobile.$errors" v-if="v$.contact_mobile.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
               </div>
               <div class="mb-4 col-span-12 md:col-span-6">
                 <label for="contact.phone" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.contact.phone') }}</label>

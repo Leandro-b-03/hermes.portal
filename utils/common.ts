@@ -1,3 +1,5 @@
+import type { Reactive } from "vue";
+
 export function formatCurrency(value: any, monthly: boolean = false): string {
   if (value !== 0 && value !== '0.0')
     return new Intl.NumberFormat('pt-BR', {
@@ -85,3 +87,26 @@ export function formatZipCode(zipCode: string): string {
   zipCode = zipCode.length !== 8 ? `0${zipCode}` : zipCode;
   return zipCode.replace(/^(\d{5})(\d{3})$/, '$1-$2');
 };
+
+export function transformReactive(data: any, reactive: any): void {
+  if (typeof data !== 'object' || data === null) {
+    return; // Just return for non-object inputs
+  }
+
+  Object.entries(data).forEach(([key, value]) => {
+    reactive[key] = value;
+  });
+};
+
+export async function loadZipCode(zipCode: string): Promise<any> {
+  const zip = zipCode.replace('-', '');
+  const { data, status } = await useAsyncData('cep', () => 
+    $fetch(`https://opencep.com/v1/${zip}`)
+  );
+  
+  if (status.value !== 'success') {
+    return null;
+  }
+
+  return data;
+}

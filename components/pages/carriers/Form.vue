@@ -194,14 +194,11 @@ const find = async (): Promise<any> => {
 const zipValidation = async (): Promise<any> => {
   if (carrier.zip_code.length === 9) {
     zipLoading.value = true;
-    const zip = carrier.zip_code.replace('-', '');
-    const { data, status, error, refresh, clear } = await useAsyncData('cep', () => 
-      $fetch(`https://opencep.com/v1/${zip}`)
-    );
+    const data = loadZipCode(carrier.zip_code);
 
     disabled.value.address = true;
 
-    if (status.value === 'success') {
+    if (data !== null) {
       carrier.address = data.value.logradouro;
       carrier.address_3 = data.value.bairro;
       carrier.city = data.value.localidade;

@@ -37,12 +37,13 @@ export const useShipperStore = defineStore({
         this.isLoading = false;
       }
     },
-    async update(shipper: IShipper): Promise<any> {
+    async update(shipper: FormData): Promise<any> {
       this.isLoading = true;
       this.error = null;
       try {
-        const params = `action=update_shipper&token=${sessionStorage.sessionId}`;
-        const updatedShipper = await $fetch(`/api/shipper?${params}`, { method: 'PUT', body: JSON.stringify(shipper) });
+        shipper.append('action', 'update_shipper');
+        shipper.append('token', sessionStorage.sessionId);
+        const updatedShipper = await $fetch(`/api/shipper`, { method: 'PUT', body: JSON.stringify(shipper) });
         this.setShipper(updatedShipper);
         return updatedShipper;
       } catch (error: any) {
