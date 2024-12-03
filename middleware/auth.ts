@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     const response = await $fetch('/api/auth', {
       method: 'GET',
       query: {
-        token: sessionStorage.sessionId,
+        token: localStorage.sessionId,
         action: 'current_user'
       }
     });

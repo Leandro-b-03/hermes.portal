@@ -110,3 +110,30 @@ export async function loadZipCode(zipCode: string): Promise<any> {
 
   return data;
 }
+
+export function toFormData(data: any, modelPrefix?: string): FormData {
+  const formData = new FormData();
+
+  if (typeof data !== 'object' || data === null) {
+    return formData; // Return empty FormData for non-object inputs
+  }
+
+  for (const [key, value] of Object.entries(data)) {
+    const prefixedKey = modelPrefix ? `${modelPrefix}[${key}]` : key;
+    formData.append(prefixedKey, value as string | Blob);
+  }
+
+  return formData;
+}
+
+export function formatPhone(phone: string, country: string = 'BR'): string {
+  if (!phone) {
+    return '-';
+  }
+
+  if (country === 'BR') {
+    return phone.replace(/^(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3');
+  }
+
+  return phone;
+}

@@ -26,7 +26,7 @@ export const useShipperStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        const params = `action=get_shipper&token=${sessionStorage.sessionId}`;
+        const params = `action=get_shipper&token=${localStorage.sessionId}`;
         const shipper = await $fetch(`/api/shipper?${params}`, { method: 'GET' });
         this.setShipper(shipper);
         return shipper;
@@ -42,11 +42,13 @@ export const useShipperStore = defineStore({
       this.error = null;
       try {
         shipper.append('action', 'update_shipper');
-        shipper.append('token', sessionStorage.sessionId);
-        const updatedShipper = await $fetch(`/api/shipper`, { method: 'PUT', body: JSON.stringify(shipper) });
+        shipper.append('token', localStorage.sessionId);
+        shipper.append('_method', 'PUT');
+        const updatedShipper = await $fetch(`/api/shipper`, { method: 'PUT', body: shipper });
         this.setShipper(updatedShipper);
         return updatedShipper;
       } catch (error: any) {
+        console.log(error);
         this.error = error.response.data.error || 'An error occurred during login';
         return Promise.reject(this.error);
       } finally {

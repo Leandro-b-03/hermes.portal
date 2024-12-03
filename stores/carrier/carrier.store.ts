@@ -29,8 +29,8 @@ export const useCarrierStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        params = params ? `${params}&action=collect_carriers&token=${sessionStorage.sessionId}` 
-                : `action=collect_carriers&token=${sessionStorage.sessionId}`;
+        params = params ? `${params}&action=collect_carriers&token=${localStorage.sessionId}` 
+                : `action=collect_carriers&token=${localStorage.sessionId}`;
         const carriers = await $fetch<ICarrierListResponse[]>(`/api/carrier?${params}`, { method: "GET" });
         this.setCarriers(carriers);
       } catch (error: any) {
@@ -44,7 +44,7 @@ export const useCarrierStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        const carrier = await $fetch('/api/carrier/', { method: "GET", params: { action: 'collect_carrier', token: sessionStorage.sessionId, id: id } });
+        const carrier = await $fetch('/api/carrier/', { method: "GET", params: { action: 'collect_carrier', token: localStorage.sessionId, id: id } });
         this.setCarrier(carrier);
         return this.carrier;
       } catch (error: any) {
@@ -58,7 +58,7 @@ export const useCarrierStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        const carrierList = await $fetch('/api/carrier/', { method: "GET", params: { action: 'collect_carrier', token: sessionStorage.sessionId, id: 'list' } });
+        const carrierList = await $fetch('/api/carrier/', { method: "GET", params: { action: 'collect_carrier', token: localStorage.sessionId, id: 'list' } });
         this.carrierList = carrierList;
         return this.carrierList;
       } catch (error: any) {
@@ -72,7 +72,7 @@ export const useCarrierStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        const carrier = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "POST", body: { action: 'find', token: sessionStorage.sessionId, tax_id: tax_id } });
+        const carrier = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "POST", body: { action: 'find', token: localStorage.sessionId, tax_id: tax_id } });
         this.setCarrier(carrier);
         return this.carrier;
       } catch (error: any) {
@@ -88,9 +88,9 @@ export const useCarrierStore = defineStore({
       try {
         let response;
         if (!carrier.id || carrier.id === "") {
-          response = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "POST", body: { action: 'create', token: sessionStorage.sessionId, carrier: carrier } });
+          response = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "POST", body: { action: 'create', token: localStorage.sessionId, carrier: carrier } });
         } else {
-          response = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "PUT", body: { action: 'update', token: sessionStorage.sessionId, carrier: carrier } });
+          response = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "PUT", body: { action: 'update', token: localStorage.sessionId, carrier: carrier } });
         }
 
         return response;
@@ -109,7 +109,7 @@ export const useCarrierStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        const response = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "DELETE", body: { action: 'delete', token: sessionStorage.sessionId, id: id } });
+        const response = await $fetch<ICarrierListResponse>(`/api/carrier`, { method: "DELETE", body: { action: 'delete', token: localStorage.sessionId, id: id } });
         console.log(this.data.data);
         this.data.data = this.data.data.filter((carrier) => carrier.id !== id);
         return true;
@@ -124,7 +124,7 @@ export const useCarrierStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        const exportCarriers = await $fetch(`/api/carrier`, { method: "GET", params: { action: 'export', token: sessionStorage.sessionId } });
+        const exportCarriers = await $fetch(`/api/carrier`, { method: "GET", params: { action: 'export', token: localStorage.sessionId } });
         return exportCarriers;
       } catch (error: any) {
         this.error = error.data || "An error occurred while exporting carriers";

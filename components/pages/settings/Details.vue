@@ -81,8 +81,8 @@ const schema = computed(() => {
 });
 const v$ = useVuelidate(schema, shipper);
 
-onMounted(() => {
-  shipperStore.getUserShipper();
+onMounted(async () => {
+  await shipperStore.getUserShipper();
 
   transformReactive(shipperLoad.value, shipper);
 });
@@ -124,7 +124,9 @@ const save = async (): Promise<any> => {
       return;
     }
 
-    shipperStore.update(shipper).then((response) => {
+    const formData = toFormData(shipper, 'shipper');
+
+    shipperStore.update(formData).then((response) => {
       $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('shipper.edit.message.success'), life: 5000 });
       emit('cancelEdit', false);
     }).catch((error) => {
@@ -151,13 +153,34 @@ const cancel = (): void => {
         <div class="col-span-12 lg:col-span-6 p-4">
           <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('settings.details.company') }}</div>
           <Skeleton v-if="loading" width="50%" height="1.3rem" />
-          <div v-else-if="!edit" class="text-surface-900 dark:text-surface-0">{{ `${shipperLoad?.name}/${shipperLoad?.fantasy_name}` }}</div>
-          <InputText v-else v-model="shipper.name" />
+          <div v-else-if="!edit" class="text-surface-900 dark:text-surface-0">{{ `${shipperLoad?.name}/${shipperLoad?.commercial_name}` }}</div>
+          <div v-else>
+            <div class="grid grid-cols-12 gap-4 grid-nogutter">
+              <div class="mb-4 col-span-12 lg:col-span-6">
+                <label for="zip_code" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.name') }}</label>
+                <InputText v-model="shipper.name" class="w-full" />
+              </div>
+              <div class="mb-4 col-span-12 lg:col-span-6">
+                <label for="zip_code" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.commercial_name') }}</label>
+                <InputText v-model="shipper.commercial_name" class="w-full" />
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 p-4">
+        <div class="col-span-12 lg:col-span-3 p-4">
           <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('setup.tax_id') }}</div>
           <Skeleton v-if="loading" width="50%" height="1.3rem" />
-          <div v-else qclass="text-surface-900 dark:text-surface-0">{{ shipperLoad?.tax_id }}</div>
+          <div v-else class="text-surface-900 dark:text-surface-0">{{ shipperLoad?.tax_id }}</div>
+        </div>
+        <div class="col-span-12 lg:col-span-3 p-4">
+          <!-- <img :src="shipperLoad?.logo_image_url" alt="Logo" class="w-24 h-24 rounded shadow-lg" /> -->
+          <!-- <Button v-if="edit" icon="pi pi-upload" rounded class="absolute -top-5 -right-7 -mb-4" /> -->
+          <div :style="{ backgroundImage: `url(${shipperLoad?.logo_image_url})` }" class="w-28 h-28 bg-cover bg-center rounded shadow-lg flex flex-col-reverse">
+            <div class="flex items-center justify-center w-full h-7 bg-black bg-opacity-50 rounded-b cursor-pointer" @click="">
+              <i class="pi pi-upload text-white"></i>
+            </div>
+            <input type="file" class="hidden" />
+          </div>
         </div>
         <div class="col-span-12 p-4">
           <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('settings.details.address_complete') }}</div>
@@ -231,7 +254,7 @@ const cancel = (): void => {
             </div>
           </div>
         </div>
-        <div class="col-span-12 lg:col-span-6 p-4">
+        <div class="col-span-12 p-4">
           <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('settings.details.contact_name') }}</div>
           <Skeleton v-if="loading" width="50%" height="1.3rem" />
           <div v-else-if="!edit" class="text-surface-900 dark:text-surface-0 cursor-pointer" @click="showContactInfo = true">{{ shipperLoad?.contact_name }}</div>
@@ -299,39 +322,39 @@ const cancel = (): void => {
   <Dialog v-model:visible="showContactInfo" modal :header="$t('settings.details.contact.header')" class="min-w-[30rem]">
     <ul class="list-none p-0 m-0 border-t border-surface">
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-            <div class="text-surface-500 dark:text-surface-300 w-full lg:w-2/12 font-medium">{{ $t('carriers.index.contact_info.name') }}</div>
-            <div class="text-surface-900 dark:text-surface-0 w-full lg:w-10/12">{{ shipperLoad?.contact_name }}</div>
+            <div class="text-surface-500 dark:text-surface-300 w-full lg:w-4/12 font-medium">{{ $t('carriers.index.contact_info.name') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full lg:w-8/12">{{ shipperLoad?.contact_name }}</div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap">
-            <div class="text-surface-500 dark:text-surface-300 w-full lg:w-2/12 font-medium">{{ $t('carriers.index.contact_info.contact_title') }}</div>
-            <div class="text-surface-900 dark:text-surface-0 w-full lg:w-10/12 leading-normal">{{ shipperLoad?.contact_title }}</div>
+            <div class="text-surface-500 dark:text-surface-300 w-full lg:w-4/12 font-medium">{{ $t('carriers.index.contact_info.contact_title') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full lg:w-8/12 leading-normal">{{ shipperLoad?.contact_title }}</div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-            <div class="text-surface-500 dark:text-surface-300 w-full lg:w-2/12 font-medium">{{ $t('carriers.index.contact_info.department') }}</div>
-            <div class="text-surface-900 dark:text-surface-0 w-full lg:w-10/12">{{ shipperLoad?.contact_department }}</div>
+            <div class="text-surface-500 dark:text-surface-300 w-full lg:w-4/12 font-medium">{{ $t('carriers.index.contact_info.department') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full lg:w-8/12">{{ shipperLoad?.contact_department }}</div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap">
-            <div class="text-surface-500 dark:text-surface-300 w-full lg:w-2/12 font-medium">{{ $t('carriers.index.contact_info.email') }}</div>
-            <div class="text-surface-900 dark:text-surface-0 w-full lg:w-10/12">
+            <div class="text-surface-500 dark:text-surface-300 w-full lg:w-4/12 font-medium">{{ $t('carriers.index.contact_info.email') }}</div>
+            <div class="text-surface-900 dark:text-surface-0 w-full lg:w-8/12">
                 <a :href="`mailto:${shipperLoad?.contact_email}`" target="_blank"><Tag class="mr-2" :value="shipperLoad?.contact_email" :rounded="true" /></a>
             </div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-          <div class="text-surface-500 dark:text-surface-300 w-full lg:w-2/12 font-medium">{{ $t('carriers.index.contact_info.phone') }}</div>
-          <div class="text-surface-900 dark:text-surface-0 w-full lg:w-10/12">
-            <Tag :value="`${shipperLoad?.contact_phone}`" severity="info" :rounded="true" />
+          <div class="text-surface-500 dark:text-surface-300 w-full lg:w-4/12 font-medium">{{ $t('carriers.index.contact_info.phone') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full lg:w-8/12">
+            <Tag :value="`${formatPhone(shipperLoad?.contact_phone)}`" severity="info" :rounded="true" />
           </div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-          <div class="text-surface-500 dark:text-surface-300 w-full lg:w-2/12 font-medium">{{ $t('carriers.index.contact_info.mobile') }}</div>
-          <div class="text-surface-900 dark:text-surface-0 w-full lg:w-10/12">
-            <Tag :value="`${shipperLoad?.contact_mobile}`" severity="success" :rounded="true" />
+          <div class="text-surface-500 dark:text-surface-300 w-full lg:w-4/12 font-medium">{{ $t('carriers.index.contact_info.mobile') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full lg:w-8/12">
+            <Tag :value="`${formatPhone(shipperLoad?.contact_mobile)}`" severity="success" :rounded="true" />
           </div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-          <div class="text-surface-500 dark:text-surface-300 w-full lg:w-2/12 font-medium">{{ $t('carriers.index.contact_info.fax') }}</div>
-          <div class="text-surface-900 dark:text-surface-0 w-full lg:w-10/12">
-            <Tag :value="`${shipperLoad?.contact_fax}`" severity="warning" :rounded="true" />
+          <div class="text-surface-500 dark:text-surface-300 w-full lg:w-4/12 font-medium">{{ $t('carriers.index.contact_info.fax') }}</div>
+          <div class="text-surface-900 dark:text-surface-0 w-full lg:w-8/12">
+            <Tag :value="`${formatPhone(shipperLoad?.contact_fax)}`" severity="warning" :rounded="true" />
           </div>
         </li>
     </ul>

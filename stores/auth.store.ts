@@ -29,21 +29,21 @@ export const useAuthStore = defineStore({
       this.isLoading = true;
       this.error = null;
 
-      const storedSessionId = sessionStorage.sessionId || null;
+      const storedSessionId = localStorage.sessionId || null;
 
       if (!storedSessionId) {
-        sessionStorage.sessionId = uuidv4();
+        localStorage.sessionId = uuidv4();
       }
 
       try {
-        const body = { token: sessionStorage.sessionId, action: 'sign_in', user: user_data };
+        const body = { token: localStorage.sessionId, action: 'sign_in', user: user_data };
         const user = await $fetch('/api/auth', { method: 'POST', body: body });
         this.setAuthUser(user);
-        sessionStorage.authenticated = true;
+        localStorage.authenticated = true;
         return true;
       } catch (error: any) {
         this.error = error.response.data.error || 'An error occurred during login';
-        sessionStorage.authenticated = false;
+        localStorage.authenticated = false;
         return Promise.reject(this.error);
       } finally {
         this.isLoading = false;
@@ -53,12 +53,12 @@ export const useAuthStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        const user = await $fetch('/api/auth', { method: 'POST', body: { token: sessionStorage.sessionId, action: 'sign_up', user: user_data } });
+        const user = await $fetch('/api/auth', { method: 'POST', body: { token: localStorage.sessionId, action: 'sign_up', user: user_data } });
         this.setAuthUser(user);
-        sessionStorage.authenticated = true;
+        localStorage.authenticated = true;
       } catch (error: any) {
         this.error = error.data.message || 'An error occurred during signup';
-        sessionStorage.authenticated = false;
+        localStorage.authenticated = false;
         return Promise.reject(this.error);
       } finally {
         this.isLoading = false;
@@ -68,21 +68,21 @@ export const useAuthStore = defineStore({
       this.isLoading = true;
       this.error = null;
 
-      const storedSessionId = sessionStorage.sessionId || null;
+      const storedSessionId = localStorage.sessionId || null;
 
       if (!storedSessionId) {
-        sessionStorage.sessionId = uuidv4();
+        localStorage.sessionId = uuidv4();
       }
 
       try {
-        const response = await $fetch('/api/auth', { method: 'GET', query: { token: sessionStorage.sessionId, action: 'current_user' } });
+        const response = await $fetch('/api/auth', { method: 'GET', query: { token: localStorage.sessionId, action: 'current_user' } });
 
         this.setAuthUser(response?.user);
-        sessionStorage.authenticated = true;
+        localStorage.authenticated = true;
       } catch (error: any) {
         this.error = error.message || 'Failed to fetch user information';
         this.setAuthUser(null);
-        sessionStorage.authenticated = false;
+        localStorage.authenticated = false;
       } finally {
         this.isLoading = false;
       }
@@ -92,23 +92,23 @@ export const useAuthStore = defineStore({
       this.error = null;
 
       try {
-        const user = await $fetch('/api/auth', { method: 'POST', body: { token: sessionStorage.sessionId, action: 'google_oauth2/callback', ...data } });
+        const user = await $fetch('/api/auth', { method: 'POST', body: { token: localStorage.sessionId, action: 'google_oauth2/callback', ...data } });
         this.setAuthUser(user);
-        sessionStorage.authenticated = true;
+        localStorage.authenticated = true;
       } catch (err) {
         this.error = err.message || 'An error occurred during social login';
-        sessionStorage.authenticated = false;
+        localStorage.authenticated = false;
       } finally {
         this.isLoading = false;
       }
     },
     async logout() {
-      const response = await $fetch('/api/auth', { method: 'DELETE', body: { token: sessionStorage.sessionId, action: 'sign_out' } });
+      const response = await $fetch('/api/auth', { method: 'DELETE', body: { token: localStorage.sessionId, action: 'sign_out' } });
       if (response.success) {
         this.setAuthUser(null);
       }
 
-      sessionStorage.authenticated = false;
+      localStorage.authenticated = false;
 
       return response;
     },

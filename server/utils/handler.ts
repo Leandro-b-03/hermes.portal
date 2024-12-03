@@ -35,8 +35,10 @@ export const apiHandler = () => {
     } else {
       if (method !== 'GET' && data.token) { // Check if data is an object and has a 'token' property
         delete data.token;
+        delete data.action;
       } else if (data instanceof FormData && data.get('token')) { // Check if data is FormData and has a 'token' entry
         data.delete('token');
+        data.delete('action');
       }
     }
 
