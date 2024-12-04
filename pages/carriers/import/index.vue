@@ -68,7 +68,7 @@ const onRowCollapse = (event: any) => {
             <div class="mb-2 flex items-center justify-between">
               <div class="flex items-center">
                 <i class="pi pi-table text-surface-500 dark:text-surface-300 mr-2 text-xl" />
-                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('carriers.import.title')
+                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('modules.carriers.import.title')
                   }}</span>
               </div>
               <div>
@@ -91,7 +91,7 @@ const onRowCollapse = (event: any) => {
                 </Menu>
               </div>
             </div>
-            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.import.subtitle') }}
+            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('modules.carriers.import.description') }}
             </div>
             <div>
               <ConfirmDialog></ConfirmDialog>
@@ -104,9 +104,9 @@ const onRowCollapse = (event: any) => {
                   </div>
                 </template>
                 <Column expander style="width: 5rem" />
-                <Column field="tax_id" :header="$t('setup.tax_id')" sortable />
-                <Column field="name" :header="$t('setup.name')" sortable />
-                <Column field="carrier_freight_table" :header="$t(`carriers.import.qtd_csv`)">
+                <Column field="tax_id" :header="$t('fields.tax_id')" sortable />
+                <Column field="name" :header="$t('fields.name')" sortable />
+                <Column field="carrier_freight_table" :header="$t(`fields.qtd_csv`)">
                   <template #body="slotProps">
                     <span>{{ slotProps.data.carrier_freight_table.length }}</span>
                   </template>
@@ -119,12 +119,12 @@ const onRowCollapse = (event: any) => {
                           <i class="pi" :class="(slotProps.data.error_on_import && !slotProps.data.imported_at) ? 'pi-exclamation-triangle text-red-500' : slotProps.data.imported_at ? 'pi-check text-green-500' : 'pi-hourglass text-yellow-600'"></i>
                         </template>
                       </column>
-                      <Column field="uuid" :header="$t('carriers.fields.uuid')" sortable></Column>
-                      <Column field="freight_type" :header="$t('carriers.fields.freight_type')" sortable></Column>
-                      <Column field="freight_name" :header="$t('carriers.fields.freight_name')" sortable></Column>
-                      <Column field="file_name" :header="$t('carriers.fields.file_name')" sortable></Column>
-                      <Column field="created_at" :header="$t('carriers.fields.created_at')" sortable></Column>
-                      <Column field="updated_at" :header="$t('carriers.fields.created_at')" sortable></Column>
+                      <Column field="uuid" :header="$t('fields.uuid')" sortable></Column>
+                      <Column field="freight_type" :header="$t('fields.freight_type')" sortable></Column>
+                      <Column field="freight_name" :header="$t('fields.freight_name')" sortable></Column>
+                      <Column field="file_name" :header="$t('fields.file_name')" sortable></Column>
+                      <Column field="created_at" :header="$t('fields.created_at')" sortable></Column>
+                      <Column field="updated_at" :header="$t('fields.created_at')" sortable></Column>
                       <Column>
                         <template #body="slotProps">
                           <NuxtLink :to="`/carriers/import/${slotProps.data.id}/view`" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">

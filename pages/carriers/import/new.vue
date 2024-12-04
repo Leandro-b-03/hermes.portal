@@ -73,10 +73,10 @@ const submit = (): void => {
   });
 
   importStore.scheduleImport(formData).then((response) => {
-    $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('carriers.import.new.message.success'), life: 5000 });
+    $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.carriers.import.new.success'), life: 5000 });
     router.push('/carriers/import');
   }).catch((error) => {
-    $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error'), detail: t('carriers.import.new.message.error'), life: 5000 });
+    $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error'), detail: t('modules.carriers.import.new.error'), life: 5000 });
   });
 }
 </script>
@@ -100,30 +100,29 @@ const submit = (): void => {
             <div class="mb-2 flex items-center justify-between">
               <div class="flex items-center">
                 <i class="pi pi-upload text-surface-500 dark:text-surface-300 mr-2 text-xl" />
-                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('carriers.import.new.title')
-                  }}</span>
+                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('modules.carriers.import.new.title') }}</span>
               </div>
             </div>
-            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.import.new.subtitle') }}
+            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('modules.carriers.import.new.description') }}
             </div>
             <div>
               <Fluid>
                 <div class="grid grid-cols-12 gap-4">
                   <div class="mb-4 col-span-12 md:col-span-6 lg:col-span-4 xl:col-span-4">
                     <label class="block text-surface-500 dark:text-surface-300 font-medium mb-2"
-                      for="carrier">{{ $t('carriers.import.new.fields.carrier') }}</label>
+                      for="carrier">{{ $t('modules.carriers.title') }}</label>
                     <Select v-model="carrier"
                             :options="carriersList"
                             filter
                             :filterFields="['name','tax_id']"
                             optionLabel="name"
                             option-value="id"
-                            :placeholder="$t('carriers.import.new.fields.carrier_placeholder')"
-                            :filterMessage="$t('carriers.import.new.fields.carrier_filter')"
-                            :selectionMessage="$t('carriers.import.new.fields.carrier_empty')"
-                            :emptySelectionMessage="$t('carriers.import.new.fields.carrier_empty')"
-                            :emptyMessage="$t('carriers.import.new.fields.carrier_empty')"
-                            :emptyFilterMessage="$t('carriers.import.new.fields.carrier_empty')"
+                            :placeholder="$t('fields.carrier_placeholder')"
+                            :filterMessage="$t('fields.carrier_filter')"
+                            :selectionMessage="$t('fields.carrier_empty')"
+                            :emptySelectionMessage="$t('fields.carrier_empty')"
+                            :emptyMessage="$t('fields.carrier_empty')"
+                            :emptyFilterMessage="$t('fields.carrier_empty')"
                             class="w-full">
                         <template #option="{ option }">
                             <span>{{ `${option.name} - ${option.tax_id}` }}</span>
@@ -133,12 +132,12 @@ const submit = (): void => {
                   <div class="mb-4 md:col-span-6 lg:col-span-4 xl:col-span-8"></div>
                   <div class="mb-4 col-span-12">
                     <label class="block text-surface-500 dark:text-surface-300 font-medium mb-2"
-                      for="file">{{ $t('carriers.import.new.fields.files') }}</label>
+                      for="file">{{ $t('fields.files') }}</label>
                       <FileUpload name="files[]" url="/api/upload" :multiple="true" accept=".csv" :maxFileSize="1000000000" :fileLimit="10" @select="onSelectedFiles" class="w-full">
                         <template #header="{ chooseCallback, clearCallback, files }">
                             <div class="flex flex-wrap justify-between items-center flex-1 gap-4">
                               <div class="flex items-center gap-2">
-                                <h5>{{ $t('carriers.import.new.table.title') }}</h5>
+                                <h5>{{ $t('modules.carriers.import.new.files') }}</h5>
                               </div>
                               <div class="flex gap-2">
                                   <Button @click="chooseCallback()" ref="chooseCallbackButton" icon="pi pi-file-excel" rounded outlined severity="secondary"></Button>
@@ -156,23 +155,23 @@ const submit = (): void => {
                                       <span>{{ index + 1 }}</span>
                                     </template>
                                   </Column>
-                                  <Column field="type" :header="$t('carriers.import.new.table.header.type')">
+                                  <Column field="type" :header="$t('fields.type')">
                                     <template #body="{ data }">
                                       <span>{{ nameValid(data.name, 'type') }}</span>
                                     </template>
                                   </Column>
-                                  <Column field="name" :header="$t('carriers.import.new.table.header.name')">
+                                  <Column field="name" :header="$t('fields.name')">
                                     <template #body="{ data }">
                                       <span>{{ nameValid(data.name, 'name') }}</span>
                                     </template>
                                   </Column>
-                                  <Column field="name" :header="$t('carriers.import.new.table.header.file_name')"></Column>
-                                  <Column field="size" :header="$t('carriers.import.new.table.header.size')">
+                                  <Column field="name" :header="$t('fields.file_name')"></Column>
+                                  <Column field="size" :header="$t('fields.size')">
                                     <template #body="{ data }">
                                       <span>{{ formatSize(data.size) }}</span>
                                     </template>
                                   </Column>
-                                  <Column :header="$t('carriers.import.new.table.header.actions')">
+                                  <Column :header="$t('common.actions')">
                                     <template #body="{ data }">
                                       <Button icon="pi pi-times" class="!bg-red-50 hover:!bg-red-100" @click="onRemoveTemplatingFile(data, removeFileCallback, index)" outlined rounded severity="danger" />
                                     </template>
@@ -192,9 +191,9 @@ const submit = (): void => {
                   </div>
                 </div>
                 <div class="flex flex-row justify-between">
-                  <Button :label="$t('carriers.import.buttons.save')" icon="pi pi-upload" class="!w-32" @click="submit" :loading="loading" />
+                  <Button :label="$t('setup.buttons.save')" icon="pi pi-upload" class="!w-32" @click="submit" :loading="loading" />
                   <NuxtLink to="/carriers/import" class="!w-32">
-                    <Button :label="$t('carriers.import.buttons.cancel')" icon="pi pi-times" class="!w-32" />
+                    <Button :label="$t('setup.buttons.cancel')" icon="pi pi-times" class="!w-32" />
                   </NuxtLink>
                 </div>
               </Fluid>

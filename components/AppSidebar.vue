@@ -7,68 +7,68 @@ const loading = ref(true);
 const user = computed(() => authStore.authUser);
 
 const sidebarLinks = ref([{
-  name: 'dashboard',
+  name: 'modules.dashboard.title',
   icon: 'pi pi-chart-bar',
   url: '/dashboard',
 },
 {
-  name: 'reports',
+  name: 'modules.reports.title',
   icon: 'pi pi-chart-line',
   isOpen: ref(route.path.toString().includes('/reports') || route.path.toString().includes('/revenue') || route.path.toString().includes('/expenses')),
   children: [
     {
-      name: 'revenue',
+      name: 'modules.reports.revenue.title',
       icon: 'pi pi-table',
       isOpen: ref(route.path.toString().includes('/revenue')),
       children: [
         {
-          name: 'view',
+          name: 'common.view',
           icon: 'pi pi-table',
           url: '/reports/revenue/view',
         },
         {
-          name: 'search',
+          name: 'common.search',
           icon: 'pi pi-search',
           url: '/reports/revenue/search',
         },
       ],
     },
     {
-      name: 'expenses',
+      name: 'modules.reports.expenses.title',
       icon: 'pi pi-chart-line',
       url: '/reports/expenses',
     },
   ]
 },
 {
-  name: 'carriers.title',
+  name: 'modules.carriers.title',
   icon: 'pi pi-truck',
   isOpen: ref(route.path.toString().includes('/carriers')),
   children: [
     {
-      name: 'carriers.manage',
+      name: 'modules.carriers.manage.title',
       icon: 'pi pi-table',
       url: '/carriers',
     },
     {
-      name: 'carriers.import',
+      name: 'modules.carriers.import.title',
       icon: 'pi pi-file-import',
       url: '/carriers/import',
     },
   ],
 },
 {
-  name: 'invoices',
+  name: 'modules.invoices.title',
   icon: 'pi pi-file',
   url: '/invoices',
 },
 {
-  name: 'events',
+  name: 'modules.events.title',
   icon: 'pi pi-calendar',
   url: '/events',
 },
 {
-  name: 'options',
+  name: 'modules.options.title',
   icon: 'pi pi-cog',
   url: '/options',
 },
@@ -105,12 +105,17 @@ watch((user), () => {
     class="w-[280px] bg-surface-900 h-screen hidden lg:block flex-shrink-0 absolute lg:fixed left-0 top-0 z-10 select-none">
     <div class="flex flex-col h-full">
       <div class="h-[60px] flex items-center px-8 bg-surface-950 flex-shrink-0 dark:border-b border-surface">
-        <svg height="36" viewBox="0 0 48 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-            d="M33.1548 9.65956L23.9913 4.86169L5.54723 14.5106L0.924465 12.0851L23.9913 0L37.801 7.23403L33.1548 9.65956ZM23.9931 19.3085L42.4255 9.65955L47.0717 12.0851L23.9931 24.1595L10.1952 16.9361L14.8297 14.5106L23.9931 19.3085ZM4.6345 25.8937L0 23.4681V37.9149L23.0669 50V45.1489L4.6345 35.4894V25.8937ZM18.4324 28.2658L0 18.6169V13.7658L23.0669 25.8403V40.2977L18.4324 37.8615V28.2658ZM38.7301 23.468V18.6169L24.9205 25.8403V49.9999L29.555 47.5743V28.2659L38.7301 23.468ZM43.3546 35.4892V16.1914L48.0008 13.7659V37.9148L34.1912 45.1488V40.2977L43.3546 35.4892Z"
-            class="fill-white" />
-        </svg>
-        <span class="font-medium text-lg text-white ml-2">{{ $t('hermes_tms') }}</span>
+        <TransitionFade group>
+          <Skeleton v-if="loading" height="48px" />
+          <div v-else class="flex items-center">
+            <svg height="36" viewBox="0 0 48 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd"
+                d="M33.1548 9.65956L23.9913 4.86169L5.54723 14.5106L0.924465 12.0851L23.9913 0L37.801 7.23403L33.1548 9.65956ZM23.9931 19.3085L42.4255 9.65955L47.0717 12.0851L23.9931 24.1595L10.1952 16.9361L14.8297 14.5106L23.9931 19.3085ZM4.6345 25.8937L0 23.4681V37.9149L23.0669 50V45.1489L4.6345 35.4894V25.8937ZM18.4324 28.2658L0 18.6169V13.7658L23.0669 25.8403V40.2977L18.4324 37.8615V28.2658ZM38.7301 23.468V18.6169L24.9205 25.8403V49.9999L29.555 47.5743V28.2659L38.7301 23.468ZM43.3546 35.4892V16.1914L48.0008 13.7659V37.9148L34.1912 45.1488V40.2977L43.3546 35.4892Z"
+                class="fill-white" />
+            </svg>
+            <span class="font-medium text-lg text-white ml-2">{{ $t('hermes_tms') }}</span>
+          </div>
+        </TransitionFade>
       </div>
       <div class="overflow-y-auto mt-4">
         <Transition name="fade" mode="out-in">
@@ -122,12 +127,12 @@ watch((user), () => {
               <NuxtLink v-if="!link.children" :to="link.url"
                 class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                 <i class="pi mr-2" :class="link.icon" />
-                <span class="font-medium">{{ $t(`sidebar.${link.name}`) }}</span>
+                <span class="font-medium">{{ $t(link.name) }}</span>
                 </NuxtLink>
               <a v-else @click="toggleMenu(link)"
                 class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                 <i class="pi mr-2" :class="link.icon" />
-                <span class="font-medium">{{ $t(`sidebar.${link.name}`) }}</span>
+                <span class="font-medium">{{ $t(link.name) }}</span>
                 <i class="pi ml-auto transition-all duration-200 pi-chevron-left" :class="link.isOpen ? '-rotate-90' : ''" />
               </a>
               <TransitionExpand>
@@ -137,7 +142,7 @@ watch((user), () => {
                       <a @click="toggleMenu(child_link, true)"
                         class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                         <i class="pi mr-2" :class="child_link.icon" />
-                        <span class="font-medium">{{ $t(`sidebar.${child_link.name}`) }}</span>
+                        <span class="font-medium">{{ $t(child_link.name) }}</span>
                         <i class="pi ml-auto transition-all duration-200 pi-chevron-left text-surface-300"
                           :class="child_link.isOpen ? '-rotate-90' : ''" />
                       </a>
@@ -147,7 +152,7 @@ watch((user), () => {
                               <NuxtLink :to="sub_child_link.url"
                                 class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                                 <i class="pi mr-2" :class="sub_child_link.icon" />
-                                <span class="font-medium">{{ $t(`sidebar.${sub_child_link.name}`) }}</span>
+                                <span class="font-medium">{{ $t(sub_child_link.name) }}</span>
                               </NuxtLink>
                             </li>
                           </ul>
@@ -156,7 +161,7 @@ watch((user), () => {
                       <NuxtLink v-else :to="child_link.url"
                         class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                         <i class="pi mr-2" :class="child_link.icon" />
-                        <span class="font-medium">{{ $t(`sidebar.${child_link.name}`) }}</span>
+                        <span class="font-medium">{{ $t(child_link.name) }}</span>
                       </NuxtLink>
                   </li>
                 </ul>
@@ -177,7 +182,7 @@ watch((user), () => {
             <NuxtLink :to="`/settings`"
               class="flex items-center cursor-pointer p-4 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
               <i class="pi pi-cog mr-2" />
-              <span class="font-medium">{{ $t('sidebar.settings') }}</span>
+              <span class="font-medium">{{ $t('modules.settings.title') }}</span>
             </NuxtLink>
           </li>
         </ul>

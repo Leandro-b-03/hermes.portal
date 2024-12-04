@@ -20,19 +20,19 @@ const permissions = ref({
 
 const menu = ref([
   {
-    label: t('settings.details.title'),
+    label: t('modules.settings.details.title'),
     command: () => {
       changeQuery({ menu: 'details' });
     },
   },
   {
-    label: t('settings.users.title'),
+    label: t('modules.settings.users.title'),
     command: () => {
       changeQuery({ menu: 'users' });
     },
   },
   {
-    label: t('settings.permissions.title'),
+    label: t('modules.settings.permissions.title'),
     command: () => {
       changeQuery({ menu: 'permissions' });
     },
@@ -51,32 +51,42 @@ onMounted(() => {
   routeContent(selectedMenu.value);
 });
 
-watch(() => !!route.query.menu, () => {
-  selectedMenu.value = route.query.menu as string;
-  routeContent(selectedMenu.value);
-});
+watch(
+  () => route.query.menu, 
+  (newMenu, oldMenu) => {
+    // Optional: Add validation or error handling for newMenu
+    if (typeof newMenu === 'string') {
+      selectedMenu.value = newMenu;
+      routeContent(newMenu); 
+    } else {
+      // Handle the case where newMenu is not a string
+      console.error('Invalid menu query parameter:', newMenu);
+      // Optionally, set a default value for selectedMenu.value
+    }
+  }
+);
 
 const title = ref('');
-const subtitle = ref('');
+const description = ref('');
 const icon = ref('');
 
 const routeContent = (value: string): void => {
   switch (value) {
     case 'details':
       icon.value = 'pi pi-info-circle';
-      title.value = 'settings.details.title';
-      subtitle.value = 'settings.details.subtitle';
+      title.value = 'modules.settings.details.title';
+      description.value = 'modules.settings.details.description';
       permissions.value.shipper.edit = authStore.hasPermission('Shipper.Editor');
       break;
     case 'users':
       icon.value = 'pi pi-users';
-      title.value = 'settings.users.title';
-      subtitle.value = 'settings.users.subtitle';
+      title.value = 'modules.settings.users.title';
+      description.value = 'modules.settings.users.description';
       break;
     case 'permissions':
       icon.value = 'pi pi-lock';
-      title.value = 'settings.permissions.title';
-      subtitle.value = 'settings.permissions.subtitle';
+      title.value = 'modules.settings.permissions.title';
+      description.value = 'modules.settings.permissions.description';
       break;
   }
 }
@@ -105,10 +115,11 @@ const cancelEdit = () => {
                 <Button v-if="selectedMenu === 'details' && permissions.shipper.edit" :disabled="editMode" v-tooltip.top="$t('setup.options.edit')" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editMode = !editMode" />
               </div>
             </div>
-            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t(subtitle) }}
+            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t(description) }}
             </div>
             <div>
               <PagesSettingsDetails v-if="selectedMenu === 'details'" :edit="editMode" @cancel-edit="cancelEdit" />
+              <PagesSettingsUsers v-if="selectedMenu === 'users'" />
             </div>
           </div>
         </div>

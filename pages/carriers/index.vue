@@ -99,8 +99,8 @@ const exportCSV = (): void => {
 
 const deleteCarrier = (id: number): void => {
   confirm.require({
-    message: t('carriers.index.delete.subtitle'),
-    header: t('carriers.index.delete.title'),
+    message: t('modules.fields.delete.subtitle'),
+    header: t('modules.fields.delete.title'),
     icon: 'pi pi-info-circle',
     rejectLabel: t('setup.options.cancel'),
     rejectProps: {
@@ -116,12 +116,12 @@ const deleteCarrier = (id: number): void => {
       carrierStore.delete(id).then((response) => {
         console.log(response);
         if (response) {
-          $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('carriers.index.delete.message.success_header'), detail:  t('carriers.index.delete.message.success'), life: 3000 });
+          $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('modules.fields.delete.message.success_header'), detail:  t('modules.fields.delete.message.success'), life: 3000 });
         } else {
-          $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('carriers.index.delete.message.error_header'), detail:  t('carriers.index.delete.message.error'), life: 3000 });
+          $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('modules.fields.delete.message.error_header'), detail:  t('modules.fields.delete.message.error'), life: 3000 });
         }
       }).catch((error) => {
-        $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('carriers.index.delete.message.error_header'), detail:  t('carriers.index.delete.message.error'), life: 3000 });
+        $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('modules.fields.delete.message.error_header'), detail:  t('modules.fields.delete.message.error'), life: 3000 });
       });
     }
   });
@@ -147,8 +147,7 @@ const deleteCarrier = (id: number): void => {
             <div class="mb-2 flex items-center justify-between">
               <div class="flex items-center">
                 <i class="pi pi-table text-surface-500 dark:text-surface-300 mr-2 text-xl" />
-                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('carriers.index.title')
-                  }}</span>
+                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('modules.carriers.title') }}</span>
               </div>
               <div>
                 <NuxtLink to="/carriers/create" v-tooltip.top="$t('setup.options.add')" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">
@@ -170,7 +169,7 @@ const deleteCarrier = (id: number): void => {
                 </Menu>
               </div>
             </div>
-            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.index.subtitle') }}
+            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('modules.carriers.manage.description') }}
             </div>
             <div>
               <ConfirmDialog></ConfirmDialog>
@@ -183,17 +182,17 @@ const deleteCarrier = (id: number): void => {
                   </div>
                 </template>
                 <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
-                <Column field="name" :header="$t(`carriers.index.table.name`)">
+                <Column field="name" :header="$t(`fields.name`)">
                   <template #body="slotProps">
                     <NuxtLink :to="`/carriers/${slotProps.data.id}/view`">{{ slotProps.data.name }}</NuxtLink>
                   </template>
                 </Column>
-                <Column field="tax_id" :header="$t(`carriers.index.table.tax_id`)">
+                <Column field="tax_id" :header="$t(`fields.tax_id`)">
                   <template #body="slotProps">
                     <span>{{ slotProps.data.tax_id }}</span>
                   </template>
                 </Column>
-                <Column field="address" :header="$t(`carriers.index.table.address`)">
+                <Column field="address" :header="$t(`fields.address`)">
                   <template #body="slotProps">
                     <span class="cursor-pointer"
                     v-tooltip.top="slotProps.data.address + ', ' + slotProps.data.number + ', ' + slotProps.data.address_2 + ' - ' + slotProps.data.address_3 + ', ' + slotProps.data.city + ' - ' + slotProps.data.state + ', ' + slotProps.data.zip">
@@ -201,27 +200,27 @@ const deleteCarrier = (id: number): void => {
                     </span>
                   </template>
                 </Column>
-                <Column field="zip" :header="$t(`carriers.index.table.zip`)">
+                <Column field="zip" :header="$t(`fields.zip_code`)">
                   <template #body="slotProps">
                     <span>{{ slotProps.data.zip }}</span>
                   </template>
                 </Column>
-                <Column field="carrier_contact.name" :header="$t(`carriers.index.table.contact_name`)">
+                <Column field="carrier_contact.name" :header="$t(`fields.contact.name`)">
                   <template #body="slotProps">
                     <span class="cursor-pointer" @click="showContactInfo(slotProps.data.carrier_contact[0])">{{ slotProps.data.carrier_contact[0].name }}</span>
                   </template>
                 </Column>
-                <Column field="carrier_shipper.active" :header="$t(`carriers.index.table.status`)">
+                <Column field="carrier_shipper.active" :header="$t(`fields.status`)">
                   <template #body="slotProps">
                     <Badge :severity="getSeverityB(slotProps.data.carrier_shipper[0].active)" :value="$t(`setup.status.${slotProps.data.carrier_shipper[0].active}`)" />
                   </template>
                 </Column>
-                <Column field="updated_at" :header="$t(`carriers.index.table.updated_at`)">
+                <Column field="updated_at" :header="$t(`fields.updated_at`)">
                   <template #body="slotProps">
                     {{ formatDate(slotProps.data.updated_at, true) }}
                   </template>
                 </Column>
-                <Column :header="$t(`carriers.index.table.actions`)">
+                <Column :header="$t(`common.actions`)">
                   <template #body="slotProps">
                     <Button v-tooltip.left="$t('setup.options.edit')" icon="pi pi-pencil" class="mr-2" @click="edit(slotProps.data.id)" />
                     <Button v-tooltip.right="$t('setup.options.delete')" icon="pi pi-trash" class="mr-2" @click="deleteCarrier(slotProps.data.id)" />
@@ -237,42 +236,42 @@ const deleteCarrier = (id: number): void => {
     </div>
   </div>
 
-  <Dialog v-model:visible="modal.contactInfo.open" maximizable modal :header="$t('carriers.index.contact_info.title')" :style="{ width: '45rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+  <Dialog v-model:visible="modal.contactInfo.open" maximizable modal :header="$t('modules.fields.contact_info.title')" :style="{ width: '45rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <div class="font-medium text-3xl text-surface-900 dark:text-surface-0 mb-4">{{ modal.contactInfo.data.name }}</div>
     <div class="text-surface-500 dark:text-surface-300 mb-8">{{ `${$t('setup.tax_id')}: ${modal.contactInfo.data.tax_id}` }} </div>
     <ul class="list-none p-0 m-0 border-t border-surface">
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.name') }}</div>
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('modules.fields.contact_info.name') }}</div>
             <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">{{ modal.contactInfo.data.name }}</div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap">
-            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.contact_title') }}</div>
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('modules.fields.contact_info.contact_title') }}</div>
             <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12 leading-normal">{{ modal.contactInfo.data.title }}</div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.department') }}</div>
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('modules.fields.contact_info.department') }}</div>
             <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">{{ modal.contactInfo.data.department }}</div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap">
-            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.email') }}</div>
+            <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('modules.fields.contact_info.email') }}</div>
             <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
                 <a :href="`mailto:${modal.contactInfo.data.email}`" target="_blank"><Tag class="mr-2" :value="modal.contactInfo.data.email" :rounded="true" /></a>
             </div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.phone') }}</div>
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('modules.fields.contact_info.phone') }}</div>
           <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
             <Tag :value="`${modal.contactInfo.data.phone}`" severity="info" :rounded="true" />
           </div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.mobile') }}</div>
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('modules.fields.contact_info.mobile') }}</div>
           <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
             <Tag :value="`${modal.contactInfo.data.mobile}`" severity="success" :rounded="true" />
           </div>
         </li>
         <li class="flex items-center py-4 px-2 flex-wrap bg-surface-50 dark:bg-surface-800">
-          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('carriers.index.contact_info.fax') }}</div>
+          <div class="text-surface-500 dark:text-surface-300 w-full md:w-2/12 font-medium">{{ $t('modules.fields.contact_info.fax') }}</div>
           <div class="text-surface-900 dark:text-surface-0 w-full md:w-10/12">
             <Tag :value="`${modal.contactInfo.data.fax}`" severity="warning" :rounded="true" />
           </div>

@@ -28,11 +28,11 @@ onMounted(() => {
             <div class="mb-2 flex items-center justify-between">
               <div class="flex items-center">
                 <i class="pi pi-plus text-surface-500 dark:text-surface-300 mr-2 text-xl" />
-                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('carriers.create.title')
+                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t('modules.carriers.create.title')
                   }}</span>
               </div>
             </div>
-            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('carriers.create.subtitle') }}
+            <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('modules.carriers.create.description') }}
             </div>
             <div>
               <PagesCarriersForm />

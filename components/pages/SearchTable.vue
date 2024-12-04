@@ -12,7 +12,7 @@ const selectedFields = ref(props.fields || []);
 
 const fieldOptions = computed(() => 
   props.fields.map(field => ({
-    label: t(`carriers.fields.${field.replace('carrierContact', 'contact')}`),
+    label: t(`fields.${field.replace('carrierContact', 'contact')}`),
     value: field
   }))
 );
@@ -32,7 +32,7 @@ const search = async (searchInput: string): Promise<void> => {
 <template>
   <InputGroup>
     <MultiSelect v-model="selectedFields" :options="fieldOptions" optionLabel="label" optionValue="value" filter display="chip" :maxSelectedLabels="3" :placeholder="$t('setup.tables.select')" class="w-1/4"></MultiSelect>
-    <InputText v-model="searchInput" :placeholder="$t('setup.tables.search')" class="w-full" @keyup.enter="search(searchInput)" />
+    <InputText v-model="searchInput" :placeholder="$t('common.search')" class="w-full" @keyup.enter="search(searchInput)" />
     <Button icon="pi pi-search" severity="secondary" @click="search(searchInput)" />
   </InputGroup>
 </template>
