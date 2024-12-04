@@ -443,7 +443,8 @@
   "setup": {
     "buttons": {
       "cancel": "Cancelar",
-      "save": "Salvar"
+      "save": "Salvar",
+      "upload": "Upload"
     },
     "success": "Sucesso",
     "error": {

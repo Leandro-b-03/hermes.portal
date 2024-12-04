@@ -33,7 +33,7 @@ async function handlePostRequest(data: any, apiCall: any) {
 
 async function handlePutRequest(data: any, apiCall: any) {
   if (data.get('action') === 'update_shipper') {
-    return (await apiCall('POST', `/v1/shipper/${data.get('shipper[id]')}`, data)).shipper;
+    return (await apiCall('PUT', `/v1/shipper/${data.get('shipper[id]')}`, data)).shipper;
   }
 }
 

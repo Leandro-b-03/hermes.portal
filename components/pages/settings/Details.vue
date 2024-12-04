@@ -16,9 +16,11 @@ const loading = computed(() => shipperStore.isLoading);
 const showContactInfo = ref(false);
 const zipLoading = ref(false);
 const transition = ref(false);
+const uploadMouseover = ref(false);
 const disabled = ref({
   address: true,
 });
+const logo = ref(File);
 const shipper = reactive({});
 const schema = computed(() => {
   return {
@@ -26,7 +28,7 @@ const schema = computed(() => {
       required: required,
       minLength: minLength(3),
     },
-    fantasy_name: { 
+    commercial_name: { 
       required: required,
       minLength: minLength(3),
     },
@@ -118,13 +120,39 @@ const zipValidation = async (): Promise<any> => {
 
 const emit = defineEmits(['cancelEdit']);
 
+const openFileUpload = (): void => {
+  const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+  input.click();
+}
+
+const changeLogo = (event: Event): void => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+
+  if (file) {
+    logo.value = file;
+  }
+}
+
 const save = async (): Promise<any> => {
   v$.value.$validate().then(() => {
     if (v$.value.$error) {
+      console.log(v$.value.$errors);
       return;
     }
 
+    console.log(shipper);
+
     const formData = toFormData(shipper, 'shipper');
+
+    console.log(logo.value);
+    console.log(formData);
+
+    if (logo.value.name !== 'File') {
+      formData.append('shipper[logo]', logo.value);
+      formData.delete('shipper[logo_image_url]');
+      console.log(formData);
+    }
 
     shipperStore.update(formData).then((response) => {
       $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('shipper.edit.message.success'), life: 5000 });
@@ -159,10 +187,12 @@ const cancel = (): void => {
               <div class="mb-4 col-span-12 lg:col-span-6">
                 <label for="zip_code" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.name') }}</label>
                 <InputText v-model="shipper.name" class="w-full" />
+                <small v-for="error in v$.name.$errors" v-if="v$.name.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
               </div>
               <div class="mb-4 col-span-12 lg:col-span-6">
                 <label for="zip_code" class="font-medium text-surface-900 dark:text-surface-0 block mb-1">{{ $t('carriers.fields.commercial_name') }}</label>
                 <InputText v-model="shipper.commercial_name" class="w-full" />
+                <small v-for="error in v$.commercial_name.$errors" v-if="v$.name.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
               </div>
             </div>
           </div>
@@ -175,11 +205,13 @@ const cancel = (): void => {
         <div class="col-span-12 lg:col-span-3 p-4">
           <!-- <img :src="shipperLoad?.logo_image_url" alt="Logo" class="w-24 h-24 rounded shadow-lg" /> -->
           <!-- <Button v-if="edit" icon="pi pi-upload" rounded class="absolute -top-5 -right-7 -mb-4" /> -->
-          <div :style="{ backgroundImage: `url(${shipperLoad?.logo_image_url})` }" class="w-28 h-28 bg-cover bg-center rounded shadow-lg flex flex-col-reverse">
-            <div class="flex items-center justify-center w-full h-7 bg-black bg-opacity-50 rounded-b cursor-pointer" @click="">
-              <i class="pi pi-upload text-white"></i>
-            </div>
-            <input type="file" class="hidden" />
+          <div :style="{ backgroundImage: `url(${shipperLoad?.logo_image_url ? logo.name === 'File' ? shipperLoad.logo_image_url : createObjectURL(logo) : ''})` }" class="w-28 h-28 bg-cover bg-center rounded shadow-lg flex flex-col-reverse mouseover" @mouseenter="uploadMouseover = true" @mouseleave="uploadMouseover = false">
+            <TransitionFade mode="in-out">
+              <div v-if="edit && uploadMouseover" class="flex justify-center w-full h-8 bg-black bg-opacity-50 rounded-b cursor-pointer transition-all" @click="openFileUpload">
+                <i class="pi pi-upload text-white mt-2"></i>
+              </div>
+            </TransitionFade>
+            <input type="file" class="hidden" @change="changeLogo" />
           </div>
         </div>
         <div class="col-span-12 p-4">

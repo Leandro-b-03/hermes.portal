@@ -43,7 +43,6 @@ export const useShipperStore = defineStore({
       try {
         shipper.append('action', 'update_shipper');
         shipper.append('token', localStorage.sessionId);
-        shipper.append('_method', 'PUT');
         const updatedShipper = await $fetch(`/api/shipper`, { method: 'PUT', body: shipper });
         this.setShipper(updatedShipper);
         return updatedShipper;

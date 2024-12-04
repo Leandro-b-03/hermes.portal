@@ -137,3 +137,15 @@ export function formatPhone(phone: string, country: string = 'BR'): string {
 
   return phone;
 }
+
+export function fileToURLEnconder(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+  });
+}
+
+export function createObjectURL(file: File): string {
+  return URL.createObjectURL(file);
+};
