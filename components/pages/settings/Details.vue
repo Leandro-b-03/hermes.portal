@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
-import { formatZipCode } from '@/utils/common';
 
 const shipperStore = useShipperStore();
 const t = useNuxtApp().$i18n.t;
@@ -141,12 +140,7 @@ const save = async (): Promise<any> => {
       return;
     }
 
-    console.log(shipper);
-
     const formData = toFormData(shipper, 'shipper');
-
-    console.log(logo.value);
-    console.log(formData);
 
     if (logo.value.name !== 'File') {
       formData.append('shipper[logo]', logo.value);

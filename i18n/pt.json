@@ -248,6 +248,9 @@
     "dashboard": {
       "title": "Dashboard",
       "description": "Painel de controle",
+      "error": {
+        "text": "Veja como está a saúde do seu negócio"
+      }
     },
     "reports": {
       "title": "Relatórios",
@@ -310,9 +313,9 @@
         "error": "Erro ao salvar detalhes",
         "success": "Detalhes salvos com sucesso"
       },
-      "users": {
-        "title": "Usuários",
-        "description": "Gerencie os usuários",
+      "members": {
+        "title": "Membros",
+        "description": "Gerencie os membros da sua organização",
         "create": {
           "title": "Criar",
           "description": "Crie um novo usuário",
@@ -325,9 +328,12 @@
           "error": "Erro ao editar usuário",
           "success": "Usuário editado com sucesso"
         },
+        "error": {
+          "text": "Configure os detalhes, membros e permissões da sua organização"
+        },
         "manage": {
           "title": "Gerenciar",
-          "description": "Gerencie seus usuários"
+          "description": "Gerencie seus membros"
         }
       }
     },
@@ -384,6 +390,10 @@
     },
     "error": {
       "title": "Erro",
+      "403": {
+        "title": "Acesso negado",
+        "message": "Você não tem permissão para acessar esta página, por favor, contate um administrador da sua empresa."
+      },
       "404": {
         "title": "Página não encontrada",
         "message": "Houve um erro e a página não foi encontrada, por favor, verifique o caminho."

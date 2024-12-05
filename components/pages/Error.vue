@@ -17,7 +17,7 @@ const props = defineProps<{
       <p class="text-surface-700 dark:text-surface-100 text-3xl mt-0 mb-12">{{ $t(props.message) }}</p>
 
       <ul class="list-none px-0 pb-0 pt-6 m-0 border-t border-surface">
-        <li v-if="props?.statusCode !== 404" class="py-2">
+        <li v-if="props?.statusCode === 500" class="py-2">
           <NuxtLink :to="`https://localhost:5173/ticket${$route.path}`" class="cursor-pointer flex items-center rounded-border border border-transparent hover:border-surface-300 dark:hover:border-surface-500 p-4 transition-colors duration-150">
             <span class="w-14 h-14 inline-flex items-center justify-center bg-indigo-500 rounded-border flex-shrink-0">
               <i class="pi pi-envelope text-white text-3xl" />
@@ -35,8 +35,8 @@ const props = defineProps<{
               <i class="pi pi-chart-bar text-white text-3xl" />
             </span>
             <div class="ml-4">
-              <span class="text-surface-900 dark:text-surface-0 font-medium text-2xl inline-block mb-1">{{ $t('dashboard.title') }}</span>
-              <p class="text-surface-600 dark:text-surface-200 m-0 leading-normal">{{ $t('dashboard.text') }}</p>
+              <span class="text-surface-900 dark:text-surface-0 font-medium text-2xl inline-block mb-1">{{ $t('modules.dashboard.title') }}</span>
+              <p class="text-surface-600 dark:text-surface-200 m-0 leading-normal">{{ $t('modules.dashboard.error.text') }}</p>
             </div>
             <i class="text-surface-600 dark:text-surface-200 pi pi-chevron-right ml-auto" />
           </NuxtLink>
@@ -47,15 +47,15 @@ const props = defineProps<{
               <i class="pi pi-cog text-white text-3xl" />
             </span>
             <div class="ml-4">
-              <span class="text-surface-900 dark:text-surface-0 font-medium text-2xl inline-block mb-1">{{ $t('settings.title') }}</span>
-              <p class="text-surface-600 dark:text-surface-200 m-0 leading-normal">{{ $t('settings.title') }}</p>
+              <span class="text-surface-900 dark:text-surface-0 font-medium text-2xl inline-block mb-1">{{ $t('modules.settings.title') }}</span>
+              <p class="text-surface-600 dark:text-surface-200 m-0 leading-normal">{{ $t('modules.settings.error.text') }}</p>
             </div>
             <i class="text-surface-600 dark:text-surface-200 pi pi-chevron-right ml-auto" />
           </NuxtLink>
         </li>
       </ul>
       <div class="flex justify-items-start mt-8">
-        <Button class="mr-2" text label="Go Back" icon="pi pi-arrow-left" @click="$router.back()" />
+        <Button class="mr-2" text :label="$t('setup.buttons.back')" icon="pi pi-arrow-left" @click="$router.back()" />
       </div>
     </div>
   </div>
