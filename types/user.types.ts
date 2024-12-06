@@ -31,3 +31,9 @@ export interface ISignUpResponse {
 	status: string;
 	message: string;
 }
+
+export interface IUserListResponse {
+	status: string;
+	users: IUser[];
+	message: string;
+}

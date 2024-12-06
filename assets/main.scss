@@ -242,3 +242,7 @@ body {
 .p-popover.profile::after {
   margin-left: calc(0.5 * (var(--p-popover-gutter) - 2px));
 }
+
+.p-datatable-header-cell {
+  border-width: 0 0 2px 0 !important;
+}

@@ -120,9 +120,6 @@ const permissionsLoad = () => {
   permissions.value.permissions.delete = authStore.hasPermission('permissions.delete');
 
   Object.keys(permissions.value).forEach((key) => {
-    console.log('key:', key);
-    console.log('selectedMenu:', selectedMenu.value);
-    console.log(key === selectedMenu.value);
     if (key === selectedMenu.value) {
       if (permissions.value[key].read !== true) {
         notAllowed.value = true;
@@ -155,9 +152,6 @@ const cancelEdit = () => {
                   <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ $t(title) }}</span>
                 </div>
                 <div>
-                  <a v-if="selectedMenu !== 'details'" v-tooltip.top="$t('setup.options.add')" class="p-button p-component p-button-icon-only p-button-rounded p-button-text ripple">
-                    <i class="pi pi-plus"></i>
-                  </a>
                   <Button v-if="selectedMenu === 'details' && permissions.shipper.edit" :disabled="editMode" v-tooltip.top="$t('setup.options.edit')" icon="pi pi-pencil" class="p-button-rounded p-button-text" @click="editMode = !editMode" />
                 </div>
               </div>

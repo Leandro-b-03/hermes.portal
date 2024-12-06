@@ -34,15 +34,18 @@ if (userAuthenticated.value) {
 
 const onLogin = async (): Promise<void> => {
   if (!user.value.email) {
+    error.value.showMessage = true;
     error.value.email = true;
   }
 
   if (!user.value.password) {
+    error.value.showMessage = true;
     error.value.password = true;
   }
 
   if (error.value.email || error.value.password) {
-    error.value.message = t('login.errors.empty_field');
+    error.value.showMessage = true;
+    error.value.message = t('modules.login.errors.empty_field');
     return;
   }
 
@@ -58,12 +61,14 @@ const onLogin = async (): Promise<void> => {
     } else {
       error.value.email = false;
       error.value.password = false;
-      error.value.message = t('login.errors.invalid_user_pass');
+      error.value.showMessage = true;
+      error.value.message = t('modules.login.errors.invalid_user_pass');
     }
   }).catch(() => {
     error.value.email = false;
     error.value.password = false;
-    error.value.message = t('login.errors.500');
+    error.value.showMessage = true;
+    error.value.message = t('modules.login.errors.500');
   });
 };
 
@@ -97,7 +102,7 @@ const onThemeToggler = (): void => {
       </div>
       <h1 class="text-center text-3xl font-medium text-surface-900 dark:text-surface-0">Hermes TMS</h1>
       <div class="flex items-center gap-4 w-full">
-        <Button outlined icon="pi pi-google text-lg" severity="secondary" v-tooltip.top="$t('login.google_tooltip')"
+        <Button outlined icon="pi pi-google text-lg" severity="secondary" v-tooltip.top="$t('setup.buttons.google')"
           class="!flex-1 !py-1 !text-surface-900 dark:!text-surface-0" />
         <Button outlined icon="pi pi-facebook text-lg" severity="secondary"
           class="!flex-1 !py-1 !text-surface-900 dark:!text-surface-0" />
@@ -106,7 +111,7 @@ const onThemeToggler = (): void => {
       </div>
       <div class="flex items-center gap-6 w-full">
         <div class="h-[1px] flex-1 bg-surface-200 dark:bg-surface-800" />
-        <div class="text-surface-700 dark:text-surface-300 font-medium">{{ $t('login.or') }}</div>
+        <div class="text-surface-700 dark:text-surface-300 font-medium uppercase">{{ $t('common.or') }}</div>
         <div class="h-[1px] flex-1 bg-surface-200 dark:bg-surface-800" />
       </div>
       <Transition name="fade">
@@ -116,24 +121,24 @@ const onThemeToggler = (): void => {
       </Transition>
       <div class="flex flex-col gap-6 w-full">
         <div class="flex flex-col gap-2">
-          <label for="email">{{ $t('login.email') }}</label>
-          <InputText id="email" v-model="user.email" :placeholder="$t('login.email_placeholder')" class="dark:!bg-surface-900" :invalid="error.email" @keyup.enter="onLogin" />
+          <label for="email">{{ $t('fields.contact.email') }}</label>
+          <InputText id="email" v-model="user.email" :placeholder="$t('fields.contact.email_placeholder')" class="dark:!bg-surface-900" :invalid="error.email" @keyup.enter="onLogin" />
         </div>
         <div class="flex flex-col gap-2">
-          <label for="password">{{ $t('login.password') }}</label>
-          <Password :feedback="false" toggleMask id="password" v-model="user.password" :placeholder="$t('login.password_placeholder')" class="dark:!bg-surface-900 pw-input-full" :invalid="error.password" pt:pcInput:class="w-full" pt:pcInput:id="password" @keyup.enter="onLogin" />
+          <label for="password">{{ $t('fields.password') }}</label>
+          <Password :feedback="false" toggleMask id="password" v-model="user.password" :placeholder="$t('fields.password_placeholder')" class="dark:!bg-surface-900 pw-input-full" :invalid="error.password" pt:pcInput:class="w-full" pt:pcInput:id="password" @keyup.enter="onLogin" />
         </div>
       </div>
       <div class="flex items-center justify-between w-full">
         <div class="flex items-center">
           <Checkbox v-model="user.remember" input-id="remember_me" name="remember_me" />
-          <label for="remember_me" class="ml-2 text-surface-700 dark:text-surface-300"> {{ $t('login.remember_me') }} </label>
+          <label for="remember_me" class="ml-2 text-surface-700 dark:text-surface-300"> {{ $t('fields.remember_me') }} </label>
         </div>
-        <a href="#" class="font-medium text-primary hover:text-primary-emphasis transition-all">{{ $t('login.forgot_password') }}</a>
+        <a href="#" class="font-medium text-primary hover:text-primary-emphasis transition-all">{{ $t('fields.forgot_password') }}</a>
       </div>
-      <Button :label="$t('login.submit')" class="w-full" @click="onLogin" />
-      <div class="mt-2 text-surface-700 dark:text-surface-300 font-medium">{{ $t('login.no_account') }} <a href="#"
-          class="text-primary hover:text-primary-emphasis transition-all">{{ $t('login.no_account_signup') }}</a></div>
+      <Button :label="$t('setup.buttons.enter')" class="w-full" @click="onLogin" />
+      <div class="mt-2 text-surface-700 dark:text-surface-300 font-medium">{{ $t('modules.login.no_account') }} <a href="#"
+          class="text-primary hover:text-primary-emphasis transition-all">{{ $t('modules.login.no_account_signup') }}</a></div>
     </div>
   </div>
 </template>
