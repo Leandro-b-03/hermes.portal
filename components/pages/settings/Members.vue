@@ -1,31 +1,44 @@
 <script setup lang="ts">
 // import Paginatorc from '@/components/pages/Paginatorc.vue';
+
+// import Paginatorc from '@/components/pages/Paginatorc.vue';
 const memberStore = useMemberStore();
+const t = useNuxtApp().$i18n.t;
 const route = useRoute();
 
 const members = computed(() => memberStore.data);
 const query = computed(() => new URLSearchParams(route.query).toString());
 const loading = computed(() => memberStore.isLoading);
-
+const newMember = ref(false);
+const paginate = ref({
+  total: computed(() => members.value ? members.value.total : 0),
+  per_page: computed(() => members.value ? members.value.per_page : 10),
+  from: computed(() => members.value ? members.value.from : 0),
+  to: computed(() => members.value ? members.value.to : 0),
+});
 const items = [
   {
-    label: 'Edit',
+    label: 'setup.buttons.edit',
+    route: 'edit',
     icon: 'pi pi-pencil',
-    command: () => {
-      console.log('Edit');
-    },
+    action: (id: number) => editMember(id),
   },
   {
-    label: 'Inactive',
+    label: 'setup.buttons.deactivate',
+    route: 'deactivate',
     icon: 'pi pi-user-minus',
-    command: () => {
-      console.log('Delete');
-    },
+    action: (id: number) => deactivateMember(id),
   },
 ];
+const filter = route.query.filter?.toString() || '';
+const fields = ref([
+  'name',
+  'email',
+  'created_at',
+  'updated_at'
+]);
 
 onMounted(async () => {
-  console.log('query', query.value);
   await memberStore.fetchData(query.value); 
 });
 
@@ -37,29 +50,45 @@ watch(
     }
   }
 );
+
+const editMember = (id: number): void => {
+  console.log('Edit member', id);
+};
+
+const deactivateMember = (id: number): void => {
+  console.log('Deactivate member', id);
+};
 </script>
 
 <template>
   <section class="flex flex-wrap gap-4 py-12 justify-between border-t border-surface">
     <div class="flex-shrink-0 w-60">
-      <h3 class="mb-6 mt-0 text-surface-900 dark:text-surface-0 font-medium text-xl">Members</h3>
-      <p class="mb-6 mt-0 text-surface-700 dark:text-surface-100 font-normal text-base">Manage your member in this project</p>
-      <Button label="Invite a member" class="w-auto" />
+      <h3 class="mb-6 mt-0 text-surface-900 dark:text-surface-0 font-medium text-xl">{{ $t('modules.settings.members.title_2') }}</h3>
+      <p class="mb-6 mt-0 text-surface-700 dark:text-surface-100 font-normal text-base">{{ $t('modules.settings.members.description_2') }}</p>
+      <Button :label="$t('setup.buttons.invite')" class="w-auto" @click="newMember = true"/>
     </div>
     <div class="overflow-x-scroll">
-      <DataTable :value="members?.data" row-hover :loading="loading" class="header-border">
+      <DataTable :value="members?.data" row-hover :loading="loading">
+        <template #header>
+          <div v-if="members?.data?.length > 0" class="flex justify-end">
+            <div class="w-30">
+              <PagesSearchTable v-model:filter="filter" v-model:fields="fields" />
+            </div>
+          </div>
+        </template>
         <Column class="min-w-[25rem]">
           <template #header>
             <span class="font-semibold text-sm text-muted-color">{{ $t('fields.name') }}</span>
           </template>
           <template #body="{ data }">
             <div class="flex items-center gap-4">
-              <Avatar :image="data.user_info.photo_url" class="mr-2" size="large" shape="circle" />
+              <Avatar v-if="data.user_info.photo_url" :image="data.user_info.photo_url" class="mr-2 overflow-hidden" size="large" />
+              <Avatar v-else icon="pi pi-user" class="mr-2" style="background-color: #ece9fc; color: #2a1261" />
               <div>
-                <p class="mt-0 mb-2 font-medium text-lg text-color-primary">
+                <p class="mt-0 mb-3 font-medium text-base/3 text-color-primary">
                   {{ data.name }}
                 </p>
-                <p class="mt-0 mb-2 font-normal text-base text-muted-color text-sm">
+                <p class="mt-2 font-normal text-muted-color text-xs/3">
                   {{ data.email }}
                 </p>
               </div>
@@ -71,7 +100,7 @@ watch(
             <span class="font-semibold text-sm text-muted-color">{{ $t('fields.joined_at') }}</span>
           </template>
           <template #body="{ data }">
-            <p class="mt-0 mb-2 font-normal text-base text-muted-color">
+            <p class="mt-0 font-normal text-base text-muted-color">
               {{ formatDate(data.created_at) }}
             </p>
           </template>
@@ -81,28 +110,42 @@ watch(
             <span class="font-semibold text-sm text-muted-color">{{ $t('fields.last_active_at') }}</span>
           </template>
           <template #body="{ data }">
-            <p class="mt-0 mb-2 font-normal text-base text-muted-color">
+            <p class="mt-0 font-normal text-base text-muted-color">
               {{ formatDate(data.updated_at, true) }}
             </p>
           </template>
         </Column>
+        <Column>
+          <template #header>
+            <span class="font-semibold text-sm text-muted-color">{{ $t('fields.active') }}</span>
+          </template>
+          <template #body="{ data }">
+            <Badge :value="data.active ? $t('fields.active') : $t('fields.inactive')" :severity="data.active ? 'success' : 'danger'" />
+          </template>
+        </Column>
         <Column class="min-w-32">
-          <template #body>
+          <template #body="{ data }">
             <Button type="button" icon="pi pi-ellipsis-v" text severity="secondary" @click="$refs.menu.toggle($event)" />
-            <Menu ref="menu" append-to="body" popup :model="items"> 
+            <Menu ref="menu" append-to="body" popup :model="items" class="!min-w-full lg:!min-w-5">
               <template #item="{ item, props }">
-                <a v-ripple class="flex items-center" v-bind="props.action">
+                <NuxtLink v-ripple class="flex items-center cursor-pointer p-menu-item p-menu-item-link" v-bind="props.action" @click="item.action(data.id)">
                   <span :class="item.icon" />
-                  <span>{{ item.label }}</span>
-                  <Badge v-if="item.badge" class="ml-auto" :value="item.badge" />
+                  <span>{{ $t(item.label) }}</span>
                   <span v-if="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut }}</span>
-                </a>
+                </NuxtLink>
               </template>
             </Menu>
           </template>
         </Column>
       </DataTable>
-      <!-- <PagesPaginatorc v-if="members.total > 0" v-model:totalRecords="members.total" v-model:rows="members.per_page" v-model:first="members.from" v-model:last="members.to" /> -->
+      <PagesPaginatorc v-if="paginate.total > 0" v-model:totalRecords="paginate.total" v-model:rows="paginate.per_page" v-model:first="paginate.from" v-model:last="paginate.to" />
     </div>
   </section>
+  <Dialog v-model:visible="newMember" maximizable modal header="Header" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <div>
+      <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0">{{ $t('modules.settings.members.invite') }}</h3>
+      <p class="text-base text-surface-700 dark:text-surface-100 mb-2">{{ $t('modules.settings.members.invite_description') }}</p>
+      <InputText v-model="email" :placeholder="$t('fields.email')" class="mt-6" />
+    </div>
+  </Dialog>
 </template>

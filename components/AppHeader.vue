@@ -108,9 +108,8 @@ const toggle = (event: any) => {
               </ul>
             </Popover>
             <Skeleton v-if="loading" class="mr-4 lg:mr-0 rounded" width="2rem" height="2rem" />
-            <img v-else
-              :src="user?.user_info?.photo_url" :alt="user?.name"
-              class="mr-4 lg:mr-0 w-8 h-8 rounded" />
+            <Avatar v-else-if="user?.user_info.photo_url" :image="user?.user_info.photo_url" class="overflow-hidden" />
+            <Avatar v-else icon="pi pi-user" style="background-color: #ece9fc; color: #2a1261" />
             <div class="block lg:hidden">
               <div class="text-surface-900 dark:text-surface-0 font-medium">{{ user?.name }}</div>
               <span class="text-surface-600 dark:text-surface-200 font-medium text-sm">{{ user?.role }}</span>

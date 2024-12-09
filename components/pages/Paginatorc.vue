@@ -2,11 +2,16 @@
 const router = useRouter();
 
 const props = defineProps<{
-  totalRecords: number;
-  rows: number;
-  first: number;
-  last: number;
+  totalRecords: number | null;
+  rows: number | null;
+  first: number | null;
+  last: number | null;
 }>();
+
+const totalRecords = props.totalRecords ?? 0;
+const rows = props.rows ?? 0;
+const first = props.first ?? 0;
+const last = props.last ?? 0;
 
 const onPageChange = (event: { first: number }): void =>{
   scrollToTop();
@@ -23,10 +28,10 @@ const onPageChange = (event: { first: number }): void =>{
 </script>
 
 <template>
-  <Paginator class="border-b border-slate-200" :totalRecords="props.totalRecords" :rows="props.rows" :first="props.first" :last="props.last"
+  <Paginator class="border-b border-slate-200" :totalRecords="totalRecords" :rows="rows" :first="first" :last="last"
     :rowsPerPageOptions="[10, 25, 50, 100]" @page="onPageChange">
     <template #start="slotProps">
-      {{ `${$t('setup.tables.total')}: ${props.totalRecords}` }}
+      {{ `${$t('setup.tables.total')}: ${totalRecords}` }}
     </template>
     <template #end>
     </template>

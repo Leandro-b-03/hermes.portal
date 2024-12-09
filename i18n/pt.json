@@ -322,7 +322,9 @@
       },
       "members": {
         "title": "Membros",
-        "description": "Gerencie os membros da sua organização",
+        "description": "Você pode facilmente gerenciar seu time",
+        "title_2": "Organização",
+        "description_2": "Gerencie os membros da sua organização",
         "create": {
           "title": "Criar",
           "description": "Crie um novo usuário",
@@ -373,6 +375,7 @@
       "send": "Enviar",
       "print": "Imprimir",
       "download": "Baixar",
+      "deactivate": "Desativar",
       "upload": "Enviar",
       "import": "Importar",
       "export": "Exportar",
@@ -405,7 +408,8 @@
       "copy_to_clipboard_not_supported_description_2": "Por favor, copie manualmente o texto exibido",
       "google": "Entrar com Google",
       "submit": "Enviar",
-      "enter": "Entrar"
+      "enter": "Entrar",
+      "invite": "Convidar um novo membro",
     },
     "error": {
       "title": "Erro",
