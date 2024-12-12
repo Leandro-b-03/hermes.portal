@@ -10,6 +10,12 @@ const members = computed(() => memberStore.data);
 const query = computed(() => new URLSearchParams(route.query).toString());
 const loading = computed(() => memberStore.isLoading);
 const newMember = ref(false);
+const emailsText = ref('');
+const emails = ref<string[]>([]);
+const error = ref({
+  email: false,  
+  message: '',
+});
 const paginate = ref({
   total: computed(() => members.value ? members.value.total : 0),
   per_page: computed(() => members.value ? members.value.per_page : 10),
@@ -57,6 +63,43 @@ const editMember = (id: number): void => {
 
 const deactivateMember = (id: number): void => {
   console.log('Deactivate member', id);
+};
+
+const validateEmail = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  error.value.email = !emailRegex.test(emailsText.value); 
+};
+
+const addEmail = (): void => {
+  const invalid_email = t('modules.settings.members.invite.error.invalid_email')
+  const email_exists = t('modules.settings.members.invite.error.email_exists')
+
+  if (error.value.email) {
+    error.value.message = invalid_email;
+    return;
+  }
+
+  const emailsTextValue = emailsText.value.trim();
+
+  console.log(error.value.email);
+
+  if (!error.value.email && !emails.value.includes(emailsTextValue)) { 
+    emails.value.push(emailsTextValue);
+    emailsText.value = '';
+    error.value.email = false; 
+  } else {
+    error.value.email = true;
+    console.log(emails.value.includes(emailsTextValue));
+    if (emails.value.includes(emailsTextValue)) {
+      error.value.message = email_exists;
+    } else {
+      error.value.message = invalid_email;
+    }
+  }
+};
+
+const removeEmail = (index: number): void => {
+  emails.value.splice(index, 1);
 };
 </script>
 
@@ -141,11 +184,25 @@ const deactivateMember = (id: number): void => {
       <PagesPaginatorc v-if="paginate.total > 0" v-model:totalRecords="paginate.total" v-model:rows="paginate.per_page" v-model:first="paginate.from" v-model:last="paginate.to" />
     </div>
   </section>
-  <Dialog v-model:visible="newMember" maximizable modal header="Header" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+  <Dialog v-model:visible="newMember" maximizable modal :header="$t('modules.settings.members.invite.title')" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <div>
-      <h3 class="text-lg font-medium text-surface-900 dark:text-surface-0">{{ $t('modules.settings.members.invite') }}</h3>
-      <p class="text-base text-surface-700 dark:text-surface-100 mb-2">{{ $t('modules.settings.members.invite_description') }}</p>
-      <InputText v-model="email" :placeholder="$t('fields.email')" class="mt-6" />
+      <p class="text-base text-surface-700 dark:text-surface-100 mb-2">{{ $t('modules.settings.members.invite.description') }}</p>
+      <div class="w-full lg:w-96 min-h-16 mb-2">
+        <InputGroup>
+          <InputText v-model="emailsText" @keyup="validateEmail" class="w-full" placeholder="Emails" @keyup.enter="addEmail" :invalid="error.email" />
+          <Button icon="pi pi-plus" class="!rounded-r-md" @click="addEmail" />
+        </InputGroup>
+        <small v-if="error.email" class="text-red-500 text-xs mt-1 w-full">{{ error.message }}</small>
+      </div>
+      <div class="min-h-10 border-dashed border mb-4 p-1">
+        <TransitionFade group>
+          <Chip v-for="(email, index) in emails" :key="index" :label="email" removable @remove="removeEmail(index)" class="!py-1 !px-2" />
+        </TransitionFade>
+      </div>
+    </div>
+    <div class="flex justify-between gap-2">
+      <Button type="button" label="Save" @click="inviteMember"></Button>
+      <Button type="button" label="Cancel" severity="secondary" @click="newMember = false"></Button>
     </div>
   </Dialog>
 </template>

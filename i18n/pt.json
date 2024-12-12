@@ -340,6 +340,14 @@
         "error": {
           "text": "Configure os detalhes, membros e permissões da sua organização"
         },
+        "invite": {
+          "title": "Convidar",
+          "description": "Convide novo(s) membro(s)",
+          "error": {
+            "email_exists": "E-mail já está incluso abaixo",
+            "invalid_email": "E-mail inválido"
+          }
+        },
         "manage": {
           "title": "Gerenciar",
           "description": "Gerencie seus membros"
