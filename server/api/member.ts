@@ -29,6 +29,9 @@ export default defineEventHandler(async (event) => {
 });
 
 async function handlePostRequest(data: any, apiCall: any) {
+  if (data.get('action') === 'invite_users') {
+    return await apiCall('POST', '/v1/users/invite', data);
+  }
 }
 
 async function handlePutRequest(data: any, apiCall: any) {

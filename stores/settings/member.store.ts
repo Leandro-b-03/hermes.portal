@@ -42,5 +42,19 @@ export const useMemberStore = defineStore({
         this.isLoading = false;
       }
     },
+    async invite(users: FormData): Promise<void> {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        users.append('action', 'invite_users');
+        users.append('token', localStorage.sessionId);
+        await $fetch(`/api/member`, { method: "POST", body: users });
+      } catch (error: any) {
+        this.error = error.data.message || "An error occurred while inviting member";
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    }
   }
 });

@@ -1,7 +1,5 @@
 <script setup lang="ts">
-// import Paginatorc from '@/components/pages/Paginatorc.vue';
-
-// import Paginatorc from '@/components/pages/Paginatorc.vue';
+const { $toast } = useNuxtApp();
 const memberStore = useMemberStore();
 const t = useNuxtApp().$i18n.t;
 const route = useRoute();
@@ -81,8 +79,6 @@ const addEmail = (): void => {
 
   const emailsTextValue = emailsText.value.trim();
 
-  console.log(error.value.email);
-
   if (!error.value.email && !emails.value.includes(emailsTextValue)) { 
     emails.value.push(emailsTextValue);
     emailsText.value = '';
@@ -100,6 +96,29 @@ const addEmail = (): void => {
 
 const removeEmail = (index: number): void => {
   emails.value.splice(index, 1);
+};
+
+const inviteMember = (): void => {
+  if (emails.value.length === 0) {
+    error.value.email = true;
+    error.value.message = t('modules.settings.members.invite.error.empty_email');
+    return;
+  }
+
+  const formData = new FormData();
+
+  emails.value.forEach((email) => {
+    formData.append('users[]', email);
+  });
+
+  memberStore.invite(formData).then(() => {
+    newMember.value = false;
+    emails.value = [];
+    $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.members.invite.create.success'), life: 5000 });
+  }).catch((error) => {
+    console.log(error);
+    $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error'), detail: error.message, life: 5000 });
+  });
 };
 </script>
 

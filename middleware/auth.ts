@@ -27,7 +27,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       console.log(error);
       if (error.status == 401 || error.status == 403 || error.status == 500) {
         console.log(error);
-        if (to.path !== '/login') {
+        if (to.path !== '/login' && to.path !== '/signup') {
           return navigateTo('/login', { external: true });
         }
       }
