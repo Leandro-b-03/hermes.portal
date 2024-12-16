@@ -14,7 +14,7 @@ export const useI18nValidators = () => {
   const numeric = withI18nMessage(validators.numeric)
   const phone = withI18nMessage(validators.helpers.regex('phone', /^\(\d{2}\) \d{4}-\d{4}$/))
   const mobile = withI18nMessage(validators.helpers.regex('phone', /^\(\d{2}\) \d{4,5}-\d{4}$/))
-  // const sameAs = withI18nMessage(validators.sameAs)
+  const sameAs = withI18nMessage(validators.sameAs, { withArguments: true })
 
   return {
     required,
@@ -24,6 +24,6 @@ export const useI18nValidators = () => {
     numeric,
     phone,
     mobile,
-    // sameAs
+    sameAs
   }
 };

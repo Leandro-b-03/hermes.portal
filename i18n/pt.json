@@ -381,6 +381,14 @@
         "invalid_user_pass": "Usuário ou senha inválidos.",
         "500": "Erro interno do servidor. Tente novamente mais tarde."
       }
+    },
+    "signup": {
+      "title": "Cadastrar",
+      "description": "Crie uma nova conta",
+      "errors": {
+        "500": "Erro interno do servidor. Tente novamente mais tarde."
+      },
+      "success": "Conta criada com sucesso"
     }
   },
   "setup": {
@@ -490,13 +498,14 @@
       "text": "Aqui você pode abrir um ticket para o suporte."
     },
     "validations": {
-      "required": "Campo é obrigatório",
-      "email": "E-mail inválido",
-      "minLength": "Campo deve ter no mínimo {min} caracteres",
-      "maxLength": "Campo deve ter no máximo {max} caracteres",
-      "numeric": "Campo deve ser numérico",
-      "phone": "Telefone inválido",
-      "mobile": "Celular inválido"
+      "required": "Este campo é obrigatório",
+      "email": "Formato de e-mail inválido",
+      "minLength": "Este campo deve ter no mínimo {min} caracteres",
+      "maxLength": "Este campo deve ter no máximo {max} caracteres",
+      "numeric": "Este campo deve ser numérico",
+      "phone": "Formato de telefone inválido",
+      "mobile": "Formato de celular inválido",
+      "sameAsPassword": "Este campo deve ser igual à senha"
     },
     "success": "Sucesso",
   }

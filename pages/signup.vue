@@ -11,15 +11,16 @@ definePageMeta({
   layout: 'none',
 });
 
-const { required, email, minLength } = useI18nValidators();
+const { required, email, minLength, sameAs } = useI18nValidators();
 const token = route.query.token as string;
-const validToken = computed(() => authStore.isValidToken(token));
+const emailSignup = computed(() => authStore.signupEmail);
+const error500 = ref(false);
 const button = ref({
   iconClass: 'pi-moon',
 });
 const user = ref({
   name: '',
-  email: '',
+  email: emailSignup.value,
   password: '',
   c_password: '',
   remember: false,
@@ -39,17 +40,14 @@ const schema = computed(() => {
       required: required,
       minLength: minLength(3),
     },
-    email: {
-      required: required,
-      email: email,
-    },
     password: {
       required: required,
       minLength: minLength(8),
     },
     c_password: {
       required: required,
-      // sameAsPassword: sameAs(user.value.password),
+      minLength: minLength(8),
+      sameAsPassword: sameAs(user.value.password),
     },
   };
 });
@@ -60,6 +58,14 @@ if (userAuthenticated.value) {
   router.push('/dashboard');
 }
 
+onMounted(async () => {
+  if (!token) {
+    router.push('/login');
+  }
+
+  await authStore.verifyToken(token);
+});
+
 const onThemeToggler = (): void => {
   const root = document.getElementsByTagName('html')[0];
 
@@ -69,17 +75,26 @@ const onThemeToggler = (): void => {
 };
 
 
-const signup = async (): Promise<void> => {
+  const signup = async (): Promise<void> => {
+  console.log(user);
   v$.value.$validate().then(() => {
+    console.log(v$.value.$error);
     if (v$.value.$error) {
       return;
     }
 
+    if (user.value.email != emailSignup.value) {
+      window.location.reload()
+    }
+
     authStore.signup(user).then((response) => {
-      $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.carriers.create.success'), life: 5000 });
+      $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.signup.create.success'), life: 5000 });
       router.push({ path: '/dashboard' });
     }).catch((error) => {
-      $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('setup.error'), detail: t('modules.carriers.create.error'), life: 5000 });
+      // console.log(error);
+      // if (error.response.status === 500) {
+      //   error500.value = true;
+      // }
     });
   });
 };
@@ -118,20 +133,23 @@ const signup = async (): Promise<void> => {
         </svg>
       </div>
       <h1 class="text-center text-3xl font-medium text-surface-900 dark:text-surface-0">{{ $t('hermes_tms') }}</h1>
+
+      <Transition name="fade">
+        <Message class="w-full" severity="error" closable v-if="error500">
+          {{ $t('modules.signup.error.500') }}
+        </Message>
+      </Transition>
       
       <div class="flex flex-col gap-6 w-full">
+        <div class="flex flex-col gap-2">
+          <label for="email">{{ $t('fields.contact.email') }}</label>
+          <span>{{ emailSignup }}</span>
+        </div>
         <div class="flex flex-col gap-2">
           <label for="name">{{ $t('fields.name') }}</label>
           <InputText id="name" v-model="user.name" :placeholder="$t('fields.contact.name_placeholder')" class="dark:!bg-surface-900" :invalid="error.name" />
           <TransitionFade>
             <small v-for="error in v$.name.$errors" v-if="v$.name.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
-          </TransitionFade>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="email">{{ $t('fields.contact.email') }}</label>
-          <InputText id="email" v-model="user.email" :placeholder="$t('fields.contact.email_placeholder')" class="dark:!bg-surface-900" :invalid="error.email" />
-          <TransitionFade>
-            <small v-for="error in v$.email.$errors" v-if="v$.email.$error" :id="error.$message.toString()" class="text-red-500">{{ error.$message }}</small>
           </TransitionFade>
         </div>
         <div class="flex flex-col gap-2">

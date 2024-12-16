@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
 import { v4 as uuidv4 } from 'uuid';
 import type { IUser } from '@/types/user.types';
+import { verify } from 'jsonwebtoken';
 
 export type AuthStoreState = {
   authUser: IUser | null;
+  signupEmail: string | null;
   isLoading: boolean; 
   error: string | null;  
 };
@@ -12,6 +14,7 @@ export const useAuthStore = defineStore({
   id: 'authStore',
   state: (): AuthStoreState => ({
     authUser: null,
+    signupEmail: null,
     isLoading: true,
     error: null,
   }),
@@ -24,6 +27,9 @@ export const useAuthStore = defineStore({
     },
     setLoading(loading: boolean): void {
       this.isLoading = loading;
+    },
+    setSignupEmail(signupEmail: string | null): void {
+      this.signupEmail = signupEmail;
     },
     async login(user_data: []): Promise<any> {
       this.isLoading = true;
@@ -45,6 +51,21 @@ export const useAuthStore = defineStore({
         this.error = error.response.data.error || 'An error occurred during login';
         localStorage.authenticated = false;
         return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async verifyToken(token: string): Promise<void> {
+      this.isLoading = true;
+      this.error = null;
+      try {
+        const response = await $fetch('/api/auth', { method: 'GET', query: { token_code: token, action: 'verify_sign_up_token' } });
+        console.log(response);
+        this.setSignupEmail(response?.email);
+      } catch (error: any) {
+        this.error = error.message || 'Failed to verify token';
+        this.setAuthUser(null);
+        localStorage.authenticated = false;
       } finally {
         this.isLoading = false;
       }

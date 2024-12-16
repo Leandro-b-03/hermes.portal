@@ -62,7 +62,6 @@ async function handleGetRequest(data: any, apiCall: any) {
       'fields[]': data.fields || '',
     });
     return (await apiCall('GET', `/v1/carrier?${queryParams}`, { token: data.token })).carriers;
-
   } else if (data.action === 'collect_carrier') {
     if (!data.id) throw createError({ statusCode: 400, message: 'Missing required parameter: id' });
     const response = (await apiCall('GET', `/v1/carrier/${data.id}`, { token: data.token }));
@@ -72,22 +71,20 @@ async function handleGetRequest(data: any, apiCall: any) {
     } else {
       return response.carriers;
     }
-
   } else if (data.action === 'export') {
     return await apiCall('GET', `/v1/carrier/export`, { token: data.token }, null, true);
   } else if (data.action === 'import_list') {
     if (data.id) {
       return (await apiCall('GET', `/v1/carrier/import/${data.id}`, { token: data.token })).import;
     } else {
-      
-    const queryParams = new URLSearchParams({
-      page: data.page || '1',
-      per_page: data.per_page || '10',
-      order_by: data.order_by || 'desc',
-      filter: data.filter || '',
-      'fields[]': data.fields || '',
-    });
-    return (await apiCall('GET', `/v1/carrier/import?${queryParams}`, { token: data.token })).imports;
+      const queryParams = new URLSearchParams({
+        page: data.page || '1',
+        per_page: data.per_page || '10',
+        order_by: data.order_by || 'desc',
+        filter: data.filter || '',
+        'fields[]': data.fields || '',
+      });
+      return (await apiCall('GET', `/v1/carrier/import?${queryParams}`, { token: data.token })).imports;
     }
   }
 }
