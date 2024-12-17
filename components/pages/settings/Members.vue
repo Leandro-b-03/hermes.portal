@@ -15,6 +15,7 @@ const error = ref({
   email: false,  
   message: '',
 });
+const single = ref();
 const paginate = ref({
   total: computed(() => members.value ? members.value.total : 0),
   per_page: computed(() => members.value ? members.value.per_page : 10),
@@ -61,9 +62,9 @@ const editMember = (id: number): void => {
 };
 
 const deactivateMember = (event: Event, id: number): void => {
-  console.log('Deactivate member', event, id);
+  
   confirm.require({
-    target: event.currentTarget,
+    target: single.value,
     message: 'Are you sure you want to proceed?',
     header: 'Confirmation',
     rejectProps: {
@@ -141,6 +142,8 @@ const inviteMember = (): void => {
     $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error'), detail: error.message, life: 5000 });
   });
 };
+const metaKey = ref(true);
+console.log(single.value);
 </script>
 
 <template>
@@ -152,7 +155,7 @@ const inviteMember = (): void => {
       <Button :label="$t('setup.buttons.invite')" class="w-auto" @click="newMember = true"/>
     </div>
     <div class="overflow-x-scroll">
-      <DataTable :value="members?.data" row-hover :loading="loading">
+      <DataTable v-model:selection="single" :value="members?.data" row-hover :loading="loading" selectionMode="single" :metaKeySelection="metaKey" dataKey="id">
         <template #header>
           <div v-if="members?.data?.length > 0" class="flex justify-end">
             <div class="w-30">
