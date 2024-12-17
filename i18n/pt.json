@@ -386,9 +386,11 @@
       "title": "Cadastrar",
       "description": "Crie uma nova conta",
       "errors": {
-        "500": "Erro interno do servidor. Tente novamente mais tarde."
+        "500": "Erro interno do servidor. Tente novamente mais tarde.",
+        "token": "Token inválido, expirado ou já utilizado."
       },
-      "success": "Conta criada com sucesso"
+      "success": "Conta criada com sucesso",
+      "login": "Voltar para o login"
     }
   },
   "setup": {

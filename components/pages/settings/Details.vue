@@ -136,7 +136,6 @@ const changeLogo = (event: Event): void => {
 const save = async (): Promise<any> => {
   v$.value.$validate().then(() => {
     if (v$.value.$error) {
-      console.log(v$.value.$errors);
       return;
     }
 
@@ -145,7 +144,6 @@ const save = async (): Promise<any> => {
     if (logo.value.name !== 'File') {
       formData.append('shipper[logo]', logo.value);
       formData.delete('shipper[logo_image_url]');
-      console.log(formData);
     }
 
     shipperStore.update(formData).then((response) => {

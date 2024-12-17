@@ -2,6 +2,7 @@
 const { $toast } = useNuxtApp();
 const memberStore = useMemberStore();
 const t = useNuxtApp().$i18n.t;
+const confirm = useConfirm();
 const route = useRoute();
 
 const members = computed(() => memberStore.data);
@@ -31,7 +32,7 @@ const items = [
     label: 'setup.buttons.deactivate',
     route: 'deactivate',
     icon: 'pi pi-user-minus',
-    action: (id: number) => deactivateMember(id),
+    action: (event, id: number) => deactivateMember(event, id),
   },
 ];
 const filter = route.query.filter?.toString() || '';
@@ -59,8 +60,28 @@ const editMember = (id: number): void => {
   console.log('Edit member', id);
 };
 
-const deactivateMember = (id: number): void => {
-  console.log('Deactivate member', id);
+const deactivateMember = (event: Event, id: number): void => {
+  console.log('Deactivate member', event, id);
+  confirm.require({
+    target: event.currentTarget,
+    message: 'Are you sure you want to proceed?',
+    header: 'Confirmation',
+    rejectProps: {
+        label: 'Cancel',
+        severity: 'secondary',
+        outlined: true
+    },
+    acceptProps: {
+        label: 'Delete',
+        severity: 'danger'
+    },
+    accept: () => {
+      console.log('delete member', id);
+    },
+    reject: () => {
+      console.log('cancel delete member', id);
+    }
+  });
 };
 
 const validateEmail = () => {
@@ -123,6 +144,7 @@ const inviteMember = (): void => {
 </script>
 
 <template>
+  <ConfirmPopup></ConfirmPopup>
   <section class="flex flex-wrap gap-4 py-12 justify-between border-t border-surface">
     <div class="flex-shrink-0 w-60">
       <h3 class="mb-6 mt-0 text-surface-900 dark:text-surface-0 font-medium text-xl">{{ $t('modules.settings.members.title_2') }}</h3>
@@ -145,7 +167,7 @@ const inviteMember = (): void => {
           <template #body="{ data }">
             <div class="flex items-center gap-4">
               <Avatar v-if="data.user_info.photo_url" :image="data.user_info.photo_url" class="mr-2 overflow-hidden" size="large" />
-              <Avatar v-else icon="pi pi-user" class="mr-2" style="background-color: #ece9fc; color: #2a1261" />
+              <Avatar v-else icon="pi pi-user" class="mr-2" style="background-color: #ece9fc; color: #2a1261" size="large" />
               <div>
                 <p class="mt-0 mb-3 font-medium text-base/3 text-color-primary">
                   {{ data.name }}
@@ -190,7 +212,7 @@ const inviteMember = (): void => {
             <Button type="button" icon="pi pi-ellipsis-v" text severity="secondary" @click="$refs.menu.toggle($event)" />
             <Menu ref="menu" append-to="body" popup :model="items" class="!min-w-full lg:!min-w-5">
               <template #item="{ item, props }">
-                <NuxtLink v-ripple class="flex items-center cursor-pointer p-menu-item p-menu-item-link" v-bind="props.action" @click="item.action(data.id)">
+                <NuxtLink v-ripple class="flex items-center cursor-pointer p-menu-item p-menu-item-link" v-bind="props.action" @click="item.action($event, data.id)">
                   <span :class="item.icon" />
                   <span>{{ $t(item.label) }}</span>
                   <span v-if="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut }}</span>

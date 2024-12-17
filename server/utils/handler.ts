@@ -36,8 +36,11 @@ export const apiHandler = () => {
       if (method !== 'GET' && data.token) { // Check if data is an object and has a 'token' property
         delete data.token;
         delete data.action;
-      } else if (data instanceof FormData && data.get('token')) { // Check if data is FormData and has a 'token' entry
-        data.delete('token');
+      } else if (data instanceof FormData) { // Check if data is FormData and has a 'token' entry
+        if (data.get('token')) {
+          data.delete('token');
+        }
+
         data.delete('action');
       }
     }
@@ -64,11 +67,14 @@ export const apiHandler = () => {
 
       return body.data;
     } catch (error) {
-      console.log(error.response);
+      console.log("error.response", error.response);
       // Handle errors, including token expiration and 422 validation errors
       if (error.response) {
         const { status, _data: data } = await error.response;
         
+        console.log('status', status);
+        console.log('data', data);
+
         throw createError({ 
           statusCode: status || 500, 
           data: data.errors,

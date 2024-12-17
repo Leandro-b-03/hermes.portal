@@ -1,15 +1,15 @@
-import { defineStore } from 'pinia';
-import type { IUser } from '@/types/user.types';
+import { defineStore } from "pinia";
+import type { IUser } from "@/types/user.types";
 
 export type MemberStoreState = {
   data: IUser[] | null;
   member: IUser | null;
-  isLoading: boolean; 
-  error: string | null;  
+  isLoading: boolean;
+  error: string | null;
 };
 
 export const useMemberStore = defineStore({
-  id: 'memberStore',
+  id: "memberStore",
   state: (): MemberStoreState => ({
     data: null,
     member: null,
@@ -31,12 +31,17 @@ export const useMemberStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        params = params ? `${params}&action=get_members&token=${localStorage.sessionId}` 
-                : `action=get_members&token=${localStorage.sessionId}`;
-        const members = await $fetch<IUserListResponse[]>(`/api/member?${params}`, { method: "GET" });
+        params = params
+          ? `${params}&action=get_members&token=${localStorage.sessionId}`
+          : `action=get_members&token=${localStorage.sessionId}`;
+        const members = await $fetch<IUserListResponse[]>(
+          `/api/member?${params}`,
+          { method: "GET" }
+        );
         this.setMembers(members);
       } catch (error: any) {
-        this.error = error.data.message || "An error occurred while fetching member";
+        this.error =
+          error.data.message || "An error occurred while fetching member";
         return Promise.reject(this.error);
       } finally {
         this.isLoading = false;
@@ -46,15 +51,16 @@ export const useMemberStore = defineStore({
       this.isLoading = true;
       this.error = null;
       try {
-        users.append('action', 'invite_users');
-        users.append('token', localStorage.sessionId);
+        users.append("action", "invite_users");
+        users.append("token", localStorage.sessionId);
         await $fetch(`/api/member`, { method: "POST", body: users });
       } catch (error: any) {
-        this.error = error.data.message || "An error occurred while inviting member";
+        this.error =
+          error.data.message || "An error occurred while inviting member";
         return Promise.reject(this.error);
       } finally {
         this.isLoading = false;
       }
-    }
-  }
+    },
+  },
 });

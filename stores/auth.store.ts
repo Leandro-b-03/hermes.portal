@@ -31,15 +31,18 @@ export const useAuthStore = defineStore({
     setSignupEmail(signupEmail: string | null): void {
       this.signupEmail = signupEmail;
     },
-    async login(user_data: []): Promise<any> {
-      this.isLoading = true;
-      this.error = null;
-
+    startSession(): void {
       const storedSessionId = localStorage.sessionId || null;
 
       if (!storedSessionId) {
         localStorage.sessionId = uuidv4();
       }
+    },
+    async login(user_data: []): Promise<any> {
+      this.isLoading = true;
+      this.error = null;
+
+      this.startSession();
 
       try {
         const body = { token: localStorage.sessionId, action: 'sign_in', user: user_data };
@@ -55,9 +58,10 @@ export const useAuthStore = defineStore({
         this.isLoading = false;
       }
     },
-    async verifyToken(token: string): Promise<void> {
+    async verifyToken(token: string): Promise<any> {
       this.isLoading = true;
       this.error = null;
+      const valid = ref(true);
       try {
         const response = await $fetch('/api/auth', { method: 'GET', query: { token_code: token, action: 'verify_sign_up_token' } });
         console.log(response);
@@ -66,18 +70,27 @@ export const useAuthStore = defineStore({
         this.error = error.message || 'Failed to verify token';
         this.setAuthUser(null);
         localStorage.authenticated = false;
+        valid.value =  false;
       } finally {
         this.isLoading = false;
       }
+
+      return valid.value;
     },
-    async signup(user_data: string[]): Promise<void> {
+    async signup(user_data: FormData): Promise<void> {
       this.isLoading = true;
       this.error = null;
+      
+      this.startSession();
+
       try {
-        const user = await $fetch('/api/auth', { method: 'POST', body: { token: localStorage.sessionId, action: 'sign_up', user: user_data } });
+        user_data.append('action', 'sign_up');
+        user_data.append('token', localStorage.sessionId);
+        const user = await $fetch('/api/auth', { method: 'POST', body: user_data });
         this.setAuthUser(user);
         localStorage.authenticated = true;
       } catch (error: any) {
+        console.log(error);
         this.error = error.data.message || 'An error occurred during signup';
         localStorage.authenticated = false;
         return Promise.reject(this.error);

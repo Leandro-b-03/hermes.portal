@@ -11,6 +11,8 @@ export default defineEventHandler(async (event) => {
   // Use a single object to hold both body and query parameters
   const data = method === 'GET' ? getQuery(event) : hasFiles ? await readFormData(event) : await readBody(event);
 
+  console.log(data);
+
   try {
     switch (method) {
       case 'POST':
@@ -33,8 +35,8 @@ async function handlePostRequest(data: any, apiCall: any, storage: any) {
   if (data.action == 'sign_in') {
     storage.removeItem(`token_${data.token}`);
     return await apiCall('POST', '/v1/login', data);
-  } else if (data.action == 'sign_up') {
-    return await apiCall('POST', '/v1/signup', data);
+  } else if (data.get('action') == 'sign_up') {
+    return (await apiCall('POST', '/v1/user', data)).user;
   }
 }
 

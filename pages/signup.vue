@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
 
+const { $toast } = useNuxtApp();
 const authStore = useAuthStore();
 const router = useRouter();
 const route = useRoute();
@@ -14,13 +15,12 @@ definePageMeta({
 const { required, email, minLength, sameAs } = useI18nValidators();
 const token = route.query.token as string;
 const emailSignup = computed(() => authStore.signupEmail);
-const error500 = ref(false);
 const button = ref({
   iconClass: 'pi-moon',
 });
 const user = ref({
   name: '',
-  email: emailSignup.value,
+  email: '',
   password: '',
   c_password: '',
   remember: false,
@@ -30,6 +30,8 @@ const error = ref({
   password: false,
   password_confirmation: false,
   showMessage: false,
+  e500: false,
+  token: false,
   message: '',
 });
 const userAuthenticated = computed(() => authStore.isAuthenticated);
@@ -63,7 +65,14 @@ onMounted(async () => {
     router.push('/login');
   }
 
-  await authStore.verifyToken(token);
+  const pass = await authStore.verifyToken(token);
+
+  console.log(pass);
+
+  if (!pass) {
+    console.log('Token is invalid');
+    error.value.token = true;
+  }
 });
 
 const onThemeToggler = (): void => {
@@ -75,26 +84,25 @@ const onThemeToggler = (): void => {
 };
 
 
-  const signup = async (): Promise<void> => {
-  console.log(user);
+const signup = async (): Promise<void> => {
+  user.value.email = emailSignup.value;
   v$.value.$validate().then(() => {
     console.log(v$.value.$error);
     if (v$.value.$error) {
       return;
     }
 
-    if (user.value.email != emailSignup.value) {
-      window.location.reload()
-    }
+    const formData = toFormData(user.value, 'user');
 
-    authStore.signup(user).then((response) => {
+    formData.append('token_code', token);
+
+    authStore.signup(formData).then((response) => {
       $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.signup.create.success'), life: 5000 });
       router.push({ path: '/dashboard' });
     }).catch((error) => {
-      // console.log(error);
-      // if (error.response.status === 500) {
-      //   error500.value = true;
-      // }
+      if (error.response.status === 500) {
+        error.value.e500 = true;
+      }
     });
   });
 };
@@ -135,12 +143,21 @@ const onThemeToggler = (): void => {
       <h1 class="text-center text-3xl font-medium text-surface-900 dark:text-surface-0">{{ $t('hermes_tms') }}</h1>
 
       <Transition name="fade">
-        <Message class="w-full" severity="error" closable v-if="error500">
-          {{ $t('modules.signup.error.500') }}
+        <Message class="w-full" severity="error" closable v-if="error.e500">
+          {{ $t('modules.signup.errors.500') }}
+        </Message>
+      </Transition>
+
+      <Transition name="fade">
+        <Message class="w-full" severity="error" v-if="error.token">
+          {{ $t('modules.signup.errors.token') }}
         </Message>
       </Transition>
       
-      <div class="flex flex-col gap-6 w-full">
+      <NuxtLink v-if="error.token" to="/login" class="text-center text-sm text-surface-600 dark:text-surface-300 underline button">
+        {{ $t('modules.signup.login') }}
+      </NuxtLink>
+      <div v-if="!error.token" class="flex flex-col gap-6 w-full">
         <div class="flex flex-col gap-2">
           <label for="email">{{ $t('fields.contact.email') }}</label>
           <span>{{ emailSignup }}</span>
@@ -181,7 +198,7 @@ const onThemeToggler = (): void => {
           </TransitionFade>
         </div>
       </div>
-      <Button :label="$t('setup.buttons.signup')" class="w-full" @click="signup" />
+      <Button v-if="!error.token" :label="$t('setup.buttons.signup')" class="w-full" @click="signup" />
     </div>
   </div>
 </template>
