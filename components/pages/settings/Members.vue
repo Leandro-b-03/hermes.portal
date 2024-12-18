@@ -15,7 +15,6 @@ const error = ref({
   email: false,  
   message: '',
 });
-const single = ref();
 const paginate = ref({
   total: computed(() => members.value ? members.value.total : 0),
   per_page: computed(() => members.value ? members.value.per_page : 10),
@@ -27,7 +26,7 @@ const items = [
     label: 'setup.buttons.edit',
     route: 'edit',
     icon: 'pi pi-pencil',
-    action: (id: number) => editMember(id),
+    action: (event, id: number) => editMember(id),
   },
   {
     label: 'setup.buttons.deactivate',
@@ -57,14 +56,13 @@ watch(
   }
 );
 
+
 const editMember = (id: number): void => {
   console.log('Edit member', id);
 };
 
 const deactivateMember = (event: Event, id: number): void => {
-  
   confirm.require({
-    target: single.value,
     message: 'Are you sure you want to proceed?',
     header: 'Confirmation',
     rejectProps: {
@@ -83,6 +81,7 @@ const deactivateMember = (event: Event, id: number): void => {
       console.log('cancel delete member', id);
     }
   });
+  console.log('Deactivate member', id);
 };
 
 const validateEmail = () => {
@@ -142,12 +141,10 @@ const inviteMember = (): void => {
     $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error'), detail: error.message, life: 5000 });
   });
 };
-const metaKey = ref(true);
-console.log(single.value);
 </script>
 
 <template>
-  <ConfirmPopup></ConfirmPopup>
+  <ConfirmDialog></ConfirmDialog>
   <section class="flex flex-wrap gap-4 py-12 justify-between border-t border-surface">
     <div class="flex-shrink-0 w-60">
       <h3 class="mb-6 mt-0 text-surface-900 dark:text-surface-0 font-medium text-xl">{{ $t('modules.settings.members.title_2') }}</h3>
@@ -155,7 +152,7 @@ console.log(single.value);
       <Button :label="$t('setup.buttons.invite')" class="w-auto" @click="newMember = true"/>
     </div>
     <div class="overflow-x-scroll">
-      <DataTable v-model:selection="single" :value="members?.data" row-hover :loading="loading" selectionMode="single" :metaKeySelection="metaKey" dataKey="id">
+      <DataTable :value="members?.data" row-hover :loading="loading" selectionMode="single">
         <template #header>
           <div v-if="members?.data?.length > 0" class="flex justify-end">
             <div class="w-30">
@@ -211,12 +208,12 @@ console.log(single.value);
           </template>
         </Column>
         <Column class="min-w-32">
-          <template #body="{ data }">
-            <Button type="button" icon="pi pi-ellipsis-v" text severity="secondary" @click="$refs.menu.toggle($event)" />
-            <Menu ref="menu" append-to="body" popup :model="items" class="!min-w-full lg:!min-w-5">
+          <template #body="{ data }">{{ data.id }}
+            <Button type="button" icon="pi pi-ellipsis-v" text severity="secondary" @click="$refs[`menu-${data.id}`].toggle($event)" :data-id="data.id" />
+            <Menu :ref="`menu-${data.id}`" append-to="body" popup :model="items" class="!min-w-full lg:!min-w-5">
               <template #item="{ item, props }">
                 <NuxtLink v-ripple class="flex items-center cursor-pointer p-menu-item p-menu-item-link" v-bind="props.action" @click="item.action($event, data.id)">
-                  <span :class="item.icon" />
+                  <i :class="item.icon" />
                   <span>{{ $t(item.label) }}</span>
                   <span v-if="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut }}</span>
                 </NuxtLink>
