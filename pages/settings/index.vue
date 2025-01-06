@@ -137,7 +137,7 @@ const cancelEdit = () => {
   <div class="p-8 flex flex-col flex-auto">
     <div class="grid grid-cols-12 gap-4">
       <div class="col-span-12">
-        <Menubar v-if="!notAllowed" :model="menu" class="mt-4" />
+        <Menubar v-if="!notAllowed" :model="menu" class="mt-0" />
         <TransitionFade group>
           <div v-if="transition" class="h-[500px] w-full flex items-center justify-center">
             <div class="loading-container">

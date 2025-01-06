@@ -222,7 +222,7 @@ const submit = async (): Promise<any> => {
       $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t(!carrier.id ? 'modules.carriers.create.success' : 'modules.carriers.edit.success'), life: 5000 });
       router.push({ path: '/carriers' });
     }).catch((error) => {
-      $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('setup.error'), detail: t(!carrier.id ? 'modules.carriers.create.error' : 'modules.carriers.edit.error'), life: 5000 });
+      $toast.add({ severity: 'contrast', icon: 'pi-times-circle', summary: t('setup.error.title'), detail: t(!carrier.id ? 'modules.carriers.create.error' : 'modules.carriers.edit.error'), life: 5000 });
     });
   });
 }

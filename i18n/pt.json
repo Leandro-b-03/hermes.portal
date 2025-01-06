@@ -10,6 +10,8 @@
     "or": "Ou",
     "search": "Pesquisar",
     "view": "Visualizar",
+    "confirm": "Confirmação",
+    "are_you_sure": "Você tem certeza?",
   },
   "fields": {
     "password": "Senha",
@@ -350,6 +352,9 @@
           "error": "Erro ao criar usuário",
           "success": "Usuário criado com sucesso"
         },
+        "deactivate": {
+          "confirmation": "Você tem certeza que deseja desativar este usuário?",
+        },
         "edit": {
           "title": "Editar",
           "description": "Edite seu usuário",
@@ -370,6 +375,13 @@
         "manage": {
           "title": "Gerenciar",
           "description": "Gerencie seus membros"
+        },
+        "reset_password": {
+          "success": "Senha redefinida com sucesso e enviada por e-mail",
+          "errors": {
+            "429": "Muitas tentativas. Tente novamente mais tarde.",
+            "500": "Erro interno do servidor. Tente novamente mais tarde."
+          }
         }
       }
     },
@@ -448,6 +460,7 @@
       "enter": "Entrar",
       "invite": "Convidar um novo membro",
       "signup": "Cadastrar",
+      "reset_password": "Redefinir senha"
     },
     "error": {
       "title": "Erro",
@@ -509,6 +522,6 @@
       "mobile": "Formato de celular inválido",
       "sameAsPassword": "Este campo deve ser igual à senha"
     },
-    "success": "Sucesso",
+    "success": "Sucesso"
   }
 }

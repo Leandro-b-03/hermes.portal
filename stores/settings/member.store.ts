@@ -62,5 +62,20 @@ export const useMemberStore = defineStore({
         this.isLoading = false;
       }
     },
+    async delete(data: FormData): Promise<void> {
+      this.isLoading = true;
+      this.error = null;
+
+      try {
+        data.append('action', 'delete_user');
+        data.append('token', localStorage.sessionId);
+        await $fetch('/api/member', { method: 'DELETE', body: data });
+      } catch (error: any) {
+        this.error = error.data.message || 'An error occurred while deleting user';
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
   },
 });

@@ -36,7 +36,9 @@ async function handlePostRequest(data: any, apiCall: any, storage: any) {
     storage.removeItem(`token_${data.token}`);
     return await apiCall('POST', '/v1/login', data);
   } else if (data.get('action') == 'sign_up') {
-    return (await apiCall('POST', '/v1/user', data)).user;
+    return (await apiCall('POST', '/v1/auth', data)).user;
+  } else if (data.get('action') == 'reset_password') {
+    return await apiCall('POST', '/v1/auth/reset_password_l', data);
   }
 }
 
@@ -53,8 +55,8 @@ async function handleDeleteRequest(data: any, apiCall: any, storage: any) {
 
 async function handleGetRequest(data: any, apiCall: any) {  
   if (data.action == 'current_user') {
-    return await apiCall('GET', '/v1/user', { token: data.token});
+    return await apiCall('GET', '/v1/auth', { token: data.token});
   } else if (data.action === 'verify_sign_up_token') {
-    return (await apiCall('GET', `/v1/user/verify_signup_token?token_code=${data.token_code}`, { token: data.token }));
+    return (await apiCall('GET', `/v1/auth/verify_signup_token?token_code=${data.token_code}`, { token: data.token }));
   }
 }

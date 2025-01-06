@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import Form from '../carriers/Form.vue';
+
 const { $toast } = useNuxtApp();
+const authStore = useAuthStore();
 const memberStore = useMemberStore();
 const t = useNuxtApp().$i18n.t;
 const confirm = useConfirm();
@@ -23,14 +26,12 @@ const paginate = ref({
 });
 const items = [
   {
-    label: 'setup.buttons.edit',
-    route: 'edit',
-    icon: 'pi pi-pencil',
-    action: (event, id: number) => editMember(id),
+    label: 'setup.buttons.reset_password',
+    icon: 'pi pi-lock',
+    action: (event, email: string) => editMember(event, email),
   },
   {
     label: 'setup.buttons.deactivate',
-    route: 'deactivate',
     icon: 'pi pi-user-minus',
     action: (event, id: number) => deactivateMember(event, id),
   },
@@ -56,32 +57,68 @@ watch(
   }
 );
 
-
-const editMember = (id: number): void => {
-  console.log('Edit member', id);
+const rowStyle = (data: any) => {
+  if (!data.active) {
+    return { fontWeight: 'bold', fontStyle: 'italic', color: 'gray', backgroundColor: '#f9f9f9' };
+  }
 };
 
-const deactivateMember = (event: Event, id: number): void => {
+const editMember = (event: Event, email: string): void => {
+  console.log('Edit member', email);
   confirm.require({
-    message: 'Are you sure you want to proceed?',
-    header: 'Confirmation',
+    message: t('modules.settings.members.reset_password.confirmation'),
+    header: t('common.are_you_sure'),
     rejectProps: {
-        label: 'Cancel',
+        label: t('setup.buttons.cancel'),
         severity: 'secondary',
         outlined: true
     },
     acceptProps: {
-        label: 'Delete',
+        label: t('setup.buttons.reset_password'),
         severity: 'danger'
     },
     accept: () => {
-      console.log('delete member', id);
+      const data = new FormData();
+      data.append('email', email);
+      authStore.resetPassword(data).then((success) => {
+        $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.members.reset_password.success'), life: 5000 });
+      }).catch((error) => {
+        console.log(error);
+        $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: t(error), life: 5000 });
+      });
+    },
+    reject: () => {
+      console.log('cancel delete member', email);
+    }
+  });
+};
+
+const deactivateMember = (event: Event, id: number): void => {
+  confirm.require({
+    message: t('modules.settings.members.deactivate.confirmation'),
+    header: t('common.are_you_sure'),
+    rejectProps: {
+        label: t('setup.buttons.cancel'),
+        severity: 'secondary',
+        outlined: true
+    },
+    acceptProps: {
+        label: t('setup.buttons.deactivate'),
+        severity: 'danger'
+    },
+    accept: () => {
+      const data = new FormData();
+      data.append('id', id);
+      memberStore.delete(data).then((success) => {
+        $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.members.deactivate.success'), life: 5000 });
+      }).catch((error) => {
+        $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: t(error), life: 5000 });
+      });
     },
     reject: () => {
       console.log('cancel delete member', id);
     }
   });
-  console.log('Deactivate member', id);
 };
 
 const validateEmail = () => {
@@ -138,21 +175,21 @@ const inviteMember = (): void => {
     $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.members.invite.create.success'), life: 5000 });
   }).catch((error) => {
     console.log(error);
-    $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error'), detail: error.message, life: 5000 });
+    $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: error.message, life: 5000 });
   });
 };
 </script>
 
 <template>
   <ConfirmDialog></ConfirmDialog>
-  <section class="flex flex-wrap gap-4 py-12 justify-between border-t border-surface">
+  <section class="flex flex-wrap gap-4 pt-12 justify-between border-t border-surface h-[665px]">
     <div class="flex-shrink-0 w-60">
       <h3 class="mb-6 mt-0 text-surface-900 dark:text-surface-0 font-medium text-xl">{{ $t('modules.settings.members.title_2') }}</h3>
       <p class="mb-6 mt-0 text-surface-700 dark:text-surface-100 font-normal text-base">{{ $t('modules.settings.members.description_2') }}</p>
       <Button :label="$t('setup.buttons.invite')" class="w-auto" @click="newMember = true"/>
     </div>
     <div class="overflow-x-scroll">
-      <DataTable :value="members?.data" row-hover :loading="loading" selectionMode="single">
+      <DataTable :value="members?.data" row-hover :loading="loading" selectionMode="single" scrollable scrollHeight="490px"  class="width-full" :rowStyle="rowStyle">
         <template #header>
           <div v-if="members?.data?.length > 0" class="flex justify-end">
             <div class="w-30">
@@ -208,11 +245,11 @@ const inviteMember = (): void => {
           </template>
         </Column>
         <Column class="min-w-32">
-          <template #body="{ data }">{{ data.id }}
-            <Button type="button" icon="pi pi-ellipsis-v" text severity="secondary" @click="$refs[`menu-${data.id}`].toggle($event)" :data-id="data.id" />
+          <template #body="{ data }">
+            <Button type="button" icon="pi pi-ellipsis-v" text severity="secondary" @click="$refs[`menu-${data.id}`].toggle($event)" :data-email="data.id" />
             <Menu :ref="`menu-${data.id}`" append-to="body" popup :model="items" class="!min-w-full lg:!min-w-5">
               <template #item="{ item, props }">
-                <NuxtLink v-ripple class="flex items-center cursor-pointer p-menu-item p-menu-item-link" v-bind="props.action" @click="item.action($event, data.id)">
+                <NuxtLink v-ripple class="flex items-center cursor-pointer p-menu-item p-menu-item-link" v-bind="props.action" @click="item.action($event, data.email)">
                   <i :class="item.icon" />
                   <span>{{ $t(item.label) }}</span>
                   <span v-if="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut }}</span>
@@ -223,7 +260,7 @@ const inviteMember = (): void => {
         </Column>
       </DataTable>
       <PagesPaginatorc v-if="paginate.total > 0" v-model:totalRecords="paginate.total" v-model:rows="paginate.per_page" v-model:first="paginate.from" v-model:last="paginate.to" />
-    </div>
+      </div>
   </section>
   <Dialog v-model:visible="newMember" maximizable modal :header="$t('modules.settings.members.invite.title')" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
     <div>

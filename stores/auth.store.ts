@@ -146,6 +146,26 @@ export const useAuthStore = defineStore({
 
       return response;
     },
+    async resetPassword(data: FormData): Promise<void> {
+      this.isLoading = true;
+      this.error = null;
+
+      try {
+        data.append('action', 'reset_password');
+        data.append('token', localStorage.sessionId);
+        console.log(data);
+        await $fetch('/api/auth', { method: 'POST', body: data });
+      } catch (error: any) {
+        if (error.status == 429) {
+          this.error = 'modules.settings.members.reset_password.errors.429'
+        } else if (error.status == 500) {
+          this.error = 'modules.settings.members.reset_password.errors.500'
+        }
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
     hasPermission(permission: string): boolean {  
       if (this.authUser?.roles[0].name === 'admin') return true;
       
