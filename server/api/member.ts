@@ -29,8 +29,12 @@ export default defineEventHandler(async (event) => {
 });
 
 async function handlePostRequest(data: any, apiCall: any) {
-  if (data.get('action') === 'invite_users') {
+  if (data.get('action') === 'invite_member') {
     return await apiCall('POST', '/v1/user/invite', data);
+  } else if (data.get('action') === 'active_member') {
+    const id = data.get('id');
+    data.delete('id');
+    return await apiCall('POST', `/v1/user/${id}/activate`, data);
   }
 }
 
@@ -41,10 +45,10 @@ async function handlePutRequest(data: any, apiCall: any) {
 }
 
 async function handleDeleteRequest(data: any, apiCall: any) {
-  if (data.action == 'delete') {
+  if (data.get('action') === 'delete_member') {
     const id = data.get('id');
     data.delete('id');
-    return await apiCall('DELETE', `/v1/user${id}`, { token: data.token });
+    return await apiCall('DELETE', `/v1/user/${id}`, data);
   }
 }
 
@@ -56,6 +60,7 @@ async function handleGetRequest(data: any, apiCall: any) {
       order_by: data.order_by || 'desc',
       filter: data.filter || '',
       'fields[]': data.fields || '',
+      menu: data.menu || '',
     });
     return (await apiCall('GET', `/v1/user?${queryParams}`, { token: data.token })).users;
   }

@@ -352,8 +352,15 @@
           "error": "Erro ao criar usuário",
           "success": "Usuário criado com sucesso"
         },
+        "activate": {
+          "confirmation": "Você tem certeza que deseja ativar este usuário?",
+          "success": "Usuário ativado com sucesso",
+          "error": "Erro interno do servidor. Tente novamente mais tarde."
+        },
         "deactivate": {
           "confirmation": "Você tem certeza que deseja desativar este usuário?",
+          "success": "Usuário desativado com sucesso",
+          "error": "Erro interno do servidor. Tente novamente mais tarde."
         },
         "edit": {
           "title": "Editar",
@@ -377,11 +384,24 @@
           "description": "Gerencie seus membros"
         },
         "reset_password": {
+          "confirmation": "Você tem certeza que deseja resetar a senha deste membro?",
           "success": "Senha redefinida com sucesso e enviada por e-mail",
           "errors": {
             "429": "Muitas tentativas. Tente novamente mais tarde.",
             "500": "Erro interno do servidor. Tente novamente mais tarde."
           }
+        }
+      },
+      "permissions": {
+        "title": "Permissões",
+        "description": "Gerencie as permissões dos membros",
+        "error": "Erro ao salvar permissões",
+        "success": "Permissões salvas com sucesso",
+        "auth": {
+          "create": "Criar Usuários",
+          "read": "Ver Usuários",
+          "update": "Editar Usuários",
+          "delete": "Excluir Usuários"
         }
       }
     },
@@ -407,6 +427,8 @@
   },
   "setup": {
     "buttons": {
+      "active": "Ativar",
+      "activate": "Ativar",
       "save": "Salvar",
       "cancel": "Cancelar",
       "back": "Voltar",

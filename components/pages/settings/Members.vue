@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import Form from '../carriers/Form.vue';
-
 const { $toast } = useNuxtApp();
 const authStore = useAuthStore();
 const memberStore = useMemberStore();
@@ -24,16 +22,34 @@ const paginate = ref({
   from: computed(() => members.value ? members.value.from : 0),
   to: computed(() => members.value ? members.value.to : 0),
 });
+const membersActive = members.value?.data.reduce((acc, member) => {
+  acc[member.id] = member.active;
+  return acc;
+}, {});
 const items = [
   {
     label: 'setup.buttons.reset_password',
     icon: 'pi pi-lock',
-    action: (event, email: string) => editMember(event, email),
+    action: (event: Event, data: any) => editMember(event, data.email),
+    enabled: (data: any) => {
+      return !!data?.active; // Treat true as visible, false/undefined as not
+    },
   },
   {
     label: 'setup.buttons.deactivate',
     icon: 'pi pi-user-minus',
-    action: (event, id: number) => deactivateMember(event, id),
+    action: (event: Event, data: any) => deactivateMember(event, data.id),
+    enabled: (data: any) => {
+      return !!data?.active;
+    },
+  },
+  {
+    label: 'setup.buttons.activate',
+    icon: 'pi pi-user-plus',
+    action: (event: Event, data: any) => activateMember(event, data.id),
+    enabled: (data: any) => {
+      return data?.active === 0; // Only visible if explicitly false
+    },
   },
 ];
 const filter = route.query.filter?.toString() || '';
@@ -80,7 +96,7 @@ const editMember = (event: Event, email: string): void => {
     accept: () => {
       const data = new FormData();
       data.append('email', email);
-      authStore.resetPassword(data).then((success) => {
+      authStore.resetPassword(data).then(() => {
         $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.members.reset_password.success'), life: 5000 });
       }).catch((error) => {
         console.log(error);
@@ -109,8 +125,38 @@ const deactivateMember = (event: Event, id: number): void => {
     accept: () => {
       const data = new FormData();
       data.append('id', id);
-      memberStore.delete(data).then((success) => {
+      memberStore.delete(data).then(() => {
         $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.members.deactivate.success'), life: 5000 });
+        memberStore.deactivateMember(id);
+      }).catch((error) => {
+        $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: t(error), life: 5000 });
+      });
+    },
+    reject: () => {
+      console.log('cancel delete member', id);
+    }
+  });
+};
+
+const activateMember = (event: Event, id: number): void => {
+  confirm.require({
+    message: t('modules.settings.members.activate.confirmation'),
+    header: t('common.are_you_sure'),
+    rejectProps: {
+        label: t('setup.buttons.cancel'),
+        severity: 'secondary',
+        outlined: true
+    },
+    acceptProps: {
+        label: t('setup.buttons.activate'),
+        severity: 'success'
+    },
+    accept: () => {
+      const data = new FormData();
+      data.append('id', id);
+      memberStore.activate(data).then(() => {
+        $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.members.activate.success'), life: 5000 });
+        memberStore.activateMember(id);
       }).catch((error) => {
         $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: t(error), life: 5000 });
       });
@@ -249,7 +295,7 @@ const inviteMember = (): void => {
             <Button type="button" icon="pi pi-ellipsis-v" text severity="secondary" @click="$refs[`menu-${data.id}`].toggle($event)" :data-email="data.id" />
             <Menu :ref="`menu-${data.id}`" append-to="body" popup :model="items" class="!min-w-full lg:!min-w-5">
               <template #item="{ item, props }">
-                <NuxtLink v-ripple class="flex items-center cursor-pointer p-menu-item p-menu-item-link" v-bind="props.action" @click="item.action($event, data.email)">
+                <NuxtLink v-if="item.enabled(data)" v-ripple class="flex items-center cursor-pointer p-menu-item p-menu-item-link" v-bind="props.action" @click="item.action($event, data)">
                   <i :class="item.icon" />
                   <span>{{ $t(item.label) }}</span>
                   <span v-if="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut }}</span>
