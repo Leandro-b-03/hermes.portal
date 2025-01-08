@@ -46,9 +46,9 @@ const menu = ref([
     visible: computed(() => permissions.value.members.read),
   },
   {
-    label: t('modules.settings.permissions.title'),
+    label: t('modules.settings.roles-permissions.title'),
     command: () => {
-      changeQuery({ menu: 'permissions' });
+      changeQuery({ menu: 'roles-permissions' });
     },
     visible: computed(() => permissions.value.permissions.read),
   }
@@ -160,7 +160,7 @@ const cancelEdit = () => {
               <div>
                 <PagesSettingsDetails v-if="selectedMenu === 'details'" :edit="editMode" @cancel-edit="cancelEdit" />
                 <PagesSettingsMembers v-if="selectedMenu === 'members'" />
-                <PagesSettingsPermissions v-if="selectedMenu === 'permissions'" />
+                <PagesSettingsPermissions v-if="selectedMenu === 'roles-permissions'" />
               </div>
             </div>
           </div>

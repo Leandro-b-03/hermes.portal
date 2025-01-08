@@ -392,16 +392,61 @@
           }
         }
       },
-      "permissions": {
-        "title": "Permissões",
+      "roles-permissions": {
+        "title": "Papeis e Permissões",
+        "roles": "Papeis",
+        "permissions": "Permissões",
         "description": "Gerencie as permissões dos membros",
         "error": "Erro ao salvar permissões",
         "success": "Permissões salvas com sucesso",
         "auth": {
+          "title": "Autenticação",
           "create": "Criar Usuários",
           "read": "Ver Usuários",
           "update": "Editar Usuários",
           "delete": "Excluir Usuários"
+        },
+        "connect": {
+          "title": "Transportadoras",
+          "create": "Criar Transportadoras",
+          "read": "Ver Transportadoras",
+          "update": "Editar Transportadoras",
+          "delete": "Excluir Transportadoras"
+        },
+        "connect.import": {
+          "title": "Importar Tabelas de Frete",
+          "create": "Criar Importação",
+          "read": "Ver Importação",
+          "update": "Editar Importação",
+          "delete": "Excluir Importação"
+        },
+        "hub": {
+          "title": "Hubs",
+          "create": "Criar Hubs",
+          "read": "Ver Hubs",
+          "update": "Editar Hubs",
+          "delete": "Excluir Hubs"
+        },
+        "issue": {
+          "title": "Problemas",
+          "create": "Criar Problemas",
+          "read": "Ver Problemas",
+          "update": "Editar Problemas",
+          "delete": "Excluir Problemas"
+        },
+        "order": {
+          "title": "Ordens",
+          "create": "Criar Ordens",
+          "read": "Ver Ordens",
+          "update": "Editar Ordens",
+          "delete": "Excluir Ordens"
+        },
+        "shipper": {
+          "title": "Embarcador/Empresa",
+          "create": "Criar Embarcador/Empresa",
+          "read": "Ver Embarcador/Empresa",
+          "update": "Editar Embarcador/Empresa",
+          "delete": "Excluir Embarcador/Empresa"
         }
       }
     },
