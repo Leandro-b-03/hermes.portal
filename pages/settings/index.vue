@@ -160,7 +160,7 @@ const cancelEdit = () => {
               <div>
                 <PagesSettingsDetails v-if="selectedMenu === 'details'" :edit="editMode" @cancel-edit="cancelEdit" />
                 <PagesSettingsMembers v-if="selectedMenu === 'members'" />
-                <PagesSettingsPermissions v-if="selectedMenu === 'roles-permissions'" />
+                <PagesSettingsRoles v-if="selectedMenu === 'roles-permissions'" />
               </div>
             </div>
           </div>

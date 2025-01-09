@@ -39,6 +39,10 @@
     "forgot_password": "Esqueceu a senha?",
     "name": "Nome",
     "name_placeholder": "Empresa Transportadora LTDA",
+    "name_roles_placeholder": "Coordenador",
+    "description": "Descrição",
+    "description_placeholder": "Descrição da empresa",
+    "description_roles_placeholder": "Coordenador de tabelas de fretes",
     "company": "Empresa",
     "tax_id": "CNPJ",
     "tax_id_placeholder": "00.000.000/0000-00",
@@ -411,14 +415,14 @@
           "create": "Criar Transportadoras",
           "read": "Ver Transportadoras",
           "update": "Editar Transportadoras",
-          "delete": "Excluir Transportadoras"
-        },
-        "connect.import": {
-          "title": "Importar Tabelas de Frete",
-          "create": "Criar Importação",
-          "read": "Ver Importação",
-          "update": "Editar Importação",
-          "delete": "Excluir Importação"
+          "delete": "Excluir Transportadoras",
+          "import": {
+            "title": "Importar Tabelas de Frete",
+            "create": "Importar tabelas de frete",
+            "read": "Ver tabelas de frete",
+            "update": "Editar tabelas de frete",
+            "delete": "Excluir tabelas de frete"
+          }
         },
         "hub": {
           "title": "Hubs",
