@@ -100,10 +100,10 @@ const routeContent = (value: string): void => {
       title.value = 'modules.settings.members.title';
       description.value = 'modules.settings.members.description';
       break;
-    case 'permissions':
+    case 'roles-permissions':
       icon.value = 'pi pi-lock';
-      title.value = 'modules.settings.permissions.title';
-      description.value = 'modules.settings.permissions.description';
+      title.value = 'modules.settings.roles-permissions.title';
+      description.value = 'modules.settings.roles-permissions.description';
       break;
   }
 }

@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core';
+import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
 
 const { $toast } = useNuxtApp();
 const authStore = useAuthStore();
 const roleStore = useRoleStore();
+const memberStore = useMemberStore();
 const t = useNuxtApp().$i18n.t;
 const confirm = useConfirm();
 const route = useRoute();
 
-const { required, email, sameAs, minLength } = useI18nValidators();
+const { required, minLength } = useI18nValidators();
 const data = computed(() => roleStore.data);
+const members = computed(() => memberStore.data);
+const filters = ref({ name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }});
+const selectedMembers = ref([]);
 const query = computed(() => new URLSearchParams(route.query).toString());
 const loading = computed(() => roleStore.isLoading);
+const edit = ref(false);
 const roles = computed(() => data.value?.roles);
-const permissions = computed(() => data.value?.permissions);
+const modules = computed(() => data.value?.modules);
 const role = ref({
   name: '',
   description: '',
@@ -28,8 +34,11 @@ const schema = {
 
 const v$ = useVuelidate(schema, role);
 
+console.log('roles', roles.value);
+
 onMounted(async () => {
-  await roleStore.fetchData(query.value); 
+  await roleStore.fetchData(query.value);
+  await memberStore.fetchData(query.value);
 });
 
 const save = async (): Promise<void> => {
@@ -42,46 +51,107 @@ const save = async (): Promise<void> => {
     // });
   });
 };
+
+const changeRole = (name: string) => {
+  edit.value = true;
+  const selectedRole = roles.value.find((r: any) => r.name === name);
+  role.value = { ...selectedRole };
+  selectedRole.activeMenu = true;
+  console.log('selectedRole', selectedRole);
+};
+
+const cancel = (): void => {
+  edit.value = false;
+  role.value = {
+    name: '',
+    description: '',
+    permissions: [],
+  };
+};
 </script>
 
+<style>
+.roles .p-menu-item {
+  position: relative;
+  left: -0.75rem;
+}
+</style>
+
 <template>
-  <div class="flex flex-row justify-between">
-    <Menu :model="roles" class="!border-none">
+  <DataTable v-if="!loading" v-model:filters="filters" filterDisplay="menu" v-model:selection="selectedMembers" :value="members?.data" scrollable :globalFilterFields="['name']" filterLocale="pt">
+    <!-- <Column selectionMode="multiple" headerStyle="width: 3rem" frozen></Column> -->
+    <Column class="min-w-[25rem] z-50" field="name" :header="$t('fields.name')" frozen>
+      <template #body="{ data }">
+        <div class="flex items-center gap-4">
+          <Avatar v-if="data.user_info.photo_url" :image="data.user_info.photo_url" class="mr-2 overflow-hidden" size="large" />
+          <Avatar v-else icon="pi pi-user" class="mr-2" style="background-color: #ece9fc; color: #2a1261" size="large" />
+          <div>
+            <p class="mt-0 mb-3 font-medium text-base/3 text-color-primary">
+              {{ data.name }}
+            </p>
+            <p class="mt-2 font-normal text-muted-color text-xs/3">
+              {{ data.email }}
+            </p>
+          </div>
+        </div>
+      </template>
+      <template #filter="{ filterModel }">
+        <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
+      </template>
+    </Column>
+    <Column v-for="module in modules" :header="$t(`modules.settings.roles-permissions.${module.title}.title`)">
+      <template #body="{ data }">
+        <div class="flex flex-row">
+          <div v-for="permission in module.permissions" class="flex min-w-72">
+            <ToggleSwitch :name="permission.name" />
+            <label :for="permission.name" class="ml-2">{{ $t(`modules.settings.roles-permissions.${permission.name}`) }}</label>
+          </div>
+        </div>
+      </template>
+    </Column>
+  </DataTable>
+  <!-- <div class="flex flex-row justify-between">
+    <Menu :model="roles" class="!border-none roles">
       <template #start>
         {{ $t('modules.settings.roles-permissions.roles') }}
       </template>
       <template #item="{ item, props }">
-        <a v-ripple class="flex items-center" v-bind="changeRole(item.name)">
-          <span>{{ item.label }}</span>
+        <a v-ripple class="flex items-center p-2 cursor-pointer" @click="changeRole(item.name)" :active="props.activeMenu">
+          <span>{{ item.name }}</span>
         </a>
       </template>
     </Menu>
     <div class="grow py-2 px-4 ml-2">
-      <div class="grid grid-cols-12 gap-4">
-        <div class="mb-4 col-span-12 md:col-span-6 lg:col-span-4">
-          <label for="name" class="font-medium text-surface-900 dark:text-surface-0 mb-1 block">{{ $t('fields.name') }}</label>
-          <InputText v-model="role.name" id="name" type="text" class="w-full" :placeholder="$t('fields.name_roles_placeholder')" />
-          <FieldError :errors="v$.name.$errors" :error="v$.name.$error" />
-        </div>
-        <div class="col-span-12"></div>
-        <div class="mb-4 col-span-12 md:col-span-6 lg:col-span-4">
-          <label for="description" class="font-medium text-surface-900 dark:text-surface-0 mb-1 block">{{ $t('fields.description') }}</label>
-          <Textarea v-model="role.description" id="description" type="text" class="w-full" rows="5" cols="30" :placeholder="$t('fields.description_roles_placeholder')" />
-        </div>
+      <div v-if="!edit">
+        <span>Selecione um papel ao lado para editar suas permissões</span>
       </div>
-      <div class="flex flex-wrap justify-start lg:justify-between gap-4 mb-4">
-        <div v-for="module in permissions" class="border border-surface-200 dark:border-surface-700 rounded p-4 w-72">
-          <h2 class="h2 mb-2">{{ $t(`modules.settings.roles-permissions.${module.title}.title`) }}</h2>
-          <div v-for="permission in module.permissions">
-            <Checkbox :key="permission.name" :value="permission.name" :name="permission.name" />
-            <label :for="permission.name" class="ml-2">{{ $t(`modules.settings.roles-permissions.${permission.name}`) }}</label>
+      <div v-else>
+        <div class="grid grid-cols-12 gap-4">
+          <div class="mb-4 col-span-12 md:col-span-6 lg:col-span-4">
+            <label for="name" class="font-medium text-surface-900 dark:text-surface-0 mb-1 block">{{ $t('fields.name') }}</label>
+            <InputText v-model="role.name" id="name" type="text" class="w-full" :placeholder="$t('fields.name_roles_placeholder')" />
+            <FieldError :errors="v$.name.$errors" :error="v$.name.$error" />
+          </div>
+          <div class="col-span-12"></div>
+          <div class="mb-4 col-span-12 md:col-span-6 lg:col-span-4">
+            <label for="description" class="font-medium text-surface-900 dark:text-surface-0 mb-1 block">{{ $t('fields.description') }}</label>
+            <Textarea v-model="role.description" id="description" type="text" class="w-full" rows="5" cols="30" :placeholder="$t('fields.description_roles_placeholder')" />
           </div>
         </div>
-      </div>
-      <div class="flex justify-between">
-        <Button :label="$t('setup.buttons.cancel')" @click="cancel" />
-        <Button :label="$t('setup.buttons.save')" @click="save" />
+        <div class="flex flex-wrap justify-start lg:justify-between gap-4 mb-4">
+          <div v-for="module in permissions" class="border border-surface-200 dark:border-surface-700 rounded p-4 w-72">
+            <h2 class="h2 mb-2">{{ $t(`modules.settings.roles-permissions.${module.title}.title`) }}</h2>
+            <div v-for="permission in module.permissions">
+              <Checkbox :key="permission.name" :value="permission.name" :name="permission.name" />
+              <label :for="permission.name" class="ml-2">{{ $t(`modules.settings.roles-permissions.${permission.name}`) }}</label>
+            </div>
+          </div>
+        </div>
+        <div class="flex justify-between">
+          <Button :label="$t('setup.buttons.cancel')" @click="cancel" />
+          <Button :label="$t('setup.buttons.save')" @click="save" />
+        </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>

@@ -18,7 +18,7 @@ export interface IPermission {
   updated_at: string;
 }
 
-export interface IPermissionGroup {
+export interface IModules {
   title: string;
   permissions: IPermission[];
 }
@@ -26,6 +26,6 @@ export interface IPermissionGroup {
 export interface IRolesAndPermissionsResponse {
   roles: IRole[];
   permissions: {
-    [key: string]: IPermissionGroup;
+    [key: string]: IModules;
   };
 }
