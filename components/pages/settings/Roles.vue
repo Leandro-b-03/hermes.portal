@@ -38,7 +38,7 @@ console.log('roles', roles.value);
 
 onMounted(async () => {
   await roleStore.fetchData(query.value);
-  await memberStore.fetchData(query.value);
+  await memberStore.fetchData(query.value);  
 });
 
 const save = async (): Promise<void> => {
@@ -68,6 +68,12 @@ const cancel = (): void => {
     permissions: [],
   };
 };
+
+const menus = ref({});
+const openMenu = (id: number, event: Event): void => {
+  console.log('id', id);
+  menus.value[id]?.toggle(event);
+};
 </script>
 
 <style>
@@ -78,9 +84,9 @@ const cancel = (): void => {
 </style>
 
 <template>
-  <DataTable v-if="!loading" v-model:filters="filters" filterDisplay="menu" v-model:selection="selectedMembers" :value="members?.data" scrollable :globalFilterFields="['name']" filterLocale="pt">
+  <DataTable v-if="!loading" v-model:selection="selectedMembers" :value="members?.data" scrollable>
     <!-- <Column selectionMode="multiple" headerStyle="width: 3rem" frozen></Column> -->
-    <Column class="min-w-[25rem] z-50" field="name" :header="$t('fields.name')" frozen>
+    <Column class="z-50" field="name" :header="$t('fields.name')" frozen>
       <template #body="{ data }">
         <div class="flex items-center gap-4">
           <Avatar v-if="data.user_info.photo_url" :image="data.user_info.photo_url" class="mr-2 overflow-hidden" size="large" />
@@ -99,13 +105,32 @@ const cancel = (): void => {
         <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
       </template>
     </Column>
-    <Column v-for="module in modules" :header="$t(`modules.settings.roles-permissions.${module.title}.title`)">
+    <Column v-for="module in modules" :header="$t(`modules.settings.roles-permissions.${module.title}.title`)" class="w-[50px]" :headeStyle="{text: 'center'}">
       <template #body="{ data }">
-        <div class="flex flex-row">
-          <div v-for="permission in module.permissions" class="flex min-w-72">
+        <div class="flex justify-center">
+          <!-- <ToggleSwitch /> -->
+          <div class="p-toggleswitch"
+            v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'fadein', leaveActiveClass: 'fadeout', leaveToClass: 'hidden' }">
+            <div class="rounded-full py-1 hover:bg-slate-500! flex justify-start items-center bg-red-300 cursor-pointer hover:bg-red-400">
+              <div class="w-4 h-4 ml-1 bg-white rounded-full shadow-lg"></div>
+            </div>
+          </div>
+          <div class="hidden w-28 h-28 bg-white rounded-lg shadow-lg p-4 mt-10 fixed z-50 border border-slate-300">
+          </div>
+          <!-- <ToggleSwitch :name="module.title" v-tooltip.top="$t(`modules.settings.roles-permissions.${module.title}.title`)" @click="openMenu(data.id, $event)" />
+          <Menu :model="module.permissions" class="!border-none" popup :ref="el => { menus[data.id] = el }" :id="`menu-${data.id}`">
+            <template #start>
+              <span>{{ $t(`modules.settings.roles-permissions.${module.title}.title`) }}</span>
+            </template>
+            <template #item="{ item, props }">
+              <ToggleSwitch :name="item.name" />
+              <label :for="item.name" class="ml-2">{{ $t(`modules.settings.roles-permissions.${item.name}`) }}</label>
+            </template>
+          </Menu> -->
+          <!--<div v-for="permission in module.permissions" class="flex whitespace-nowrap mr-2">
             <ToggleSwitch :name="permission.name" />
             <label :for="permission.name" class="ml-2">{{ $t(`modules.settings.roles-permissions.${permission.name}`) }}</label>
-          </div>
+          </div>-->
         </div>
       </template>
     </Column>

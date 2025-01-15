@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:23-alpine3.20
 
 # Add metadata labels (following best practices)
 LABEL org.opencontainers.image.title="Hermes Frontend" \
@@ -27,9 +27,9 @@ RUN apk add --no-cache --update \
     nano
 
 # Install Resvg
-RUN npm install @resvg/resvg-js
+# RUN npm install @resvg/resvg-js
 
-RUN cargo install wasm-pack
+# RUN cargo install wasm-pack
 
 # Install dependencies (including devDependencies for Vite)
 # RUN npm install

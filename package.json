@@ -26,6 +26,7 @@
     "tailwindcss-primeui": "^0.3.4",
     "uuid": "^10.0.0",
     "vue": "latest",
+    "vue-dragscroll": "^4.0.6",
     "vue-router": "latest"
   },
   "devDependencies": {
