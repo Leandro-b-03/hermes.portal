@@ -46,9 +46,9 @@ const menu = ref([
     visible: computed(() => permissions.value.members.read),
   },
   {
-    label: t('modules.settings.roles-permissions.title'),
+    label: t('modules.settings.permissions.title'),
     command: () => {
-      changeQuery({ menu: 'roles-permissions' });
+      changeQuery({ menu: 'permissions' });
     },
     visible: computed(() => permissions.value.permissions.read),
   }
@@ -100,10 +100,10 @@ const routeContent = (value: string): void => {
       title.value = 'modules.settings.members.title';
       description.value = 'modules.settings.members.description';
       break;
-    case 'roles-permissions':
+    case 'permissions':
       icon.value = 'pi pi-lock';
-      title.value = 'modules.settings.roles-permissions.title';
-      description.value = 'modules.settings.roles-permissions.description';
+      title.value = 'modules.settings.permissions.title';
+      description.value = 'modules.settings.permissions.description';
       break;
   }
 }
@@ -160,7 +160,7 @@ const cancelEdit = () => {
               <div>
                 <PagesSettingsDetails v-if="selectedMenu === 'details'" :edit="editMode" @cancel-edit="cancelEdit" />
                 <PagesSettingsMembers v-if="selectedMenu === 'members'" />
-                <PagesSettingsRoles v-if="selectedMenu === 'roles-permissions'" />
+                <PagesSettingsRoles v-if="selectedMenu === 'permissions'" />
               </div>
             </div>
           </div>

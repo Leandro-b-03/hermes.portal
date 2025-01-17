@@ -396,10 +396,8 @@
           }
         }
       },
-      "roles-permissions": {
-        "title": "Papeis e Permissões",
-        "roles": "Papeis",
-        "permissions": "Permissões",
+      "permissions": {
+        "title": "Permissões",
         "description": "Gerencie as permissões dos membros",
         "error": "Erro ao salvar permissões",
         "success": "Permissões salvas com sucesso",

@@ -32,9 +32,9 @@ const schema = {
   },
 };
 
-const v$ = useVuelidate(schema, role);
+const checkPermission = ref([]);
 
-console.log('roles', roles.value);
+const v$ = useVuelidate(schema, role);
 
 onMounted(async () => {
   await roleStore.fetchData(query.value);
@@ -69,10 +69,19 @@ const cancel = (): void => {
   };
 };
 
-const menus = ref({});
-const openMenu = (id: number, event: Event): void => {
-  console.log('id', id);
-  menus.value[id]?.toggle(event);
+// const checkPermission = (event: Event): void => {
+//   console.log('event', event.target);
+//   console.log('div 1', event.target.parentElement.children[0]);
+//   console.log('Checkbox', event.target.parentElement.children[0].children[0]);
+
+//   const checkbox = event.target.parentElement.children[0].children[0];
+//   console.log('checkbox', checkbox.checked);
+//   checkbox.checked = !checkbox.checked;
+  // };
+
+const clickP = (): void => {
+  console.log('clickP');
+  console.log('checkPermission', checkPermission);
 };
 </script>
 
@@ -80,6 +89,32 @@ const openMenu = (id: number, event: Event): void => {
 .roles .p-menu-item {
   position: relative;
   left: -0.75rem;
+}
+
+@keyframes fadein-permissions {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeout-permissions {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.fadein-permissions {
+    animation: my-fadein 150ms linear;
+}
+
+.fadeout-permissions {
+    animation: my-fadeout 150ms linear;
 }
 </style>
 
@@ -105,32 +140,29 @@ const openMenu = (id: number, event: Event): void => {
         <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
       </template>
     </Column>
-    <Column v-for="module in modules" :header="$t(`modules.settings.roles-permissions.${module.title}.title`)" class="w-[50px]" :headeStyle="{text: 'center'}">
+    <Column v-for="module in modules" :header="$t(`modules.settings.permissions.${module.title}.title`)" :headeStyle="{text: 'center'}">
       <template #body="{ data }">
         <div class="flex justify-center">
-          <!-- <ToggleSwitch /> -->
-          <div class="p-toggleswitch"
-            v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'fadein', leaveActiveClass: 'fadeout', leaveToClass: 'hidden' }">
+          <div 
+            v-styleclass="{
+                selector: '@next',
+                enterFromClass: 'hidden',
+                enterActiveClass: 'fadein-permissions',
+                leaveToClass: 'hidden',
+                leaveActiveClass: 'fadeout-permissions',
+                hideOnOutsideClick: true,
+            }"
+            class="p-toggleswitch">
             <div class="rounded-full py-1 hover:bg-slate-500! flex justify-start items-center bg-red-300 cursor-pointer hover:bg-red-400">
               <div class="w-4 h-4 ml-1 bg-white rounded-full shadow-lg"></div>
             </div>
           </div>
-          <div class="hidden w-28 h-28 bg-white rounded-lg shadow-lg p-4 mt-10 fixed z-50 border border-slate-300">
+          <div class="hidden animate-duration-500 min-w-10 min-h-16 bg-white rounded-lg shadow-lg p-4 mt-10 fixed z-50! border border-slate-300 overflow-hidden">
+            <div v-for="permission in module.permissions" class="flex whitespace-nowrap mr-2 mb-1">
+              <ToggleSwitch v-model="checkPermission[permission.name]" :name="permission.name" @click="clickP" />
+              <label :for="permission.name" class="ml-2" @click="checkPermission[permission.name] == !checkPermission[permission.name]">{{ $t(`modules.settings.permissions.${permission.name}`) }}</label>
+            </div>
           </div>
-          <!-- <ToggleSwitch :name="module.title" v-tooltip.top="$t(`modules.settings.roles-permissions.${module.title}.title`)" @click="openMenu(data.id, $event)" />
-          <Menu :model="module.permissions" class="!border-none" popup :ref="el => { menus[data.id] = el }" :id="`menu-${data.id}`">
-            <template #start>
-              <span>{{ $t(`modules.settings.roles-permissions.${module.title}.title`) }}</span>
-            </template>
-            <template #item="{ item, props }">
-              <ToggleSwitch :name="item.name" />
-              <label :for="item.name" class="ml-2">{{ $t(`modules.settings.roles-permissions.${item.name}`) }}</label>
-            </template>
-          </Menu> -->
-          <!--<div v-for="permission in module.permissions" class="flex whitespace-nowrap mr-2">
-            <ToggleSwitch :name="permission.name" />
-            <label :for="permission.name" class="ml-2">{{ $t(`modules.settings.roles-permissions.${permission.name}`) }}</label>
-          </div>-->
         </div>
       </template>
     </Column>
@@ -138,7 +170,7 @@ const openMenu = (id: number, event: Event): void => {
   <!-- <div class="flex flex-row justify-between">
     <Menu :model="roles" class="!border-none roles">
       <template #start>
-        {{ $t('modules.settings.roles-permissions.roles') }}
+        {{ $t('modules.settings.permissions.roles') }}
       </template>
       <template #item="{ item, props }">
         <a v-ripple class="flex items-center p-2 cursor-pointer" @click="changeRole(item.name)" :active="props.activeMenu">
@@ -165,10 +197,10 @@ const openMenu = (id: number, event: Event): void => {
         </div>
         <div class="flex flex-wrap justify-start lg:justify-between gap-4 mb-4">
           <div v-for="module in permissions" class="border border-surface-200 dark:border-surface-700 rounded p-4 w-72">
-            <h2 class="h2 mb-2">{{ $t(`modules.settings.roles-permissions.${module.title}.title`) }}</h2>
+            <h2 class="h2 mb-2">{{ $t(`modules.settings.permissions.${module.title}.title`) }}</h2>
             <div v-for="permission in module.permissions">
               <Checkbox :key="permission.name" :value="permission.name" :name="permission.name" />
-              <label :for="permission.name" class="ml-2">{{ $t(`modules.settings.roles-permissions.${permission.name}`) }}</label>
+              <label :for="permission.name" class="ml-2">{{ $t(`modules.settings.permissions.${permission.name}`) }}</label>
             </div>
           </div>
         </div>
