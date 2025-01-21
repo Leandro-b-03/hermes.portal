@@ -5,7 +5,11 @@ export interface IRole {
   created_at: string;
   updated_at: string;
   description?: string;
-  permissions?: string;
+  permissions?: {
+    [key: string]: { // Using an index signature for dynamic keys like "auth", "order", etc.
+      [permissionName: string]: boolean; // Permission name (e.g., "25-auth.create") and its value (true/false)
+    };
+  };
   default?: number;
   shipper_id?: number;
 }

@@ -12,6 +12,7 @@
     "view": "Visualizar",
     "confirm": "Confirmação",
     "are_you_sure": "Você tem certeza?",
+    "permissions_for": "Permissões para",
   },
   "fields": {
     "password": "Senha",
