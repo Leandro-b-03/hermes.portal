@@ -144,7 +144,15 @@ const toggleColor = (module: any): string => {
     <Column :header="$t('fields.admin')" :headerStyle="{text: 'center'}">
       <template #body="{ data }">
         <div class="flex justify-center">
-          <ToggleSwitch :modelValue="data.roles[0].name === 'admin'" :name="data.id" @click="clickP('admin', data.id, data.roles[0].name === 'admin')" />
+          <div class="p-toggleswitch">
+            <div class="rounded-full py-1 flex items-center cursor-pointer"
+              :class="[
+                data.roles[0].name === 'admin' ? 'bg-green-300 hover:bg-green-400 justify-end' : 'bg-gray-300 hover:bg-gray-400 justify-start',
+              ]"
+              @click="clickP('admin', data.id, data.roles[0].name === 'admin')">
+              <div class="w-4 h-4 mx-1 bg-white rounded-full shadow-lg"></div>
+            </div>
+          </div>
         </div>
       </template>
     </Column>
@@ -166,8 +174,7 @@ const toggleColor = (module: any): string => {
                 toggleColor(data.formatted_permissions[module.title]) === 'green' ? 'bg-green-300 hover:bg-green-400 justify-end' : '',
                 toggleColor(data.formatted_permissions[module.title]) === 'yellow' ? 'bg-yellow-300 hover:bg-yellow-400 justify-center' : '',
                 // Add more conditions for other colors or a default class
-              ]"
-            >
+              ]">
               <div class="w-4 h-4 mx-1 bg-white rounded-full shadow-lg"></div>
             </div>
           </div>
