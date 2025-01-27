@@ -401,7 +401,10 @@
         "title": "Permissões",
         "description": "Gerencie as permissões dos membros",
         "error": "Erro ao salvar permissões",
-        "success": "Permissões salvas com sucesso",
+        "success": {
+          "assign": "Permissões atribuídas com sucesso",
+          "revoke": "Permissões removidas com sucesso"
+        },
         "auth": {
           "title": "Autenticação",
           "create": "Criar Usuários",

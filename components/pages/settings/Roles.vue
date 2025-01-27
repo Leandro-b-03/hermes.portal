@@ -17,33 +17,65 @@ const filters = ref({ name: { operator: FilterOperator.AND, constraints: [{ valu
 const selectedMembers = ref([]);
 const query = computed(() => new URLSearchParams(route.query).toString());
 const loading = computed(() => roleStore.isLoading);
-const edit = ref(false);
-const roles = computed(() => data.value?.roles);
 const modules = computed(() => data.value?.modules);
-const role = ref({
-  name: '',
-  description: '',
-  permissions: [],
-});
-const schema = {
-  name: {
-    required: required,
-    minLength: minLength(3),
-  },
-};
-
-const checkPermission = ref([]);
-
-const v$ = useVuelidate(schema, role);
 
 onMounted(async () => {
   await roleStore.fetchData(query.value);
-  await memberStore.fetchData(query.value);  
+  await memberStore.fetchData(query.value);
 });
 
-const clickP = (): void => {
-  console.log('clickP');
-  console.log('checkPermission', checkPermission);
+const clickP = (permission: string, id: number, enable: boolean): void => {
+  const data = new FormData();
+
+  data.append('assign[permission][name]', permission);
+  data.append('assign[permission][guard_name]', 'api');
+  data.append('assign[user_id]', id.toString());
+
+  if (permission === 'admin') {
+    confirm.require({
+      message: t('modules.settings.permission.confirmation'),
+      header: t('common.are_you_sure'),
+      rejectProps: {
+          label: t('setup.buttons.cancel'),
+          severity: 'secondary',
+          outlined: true
+      },
+      acceptProps: {
+          label: t('setup.buttons.continue'),
+          severity: 'success'
+      },
+      accept: () => {
+        if (!enable) {
+          roleStore.assignRone(data).then(() => {
+            $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permission.success.admin'), life: 5000 });
+          }).catch((error) => {
+            $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: t(error), life: 5000 });
+          });
+        } else {
+          roleStore.revokeRole(data).then(() => {
+            $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permission.success.revoke'), life: 5000 });
+          }).catch((error) => {
+            $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: t(error), life: 5000 });
+          });
+        }
+      },
+      reject: () => {
+        console.log('cancel delete member', id);
+      }
+    });
+  } else if (!enable) {
+    roleStore.assignPermission(data).then(() => {
+      $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permissions.success.assign'), life: 5000 });
+    }).catch(() => {
+      $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error'), detail: t('modules.settings.permissions.error'), life: 5000 });
+    });
+  } else {
+    roleStore.revokePermission(data).then(() => {
+      $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permissions.success.revoke'), life: 5000 });
+    }).catch(() => {
+      $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error'), detail: t('modules.settings.permissions.error'), life: 5000 });
+    });
+  }
 };
 
 const openMenu = (id: number, title: string): void => {
@@ -62,13 +94,33 @@ const closeMenu = (id: number, title: string): void => {
   }
 };
 
-const toggleColor = (permissions: any, id: number, title: string): string => {
-  const permission = permissions.find((permission: any) => permission.module === title);
-  return permission?.permission ? 'bg-green-300 hover:bg-green-400' : 'bg-red-300 hover:bg-red-400';
+const toggleColor = (module: any): string => {
+  let trueCount = 0;
+  for (const permission in module) {
+    if (module[permission]) {
+      trueCount++;
+    }
+  }
+
+  let color = 'red'; // Default to red
+  if (trueCount === Object.keys(module).length) {
+    color = 'green'; // All permissions are true
+  } else if (trueCount > 0) {
+    color = 'yellow'; // Some permissions are true
+  }
+
+  return color;
 };
+
+// bg-red-300! hover:bg-red-400! bg-yellow-300! hover:bg-yellow-400! bg-green-300! hover:bg-green-400!
 </script>
 
+<style scoped>
+/* // bg-red-300! hover:bg-red-400! bg-yellow-300! hover:bg-yellow-400! bg-green-300! hover:bg-green-400! */
+</style>
+
 <template>
+  <ConfirmDialog></ConfirmDialog>
   <DataTable v-if="!loading" v-model:selection="selectedMembers" :value="members?.data" scrollable>
     <Column class="z-50" field="name" :header="$t('fields.name')" frozen>
       <template #body="{ data }">
@@ -89,13 +141,34 @@ const toggleColor = (permissions: any, id: number, title: string): string => {
         <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
       </template>
     </Column>
-    <Column v-for="module in modules" :header="$t(`modules.settings.permissions.${module.title}.title`)" :headeStyle="{text: 'center'}">
+    <Column :header="$t('fields.admin')" :headerStyle="{text: 'center'}">
       <template #body="{ data }">
         <div class="flex justify-center">
+          <ToggleSwitch :modelValue="data.roles[0].name === 'admin'" :name="data.id" @click="clickP('admin', data.id, data.roles[0].name === 'admin')" />
+        </div>
+      </template>
+    </Column>
+    <Column v-for="module in modules" :header="$t(`modules.settings.permissions.${module.title}.title`)" :headeStyle="{text: 'center'}">
+      <template #body="{ data }">
+        <div v-if="data.roles[0].name === 'admin'" class="flex justify-center">
+          <div class="p-toggleswitch">
+            <div class="rounded-full py-1 flex items-center bg-green-300 hover:bg-green-400 justify-end">
+              <div class="w-4 h-4 mx-1 bg-white rounded-full shadow-lg"></div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="flex justify-center">
           <div @click="openMenu(data.id, module.title)"
             class="p-toggleswitch">
-            <div class="rounded-full py-1 hover:bg-slate-500! flex justify-start items-center cursor-pointer" :class="toggleColor(data.permissions, data.id, module.title)">
-              <div class="w-4 h-4 ml-1 bg-white rounded-full shadow-lg"></div>
+            <div class="rounded-full py-1 flex items-center cursor-pointer"
+            :class="[
+                toggleColor(data.formatted_permissions[module.title]) === 'red' ? 'bg-red-300 hover:bg-red-400 justify-start' : '',
+                toggleColor(data.formatted_permissions[module.title]) === 'green' ? 'bg-green-300 hover:bg-green-400 justify-end' : '',
+                toggleColor(data.formatted_permissions[module.title]) === 'yellow' ? 'bg-yellow-300 hover:bg-yellow-400 justify-center' : '',
+                // Add more conditions for other colors or a default class
+              ]"
+            >
+              <div class="w-4 h-4 mx-1 bg-white rounded-full shadow-lg"></div>
             </div>
           </div>
           <TransitionFade mode="in-out">
@@ -105,8 +178,8 @@ const toggleColor = (permissions: any, id: number, title: string): string => {
                 <i class="pi pi-times cursor-pointer text-sm" @click="closeMenu(data.id, module.title)"></i>
               </div>
               <div v-for="permission in module.permissions" class="flex whitespace-nowrap mr-2 mb-1">
-                <ToggleSwitch v-model="data.permissions[module.title][permission.name]" :name="permission.name" @click="clickP" />
-                <label :for="permission.name" class="ml-2" @click="checkPermission[permission.name] == !checkPermission[permission.name]">{{ $t(`modules.settings.permissions.${permission.name}`) }}</label>
+                <ToggleSwitch v-model="data.formatted_permissions[module.title][permission.name]" :name="permission.name" @click="clickP(permission.name, data.id, data.formatted_permissions[module.title][permission.name])" />
+                <label :for="permission.name" class="ml-2">{{ $t(`modules.settings.permissions.${permission.name}`) }}</label>
               </div>
             </div>
           </TransitionFade>
