@@ -41,6 +41,48 @@ export const useRoleStore = defineStore({
         this.isLoading = false;
       }
     },
+    async assignRole(data: FormData): Promise<any> {
+      // this.isLoading = true;
+      this.error = null;
+
+      data.append("action", "assign_role");
+      data.append("token", localStorage.sessionId);
+      try {
+        const response = await $fetch<any>("/api/role", {
+          method: "POST",
+          body: data,
+        });
+
+        return response;
+      } catch (error: any) {
+        console.error(error);
+        this.error = error.data.message || "An error occurred while assigning role";
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    async revokeRole(data: FormData): Promise<any> {
+      // this.isLoading = true;
+      this.error = null;
+
+      data.append("action", "revoke_role");
+      data.append("token", localStorage.sessionId);
+      try {
+        const response = await $fetch<any>("/api/role", {
+          method: "POST",
+          body: data,
+        });
+
+        return response;
+      } catch (error: any) {
+        console.error(error);
+        this.error = error.data.message || "An error occurred while revoking role";
+        return Promise.reject(this.error);
+      } finally {
+        this.isLoading = false;
+      }
+    },
     async assignPermission(data: FormData): Promise<void> {
       // this.isLoading = true;
       this.error = null;

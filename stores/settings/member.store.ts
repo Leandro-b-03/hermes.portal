@@ -27,6 +27,13 @@ export const useMemberStore = defineStore({
     setLoading(loading: boolean): void {
       this.isLoading = loading;
     },
+    setRow(newData: any): void {
+      const index = this.data?.data?.findIndex((member: any) => member.id === newData?.user.id);
+      console.log(index);
+      if (index !== undefined && index !== -1 && this.data) {
+        this.data.data[index].roles[0] = newData?.role;
+      }
+    },
     async fetchData(params: string): Promise<void> {
       this.isLoading = true;
       this.error = null;

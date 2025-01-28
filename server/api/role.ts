@@ -30,7 +30,11 @@ export default defineEventHandler(async (event) => {
 
 // --- Helper functions for each HTTP method ---
 async function handlePostRequest(data: any, apiCall: any) {
-  if (data.get('action') === 'assign_permission') {
+  if (data.get('action') === 'assign_role') {
+    return (await apiCall('POST', '/v1/role/assign', data));
+  } else if (data.get('action') === 'revoke_role') {
+    return (await apiCall('POST', '/v1/role/revoke', data));
+  } else if (data.get('action') === 'assign_permission') {
     return (await apiCall('POST', '/v1/role/assign_permission', data));
   } else if (data.get('action') === 'revoke_permission') {
     return (await apiCall('POST', '/v1/role/revoke_permission', data));

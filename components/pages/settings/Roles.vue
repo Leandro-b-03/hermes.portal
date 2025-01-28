@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { useVuelidate } from '@vuelidate/core';
-import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
-
 const { $toast } = useNuxtApp();
 const authStore = useAuthStore();
 const roleStore = useRoleStore();
@@ -10,14 +7,24 @@ const t = useNuxtApp().$i18n.t;
 const confirm = useConfirm();
 const route = useRoute();
 
-const { required, minLength } = useI18nValidators();
 const data = computed(() => roleStore.data);
 const members = computed(() => memberStore.data);
-const filters = ref({ name: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] }});
-const selectedMembers = ref([]);
 const query = computed(() => new URLSearchParams(route.query).toString());
-const loading = computed(() => roleStore.isLoading);
+const loading = computed(() => roleStore.isLoading || memberStore.isLoading);
 const modules = computed(() => data.value?.modules);
+const filter = route.query.filter?.toString() || '';
+const fields = ref([
+  'name',
+  'email',
+  'created_at',
+  'updated_at'
+]);
+const paginate = ref({
+  total: computed(() => members.value ? members.value.total : 0),
+  per_page: computed(() => members.value ? members.value.per_page : 10),
+  from: computed(() => members.value ? members.value.from : 0),
+  to: computed(() => members.value ? members.value.to : 0),
+});
 
 onMounted(async () => {
   await roleStore.fetchData(query.value);
@@ -31,51 +38,68 @@ const clickP = (permission: string, id: number, enable: boolean): void => {
   data.append('assign[permission][guard_name]', 'api');
   data.append('assign[user_id]', id.toString());
 
-  if (permission === 'admin') {
-    confirm.require({
-      message: t('modules.settings.permission.confirmation'),
-      header: t('common.are_you_sure'),
-      rejectProps: {
-          label: t('setup.buttons.cancel'),
-          severity: 'secondary',
-          outlined: true
-      },
-      acceptProps: {
-          label: t('setup.buttons.continue'),
-          severity: 'success'
-      },
-      accept: () => {
-        if (!enable) {
-          roleStore.assignRone(data).then(() => {
-            $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permission.success.admin'), life: 5000 });
-          }).catch((error) => {
-            $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: t(error), life: 5000 });
-          });
-        } else {
-          roleStore.revokeRole(data).then(() => {
-            $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permission.success.revoke'), life: 5000 });
-          }).catch((error) => {
-            $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('setup.error.title'), detail: t(error), life: 5000 });
-          });
-        }
-      },
-      reject: () => {
-        console.log('cancel delete member', id);
-      }
-    });
-  } else if (!enable) {
+  if (!enable) {
     roleStore.assignPermission(data).then(() => {
       $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permissions.success.assign'), life: 5000 });
     }).catch(() => {
-      $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error'), detail: t('modules.settings.permissions.error'), life: 5000 });
+      $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error.title'), detail: t('modules.settings.permissions.error.assign'), life: 5000 });
     });
   } else {
     roleStore.revokePermission(data).then(() => {
       $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permissions.success.revoke'), life: 5000 });
     }).catch(() => {
-      $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error'), detail: t('modules.settings.permissions.error'), life: 5000 });
+      $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error.title'), detail: t('modules.settings.permissions.error.revoke'), life: 5000 });
     });
   }
+};
+
+const assignAdmin = (id: number, enable: boolean): void => {
+  if (authStore.authUser.id === id) {
+    $toast.add({ severity: 'contrast', icon: 'pi-times', success: false, summary: t('setup.error.title'), detail: t('modules.settings.permissions.error.admin'), life: 5000 });
+    return;
+  }
+
+  const data = new FormData();
+
+  data.append('assign[role][name]', 'admin');
+  data.append('assign[role][guard_name]', 'api');
+  data.append('assign[user_id]', id.toString());
+
+  confirm.require({
+    message: t('modules.settings.permission.confirmation'),
+    header: t('common.are_you_sure'),
+    rejectProps: {
+        label: t('setup.buttons.cancel'),
+        severity: 'secondary',
+        outlined: true
+    },
+    acceptProps: {
+        label: t('setup.buttons.continue'),
+        severity: 'success'
+    },
+    accept: () => {
+      if (!enable) {
+        roleStore.assignRole(data).then((response) => {
+          console.log(response);
+          memberStore.setRow(response);
+          $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permission.success.role.assign'), life: 5000 });
+        }).catch((error) => {
+          $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('modules.settings.permission.error.role.assign'), detail: t(error), life: 5000 });
+        });
+      } else {
+        roleStore.revokeRole(data).then((response) => {
+          console.log(response);
+          memberStore.setRow(response);
+          $toast.add({ severity: 'contrast', icon: 'pi-check', success: true, summary: t('setup.success'), detail: t('modules.settings.permission.success.role.revoke'), life: 5000 });
+        }).catch((error) => {
+          $toast.add({ severity: 'contrast', icon: 'pi-exclamation-triangle', success: false, summary: t('modules.settings.permission.error.role.revoke'), detail: t(error), life: 5000 });
+        });
+      }
+    },
+    reject: () => {
+      console.log('cancel delete member', id);
+    }
+  });
 };
 
 const openMenu = (id: number, title: string): void => {
@@ -121,7 +145,14 @@ const toggleColor = (module: any): string => {
 
 <template>
   <ConfirmDialog></ConfirmDialog>
-  <DataTable v-if="!loading" v-model:selection="selectedMembers" :value="members?.data" scrollable>
+  <DataTable v-if="!loading" :value="members?.data">
+    <template #header>
+      <div v-if="members?.data?.length > 0" class="flex justify-end">
+        <div class="w-30">
+          <PagesSearchTable v-model:filter="filter" v-model:fields="fields" />
+        </div>
+      </div>
+    </template>
     <Column class="z-50" field="name" :header="$t('fields.name')" frozen>
       <template #body="{ data }">
         <div class="flex items-center gap-4">
@@ -137,11 +168,8 @@ const toggleColor = (module: any): string => {
           </div>
         </div>
       </template>
-      <template #filter="{ filterModel }">
-        <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
-      </template>
     </Column>
-    <Column :header="$t('fields.admin')" :headerStyle="{text: 'center'}">
+    <Column v-if="authStore.hasPermission('admin')" :header="$t('fields.admin')" :headerStyle="{text: 'center'}">
       <template #body="{ data }">
         <div class="flex justify-center">
           <div class="p-toggleswitch">
@@ -149,7 +177,7 @@ const toggleColor = (module: any): string => {
               :class="[
                 data.roles[0].name === 'admin' ? 'bg-green-300 hover:bg-green-400 justify-end' : 'bg-gray-300 hover:bg-gray-400 justify-start',
               ]"
-              @click="clickP('admin', data.id, data.roles[0].name === 'admin')">
+              @click="assignAdmin(data.id, data.roles[0].name === 'admin')">
               <div class="w-4 h-4 mx-1 bg-white rounded-full shadow-lg"></div>
             </div>
           </div>
@@ -194,4 +222,5 @@ const toggleColor = (module: any): string => {
       </template>
     </Column>
   </DataTable>
+  <PagesPaginatorc v-if="paginate.total > 0" v-model:totalRecords="paginate.total" v-model:rows="paginate.per_page" v-model:first="paginate.from" v-model:last="paginate.to" />
 </template>

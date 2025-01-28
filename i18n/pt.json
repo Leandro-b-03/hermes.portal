@@ -15,6 +15,7 @@
     "permissions_for": "Permissões para",
   },
   "fields": {
+    "admin": "Administrador",
     "password": "Senha",
     "password_placeholder": "•••••••••",
     "password_prompt_label": "Insira uma senha",
@@ -400,10 +401,22 @@
       "permissions": {
         "title": "Permissões",
         "description": "Gerencie as permissões dos membros",
-        "error": "Erro ao salvar permissões",
+        "error": {
+          "admin": "Você não pode alterar suas próprias permissões",
+          "assign": "Erro ao atribuir permissões",
+          "revoke": "Erro ao revogar permissões",	
+          "role": {
+            "assign": "Erro ao atribuir função",
+            "revoke": "Erro ao revogar função"
+          }
+        },
         "success": {
           "assign": "Permissões atribuídas com sucesso",
-          "revoke": "Permissões removidas com sucesso"
+          "revoke": "Permissões removidas com sucesso",
+          "role": {
+            "assign": "Função atribuída com sucesso",
+            "revoke": "Função removida com sucesso"
+          }
         },
         "auth": {
           "title": "Autenticação",
