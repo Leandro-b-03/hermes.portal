@@ -82,11 +82,9 @@ const schema = computed(() => {
 });
 const v$ = useVuelidate(schema, shipper);
 
-onMounted(async () => {
-  await shipperStore.getUserShipper();
+await shipperStore.getUserShipper();
 
-  transformReactive(shipperLoad.value, shipper);
-});
+transformReactive(shipperLoad.value, shipper);
 
 watch(() => props.edit, () => {
   transition.value = true;

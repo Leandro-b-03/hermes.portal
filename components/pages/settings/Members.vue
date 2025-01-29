@@ -60,9 +60,7 @@ const fields = ref([
   'updated_at'
 ]);
 
-onMounted(async () => {
-  await memberStore.fetchData(query.value); 
-});
+await memberStore.fetchData(query.value);
 
 watch(
   () => route.query, // Watch route.query for changes

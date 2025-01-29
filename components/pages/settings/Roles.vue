@@ -26,10 +26,8 @@ const paginate = ref({
   to: computed(() => members.value ? members.value.to : 0),
 });
 
-onMounted(async () => {
-  await roleStore.fetchData(query.value);
-  await memberStore.fetchData(query.value);
-});
+await roleStore.fetchData(query.value);
+await memberStore.fetchData(query.value);
 
 const clickP = (permission: string, id: number, enable: boolean): void => {
   const data = new FormData();
@@ -201,13 +199,12 @@ const toggleColor = (module: any): string => {
                 toggleColor(data.formatted_permissions[module.title]) === 'red' ? 'bg-red-300 hover:bg-red-400 justify-start' : '',
                 toggleColor(data.formatted_permissions[module.title]) === 'green' ? 'bg-green-300 hover:bg-green-400 justify-end' : '',
                 toggleColor(data.formatted_permissions[module.title]) === 'yellow' ? 'bg-yellow-300 hover:bg-yellow-400 justify-center' : '',
-                // Add more conditions for other colors or a default class
               ]">
               <div class="w-4 h-4 mx-1 bg-white rounded-full shadow-lg"></div>
             </div>
           </div>
           <TransitionFade mode="in-out">
-            <div :id="`${module.title}-${data.id}`" class="hidden animate-duration-500 min-w-10 min-h-16 bg-white rounded-lg shadow-lg pb-4 pt-2 px-4 mt-10 fixed z-50! border border-slate-300 overflow-hidden">
+            <div :id="`${module.title}-${data.id}`" class="hidden animate-duration-500 min-w-10 min-h-16 bg-white rounded-lg shadow-lg pb-4 pt-2 px-4 mt-10 fixed z-50! border border-slate-300 overflow-hidden z-50">
               <div class="flex flex-row justify-between items-center border-b border-slate-300 mb-2 py-2">
                 <span class="font-medium text-base/3 mr-2">{{ $t('common.permissions_for') }}</span>
                 <i class="pi pi-times cursor-pointer text-sm" @click="closeMenu(data.id, module.title)"></i>

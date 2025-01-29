@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import Members from '~/components/pages/settings/Members.vue';
-
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
@@ -13,6 +11,9 @@ const description = ref('');
 const icon = ref('');
 const notAllowed = ref(false);
 const transition = ref(false);
+const keyMember = ref(new Date().getTime() + 10);
+const keyRole = ref(new Date().getTime() + 20);
+const keyDetails = ref(new Date().getTime() + 30);
 const permissions = ref({
   shipper: {
     read: true,
@@ -54,6 +55,11 @@ const menu = ref([
   }
 ]);
 
+const forceRender = () => {
+  keyMember.value = new Date().getTime() + 10;
+  keyRole.value = new Date().getTime() + 20;
+  keyDetails.value = new Date().getTime() + 30;
+};
 
 const changeQuery = (menu: {}) => {
   router.push({ query: menu });
@@ -64,6 +70,8 @@ onMounted(() => {
     selectedMenu.value = route.query.menu as string;
   }
 
+  forceRender();
+
   routeContent(selectedMenu.value);
   permissionsLoad();
 });
@@ -72,14 +80,12 @@ watch(
   () => route.query.menu, 
   (newMenu, oldMenu) => {
     transition.value = true;
-    // Optional: Add validation or error handling for newMenu
+    forceRender();
     if (typeof newMenu === 'string') {
       selectedMenu.value = newMenu;
       routeContent(newMenu); 
     } else {
-      // Handle the case where newMenu is not a string
       console.error('Invalid menu query parameter:', newMenu);
-      // Optionally, set a default value for selectedMenu.value
     }
 
     setTimeout(() => {
@@ -89,6 +95,7 @@ watch(
 );
 
 const routeContent = (value: string): void => {
+  forceRender();
   switch (value) {
     case 'details':
       icon.value = 'pi pi-info-circle';
@@ -158,9 +165,9 @@ const cancelEdit = () => {
               <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t(description) }}
               </div>
               <div>
-                <PagesSettingsDetails v-if="selectedMenu === 'details'" :edit="editMode" @cancel-edit="cancelEdit" />
-                <PagesSettingsMembers v-if="selectedMenu === 'members'" />
-                <PagesSettingsRoles v-if="selectedMenu === 'permissions'" />
+                <PagesSettingsDetails v-if="selectedMenu === 'details'" :edit="editMode" @cancel-edit="cancelEdit" :key="keyDetails" />
+                <PagesSettingsMembers v-if="selectedMenu === 'members'" :key="keyMember" />
+                <PagesSettingsRoles v-if="selectedMenu === 'permissions'" :key="keyRole" />
               </div>
             </div>
           </div>
