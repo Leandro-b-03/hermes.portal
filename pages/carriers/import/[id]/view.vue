@@ -112,8 +112,11 @@ const valueSetup = (value: string, label: string): string => {
         <div v-if="import_ != null || loading" class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
           <div class="mb-2 flex items-center justify-between">
             <div class="flex items-center">
-              <i class="pi pi-file-excel text-surface-500 dark:text-surface-300 mr-2 text-xl" />
-              <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ import_?.file_name }}</span>
+              <Skeleton v-if="loading" height="1.6rem" width="300px" />
+              <div v-else>
+                <i class="pi pi-file-excel text-surface-500 dark:text-surface-300 mr-2 text-xl" />
+                <span class="text-xl font-medium text-surface-900 dark:text-surface-0">{{ import_?.file_name }}</span>
+              </div>
             </div>
             <div>
               <Button v-if="items" v-tooltip.top="$t('setup.options.title')" icon="pi pi-ellipsis-v" text rounded @click="$refs.menu.toggle($event)" />
@@ -133,7 +136,9 @@ const valueSetup = (value: string, label: string): string => {
               <Button :label="$t('setup.options.back')" icon="pi pi-arrow-left" class="!w-32" @click="$router.back()" />
             </div>
           </div>
-          <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">{{ $t('modules.carriers.import.view.description') }}
+          <div class="font-medium text-surface-500 dark:text-surface-300 mb-4">
+            <Skeleton v-if="loading" height="1.2rem" width="300px" />
+            <span v-else>{{ $t('modules.carriers.import.view.description') }}</span>
           </div>
           <div>
             <div class="grid grid-cols-12 gap-4 grid-nogutter border-t border-surface pt-2">

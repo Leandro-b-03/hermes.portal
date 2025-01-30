@@ -314,6 +314,11 @@
         "error": "Erro ao criar transportadora",
         "success": "Transportadora criada com sucesso"
       },
+      "view": {
+        "title": "Visualizar",
+        "description": "Veja os detalhes da transportadora",
+        "error": "Erro ao visualizar transportadora"
+      },
       "edit": {
         "title": "Editar",
         "description": "Edite sua transportadora",
@@ -327,6 +332,9 @@
       "import": {
         "title": "Tabelas de frete",
         "description": "Importe tabelas de frete das transportadoras",
+        "view": {
+          "description": "Veja as tabelas de frete da transportadora",
+        },
         "new": {
           "title": "Importar tabela de frete",
           "description": "Importe uma nova tabela de frete",
