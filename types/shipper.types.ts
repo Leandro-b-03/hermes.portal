@@ -14,6 +14,7 @@ export interface IShipper {
   contact_document?: string;
   logo_image_url?: string;
   shipper_matrix_id?: number;
+  modules: string[];
   created_at?: Date;
   updated_at?: Date;
 }

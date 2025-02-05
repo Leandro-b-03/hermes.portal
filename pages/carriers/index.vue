@@ -57,13 +57,6 @@ watch(() => route.query, async () => {
   await carrierStore.fetchData(query.value);
 });
 
-const getSeverity = (status: string): string => {
-  if (status === 'Pending') return 'warning';
-  if (status === 'Active') return 'success';
-  if (status === 'Inactive') return 'danger';
-  return 'info';
-};
-
 const getSeverityB = (status: boolean): string => {
   if (status) return 'success';
   return 'danger';
@@ -80,7 +73,6 @@ const edit = (id: number): void => {
 
 const exportData = async (): Promise<void> => {
   await carrierStore.export().then((response: any) => {
-    console.log(response);
     const url = window.URL.createObjectURL(new Blob([response], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
     const link = document.createElement('a');
     link.href = url;

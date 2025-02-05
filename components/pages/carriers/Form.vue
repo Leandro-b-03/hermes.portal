@@ -194,7 +194,7 @@ const find = async (): Promise<any> => {
 const zipValidation = async (): Promise<any> => {
   if (carrier.zip_code.length === 9) {
     zipLoading.value = true;
-    const data = loadZipCode(carrier.zip_code);
+    const data = await loadZipCode(carrier.zip_code);
 
     disabled.value.address = true;
 

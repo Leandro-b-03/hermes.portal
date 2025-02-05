@@ -103,7 +103,7 @@ export async function loadZipCode(zipCode: string): Promise<any> {
   const { data, status } = await useAsyncData('cep', () => 
     $fetch(`https://opencep.com/v1/${zip}`)
   );
-  
+
   if (status.value !== 'success') {
     return null;
   }

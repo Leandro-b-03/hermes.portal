@@ -38,6 +38,24 @@ export const useAuthStore = defineStore({
         localStorage.sessionId = uuidv4();
       }
     },
+    hasPermission(permission: string): boolean {  
+      if (this.authUser?.roles[0].name === 'admin') return true;
+      
+      // Otherwise, check if the user has the specific permission
+      const userPermissions = this.authUser.roles[0].permissions.map(p => p.name)
+      if (!userPermissions) return false;
+
+      return userPermissions.includes(permission)
+    },
+    hasModule (module: string): boolean {
+      console.log(module);
+      const userModules = this.authUser.modules.map(p => p.slug)
+      if (!userModules) return false;
+
+      console.log(userModules);
+
+      return userModules.includes(module)
+    },
     async login(user_data: []): Promise<any> {
       this.isLoading = true;
       this.error = null;
@@ -165,15 +183,6 @@ export const useAuthStore = defineStore({
       } finally {
         this.isLoading = false;
       }
-    },
-    hasPermission(permission: string): boolean {  
-      if (this.authUser?.roles[0].name === 'admin') return true;
-      
-      // Otherwise, check if the user has the specific permission
-      const userPermissions = this.authUser.roles[0].permissions.map(p => p.name)
-      if (!userPermissions) return false;
-
-      return userPermissions.includes(permission)
     },
   },
 });

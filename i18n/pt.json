@@ -12,9 +12,10 @@
     "view": "Visualizar",
     "confirm": "Confirmação",
     "are_you_sure": "Você tem certeza?",
-    "permissions_for": "Permissões para",
+    "permissions_for": "Permissões para"
   },
   "fields": {
+    "id": "ID",
     "admin": "Administrador",
     "password": "Senha",
     "password_placeholder": "•••••••••",
@@ -291,37 +292,34 @@
       "revenue": {
         "title": "Receita",
         "view": {},
-        "search": {},
+        "search": {}
       },
       "expenses": {
-        "title": "Despesas",
-      },
-    },
-    "invoices": {
-      "title": "Faturas",
+        "title": "Despesas"
+      }
     },
     "events": {
-      "title": "Eventos",
+      "title": "Eventos"
     },
     "options": {
-      "title": "Opções",
+      "title": "Opções"
     },
     "carriers": {
       "title": "Transportadoras",
       "create": {
-        "title": "Criar",
-        "description": "Crie uma nova transportadora",
+        "title": "Criar uma nova transportadora",
+        "description": "Preencha os dados para criar uma nova transportadora",
         "error": "Erro ao criar transportadora",
         "success": "Transportadora criada com sucesso"
       },
       "view": {
-        "title": "Visualizar",
+        "title": "Visualizar Transportadora",
         "description": "Veja os detalhes da transportadora",
         "error": "Erro ao visualizar transportadora"
       },
       "edit": {
-        "title": "Editar",
-        "description": "Edite sua transportadora",
+        "title": "Editar Transportadora",
+        "description": "Edite o contanto com a sua transportadora",
         "error": "Erro ao editar transportadora",
         "success": "Transportadora editada com sucesso"
       },
@@ -333,7 +331,7 @@
         "title": "Tabelas de frete",
         "description": "Importe tabelas de frete das transportadoras",
         "view": {
-          "description": "Veja as tabelas de frete da transportadora",
+          "description": "Veja as tabelas de frete da transportadora"
         },
         "new": {
           "title": "Importar tabela de frete",
@@ -345,7 +343,14 @@
       }
     },
     "orders": {
-      "title": "Ordens",
+      "title": "Pedidos",
+      "manage": {
+        "description": "Gerencie seus pedidos"
+      },
+      "view": {
+        "title": "Visualizar",
+        "description": "Veja os detalhes do pedido"
+      }
     },
     "settings": {
       "title": "Configurações",

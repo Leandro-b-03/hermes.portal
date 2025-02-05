@@ -6,30 +6,36 @@ const loading = ref(true);
 
 const user = computed(() => authStore.authUser);
 
+
 const sidebarLinks = ref([{
   name: 'modules.dashboard.title',
   icon: 'pi pi-chart-bar',
   url: '/dashboard',
+  enabled: true,
 },
 {
   name: 'modules.reports.title',
   icon: 'pi pi-chart-line',
   isOpen: ref(route.path.toString().includes('/reports') || route.path.toString().includes('/revenue') || route.path.toString().includes('/expenses')),
+  enabled: computed(() => authStore.hasModule('report') || authStore.hasModule('revenue') || authStore.hasModule('expense')),
   children: [
     {
       name: 'modules.reports.revenue.title',
       icon: 'pi pi-table',
       isOpen: ref(route.path.toString().includes('/revenue')),
+      enabled: computed(() => (authStore.hasModule('revenue'))),
       children: [
         {
           name: 'common.view',
           icon: 'pi pi-table',
           url: '/reports/revenue/view',
+          enabled: computed(() => (authStore.hasPermission('revenue.view'))),
         },
         {
           name: 'common.search',
           icon: 'pi pi-search',
           url: '/reports/revenue/search',
+          enabled: computed(() => (authStore.hasPermission('revenue.view'))),
         },
       ],
     },
@@ -37,6 +43,7 @@ const sidebarLinks = ref([{
       name: 'modules.reports.expenses.title',
       icon: 'pi pi-chart-line',
       url: '/reports/expenses',
+      enabled: computed(() => (authStore.hasPermission('reports.view'))),
     },
   ]
 },
@@ -44,33 +51,39 @@ const sidebarLinks = ref([{
   name: 'modules.carriers.title',
   icon: 'pi pi-truck',
   isOpen: ref(route.path.toString().includes('/carriers')),
+  enabled: computed(() => authStore.hasModule('connect')),
   children: [
     {
       name: 'modules.carriers.manage.title',
       icon: 'pi pi-table',
       url: '/carriers',
+      enabled: computed(() => (authStore.hasPermission('connect.view'))),
     },
     {
       name: 'modules.carriers.import.title',
       icon: 'pi pi-file-import',
       url: '/carriers/import',
+      enabled: computed(() => (authStore.hasPermission('connect.import.view'))),
     },
   ],
 },
 {
-  name: 'modules.invoices.title',
+  name: 'modules.orders.title',
   icon: 'pi pi-file',
-  url: '/invoices',
+  url: '/orders',
+  enabled: computed(() => (authStore.hasPermission('order.view')) && authStore.hasModule('order')),
 },
 {
   name: 'modules.events.title',
   icon: 'pi pi-calendar',
   url: '/events',
+  enabled: computed(() => (authStore.hasPermission('event.view')) && authStore.hasModule('events')),
 },
 {
   name: 'modules.options.title',
   icon: 'pi pi-cog',
   url: '/options',
+  enabled: computed(() => (authStore.hasPermission('shipper.edit'))),
 },
 ]);
 
@@ -124,12 +137,12 @@ watch((user), () => {
           </div>
           <ul v-else class="list-none p-4 m-0">
             <li v-for="link in sidebarLinks" :key="link.name" :class="link.children ? 'relative': ''">
-              <NuxtLink v-if="!link.children" :to="link.url"
+              <NuxtLink v-if="!link.children" :to="link.url" v-show="link.enabled"
                 class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                 <i class="pi mr-2" :class="link.icon" />
                 <span class="font-medium">{{ $t(link.name) }}</span>
                 </NuxtLink>
-              <a v-else @click="toggleMenu(link)"
+              <a v-else @click="toggleMenu(link)" v-show="link.enabled"
                 class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                 <i class="pi mr-2" :class="link.icon" />
                 <span class="font-medium">{{ $t(link.name) }}</span>
@@ -139,7 +152,7 @@ watch((user), () => {
                 <ul v-if="link.isOpen" class="list-none py-0 pl-4 pr-0 m-0 overflow-y-hidden">
                   <li v-for="child_link in link.children" :key="child_link.name">
                     <div v-if="child_link.children">
-                      <a @click="toggleMenu(child_link, true)"
+                      <a @click="toggleMenu(child_link, true)" v-show="link.enabled"
                         class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                         <i class="pi mr-2" :class="child_link.icon" />
                         <span class="font-medium">{{ $t(child_link.name) }}</span>
@@ -149,7 +162,7 @@ watch((user), () => {
                         <TransitionExpand>
                           <ul v-if="child_link.isOpen" class="list-none py-0 pl-4 pr-0 m-0 overflow-y-hidden">
                             <li v-for="sub_child_link in child_link.children" :key="sub_child_link.name">
-                              <NuxtLink :to="sub_child_link.url"
+                              <NuxtLink :to="sub_child_link.url" v-show="link.enabled"
                                 class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                                 <i class="pi mr-2" :class="sub_child_link.icon" />
                                 <span class="font-medium">{{ $t(sub_child_link.name) }}</span>
@@ -158,7 +171,7 @@ watch((user), () => {
                           </ul>
                         </TransitionExpand>
                       </div>
-                      <NuxtLink v-else :to="child_link.url"
+                      <NuxtLink v-else :to="child_link.url" v-show="link.enabled"
                         class="flex items-center cursor-pointer p-4 my-1 rounded-border hover:bg-surface-800 text-surface-300 hover:text-white duration-150 transition-colors">
                         <i class="pi mr-2" :class="child_link.icon" />
                         <span class="font-medium">{{ $t(child_link.name) }}</span>
