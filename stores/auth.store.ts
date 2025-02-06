@@ -48,11 +48,8 @@ export const useAuthStore = defineStore({
       return userPermissions.includes(permission)
     },
     hasModule (module: string): boolean {
-      console.log(module);
       const userModules = this.authUser.modules.map(p => p.slug)
       if (!userModules) return false;
-
-      console.log(userModules);
 
       return userModules.includes(module)
     },

@@ -192,9 +192,9 @@ const deleteCarrier = (id: number): void => {
                     </span>
                   </template>
                 </Column>
-                <Column field="zip" :header="$t(`fields.zip_code`)">
+                <Column field="zip_code" :header="$t(`fields.zip_code`)">
                   <template #body="slotProps">
-                    <span>{{ slotProps.data.zip }}</span>
+                    <span>{{ slotProps.data.zip_code }}</span>
                   </template>
                 </Column>
                 <Column field="carrier_contact.name" :header="$t(`fields.contact.name`)">

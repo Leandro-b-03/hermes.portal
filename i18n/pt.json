@@ -46,6 +46,7 @@
     "description": "Descrição",
     "description_placeholder": "Descrição da empresa",
     "description_roles_placeholder": "Coordenador de tabelas de fretes",
+    "commercial_name": "Nome Comercial",
     "company": "Empresa",
     "tax_id": "CNPJ",
     "tax_id_placeholder": "00.000.000/0000-00",
