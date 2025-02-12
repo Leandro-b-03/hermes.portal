@@ -334,7 +334,9 @@
         "view": {
           "description": "Veja as tabelas de frete da transportadora",
           "errors": {
-            "name_not_match": "Nome da transportadora não corresponde no arquivo csv"
+            "name_not_match": "Nome da transportadora não corresponde no arquivo csv",
+            "freight_name_not_match": "Tipo da tabela de frete não corresponde no arquivo csv",
+            "error_fetching_shipper_tax_id": "Erro ao buscar CNPJ do embarcador"
           }
         },
         "new": {
