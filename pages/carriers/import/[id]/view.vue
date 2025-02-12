@@ -170,15 +170,15 @@ const valueSetup = (value: string, label: string): string => {
                 <div v-else class="text-surface-900 dark:text-surface-0">{{ formatDate(import_?.imported_at, true) }}</div>
               </div>
               <div v-if="import_?.error_at" class="col-span-12 md:col-span-4 p-4">
-                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('fields.error') }}</div>
+                <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('fields.error_at') }}</div>
                   <Skeleton v-if="loading" height="1.2rem" width="300px" />
                 <div v-else class="text-surface-900 dark:text-surface-0">{{ formatDate(import_?.error_at, true) }}</div>
               </div>
               <div v-if="import_?.error_at" class="col-span-12 p-4 border-t border-surface">
                 <div class="text-surface-500 dark:text-surface-300 font-medium mb-2">{{ $t('fields.error_message') }}</div>
                   <Skeleton v-if="loading" height="1.2rem" width="300px" />
-                <div v-else class="text-surface-900 dark:text-surface-0 leading-normal">
-                  {{ import_?.error_message }}
+                <div v-else class="dark:text-surface-0 leading-normal text-red-500">
+                  {{ $t(`modules.carriers.import.view.errors.${import_?.error_message}`) }}
                 </div>
               </div>
               <div class="col-span-12 md:col-span-4 p-4">

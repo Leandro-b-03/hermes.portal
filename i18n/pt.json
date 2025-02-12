@@ -332,7 +332,10 @@
         "title": "Tabelas de frete",
         "description": "Importe tabelas de frete das transportadoras",
         "view": {
-          "description": "Veja as tabelas de frete da transportadora"
+          "description": "Veja as tabelas de frete da transportadora",
+          "errors": {
+            "name_not_match": "Nome da transportadora não corresponde no arquivo csv"
+          }
         },
         "new": {
           "title": "Importar tabela de frete",
