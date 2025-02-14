@@ -291,11 +291,11 @@ const orderTrack = ref([
             
               <div class="flex flex-row gap-1">
                 <div v-for="name in orderTrack" class="w-1/6 h-screen border border-surface-100 dark:border-surface-700 rounded overflow-hidden">
-                  <div class="h-16 p-4" :class="name">
+                  <div class="h-14 p-4" :class="name">
                     {{ $t(`modules.orders.view.kanban.${name}`) }}
                   </div>
-                  <div class="bg-surface-100 dark:bg-surface-700 h-full p-2 shadow-inner">
-                    <div v-for="order in orders?.data" class="bg-white dark:bg-surface-500 min-h-16 p-4 rounded shadow-sm overflow-hidden">
+                  <div class="bg-surface-100 dark:bg-surface-700 h-full p-2 shadow-inner dark:shadow-slate-800">
+                    <div v-for="order in orders?.data" class="bg-white dark:bg-surface-500 min-h-16 p-4 rounded shadow-sm dark:shadow-md overflow-hidden">
                       <span v-tooltip.top="order.quote_id" class="truncate w-4/6 inline-block text-lg">{{ order.quote_id }}</span>
                       <ul class="list-disc ml-4">
                         <li class="text-xs">{{ order.business_unit }}</li>
