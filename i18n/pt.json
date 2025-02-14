@@ -363,7 +363,7 @@
           "waiting_to_ship": "Aguardando envio",
           "shipped": "Enviado",
           "delivered": "Entregue",
-          "error": "Erro com o envio"
+          "error_order": "Algo está errado"
         }
       }
     },

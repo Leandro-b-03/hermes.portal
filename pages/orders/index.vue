@@ -134,6 +134,7 @@ const quoteId = (event: Event): void => {
   }
 };
 
+const dialogOpen = ref(false);
 const orderTrack = ref([
   'created',
   'approved',
@@ -141,8 +142,15 @@ const orderTrack = ref([
   'waiting_to_ship',
   'shipped',
   'delivered',
-  'error'
-])
+  'error_order'
+]);
+
+const order = ref(null);
+const showOrder = (order: any): void => {
+  dialogOpen.value = true;
+
+  order.value = order;
+};
 </script>
 
 <style>
@@ -176,7 +184,7 @@ const orderTrack = ref([
   color: #fff;
 }
 
-.error {
+.error_order {
   background-color: #be2c2c;
   color: #fff;
 }
@@ -189,7 +197,7 @@ const orderTrack = ref([
         <PagesBreadcrump :links="links" :loading="loading" />
 
         <div class="bg-surface-50 dark:bg-surface-950 pt-2">
-          <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
+          <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border mb-2">
             <div class="mb-2 flex items-center justify-between">
               <div class="flex items-center">
                 <i class="pi pi-table text-surface-500 dark:text-surface-300 mr-2 text-xl" />
@@ -288,21 +296,27 @@ const orderTrack = ref([
                 <template #empty>{{ $t('setup.no_results') }}</template>
               </DataTable>
               <PagesPaginatorc v-if="orders?.total > 0" v-model:totalRecords="orders.total" v-model:rows="orders.per_page" v-model:first="orders.from" v-model:last="orders.last_page" /> -->
-            
+            </div>
+          </div>
+          <div class="bg-surface-0 dark:bg-surface-900 p-1 shadow rounded-border">
+            <div>
               <div class="flex flex-row gap-1">
                 <div v-for="name in orderTrack" class="w-1/6 h-screen border border-surface-100 dark:border-surface-700 rounded overflow-hidden">
                   <div class="h-14 p-4" :class="name">
                     {{ $t(`modules.orders.view.kanban.${name}`) }}
                   </div>
                   <div class="bg-surface-100 dark:bg-surface-700 h-full p-2 shadow-inner dark:shadow-slate-800">
-                    <div v-for="order in orders?.data" class="bg-white dark:bg-surface-500 min-h-16 p-4 rounded shadow-sm dark:shadow-md overflow-hidden">
-                      <span v-tooltip.top="order.quote_id" class="truncate w-4/6 inline-block text-lg">{{ order.quote_id }}</span>
-                      <ul class="list-disc ml-4">
-                        <li class="text-xs">{{ order.business_unit }}</li>
-                        <li class="text-xs">{{ order.service_type }}</li>
-                        <li class="text-xs">{{ order.order_type }}</li>
-                      </ul>
-                    </div>
+                    <TransitionScale mode="in-out">
+                      <Skeleton v-if="loading" v-for="index in Math.floor(Math.random() * 5) + 1" class="mb-2 min-h-24" />
+                      <div v-show="!loading" v-else v-for="order in orders?.data" class="bg-white dark:bg-surface-500 min-h-16 p-4 rounded shadow-sm dark:shadow-md overflow-hidden cursor-pointer" @click="showOrder(order)">
+                        <span v-tooltip.top="order.quote_id" class="truncate w-4/6 inline-block text-lg">{{ order.quote_id }}</span>
+                        <ul class="list-disc ml-4">
+                          <li class="text-xs">{{ order.business_unit }}</li>
+                          <li class="text-xs">{{ order.service_type }}</li>
+                          <li class="text-xs">{{ order.order_type }}</li>
+                        </ul>
+                      </div>
+                    </TransitionScale>
                   </div>
                 </div>
               </div>
@@ -312,4 +326,76 @@ const orderTrack = ref([
       </div>
     </div>
   </div>
+
+  <Dialog v-model:visible="dialogOpen" :modal="false" :closable="false" :show-header="false" :breakpoints="{ '960px': '75vw', '640px': '96vw' }" :style="{ width: '45vw' }">
+    <section class="flex flex-col w-full mt-6">
+        <div class="flex w-full justify-between items-center mb-6">
+            <span class="font-semibold text-base text-surface-600 dark:text-surface-200">Notes / <span class="text-surface-900 dark:text-surface-0">Daily</span></span>
+            <Button type="button" icon="pi pi-times text-sm" rounded text severity="secondary" class="!w-8 !h-8 !text-surface-600 dark:!text-surface-200" @click="dialogOpen = false" />
+        </div>
+        <div class="flex justify-between items-center w-full mb-6">
+            <p class="font-semibold text-xl mt-0 mb-0 text-surface-900 dark:text-surface-0"><span class="pi pi-bolt !text-xl text-yellow-600" /> Extend Functional Coverage</p>
+            <Button type="button" icon="pi pi-pencil text-sm" roudned text class="!w-8 !h-8 !bg-surface-200 dark:!bg-surface-600 !text-surface-600 dark:!text-surface-200" />
+        </div>
+        <table>
+            <tr class="h-10">
+                <td class="font-medium text-base text-surface-600 dark:text-surface-200">Status</td>
+                <td class="font-medium text-base text-surface-900 dark:text-surface-0">In Progress</td>
+            </tr>
+            <tr class="h-10">
+                <td class="font-medium text-base text-surface-600 dark:text-surface-200">Assignee</td>
+                <td>
+                    <div class="flex items-center">
+                        <img src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/circle/avatar-m-11.png" alt="Image" class="inline mr-2 h-6 w-6" />
+                        <span class="font-medium text-base text-surface-900 dark:text-surface-0">John Walter</span>
+                    </div>
+                </td>
+            </tr>
+            <tr class="h-10">
+                <td class="font-medium text-base text-surface-600 dark:text-surface-200">Due Date</td>
+                <td class="font-medium text-base text-surface-900 dark:text-surface-0">Oct 21 at 2:00 PM</td>
+            </tr>
+            <tr class="h-10">
+                <td class="font-medium text-base text-surface-600 dark:text-surface-200">Label</td>
+                <td>
+                    <Tag severity="warn" class="mr-2">Product</Tag>
+                    <Tag severity="success">Quality</Tag>
+                </td>
+            </tr>
+        </table>
+        <div class="border-y border-surface py-6 my-6">
+            <p class="font-medium text-lg text-surface-700 dark:text-surface-100 mt-0">Description</p>
+            <p class="text-base text-surface-900 dark:text-surface-0 mt-0 mb-0">
+                Donec enim diam vulputate ut. Tellus mauris a diam maecenas. At varius vel pharetra vel turpis. Diam sollicitudin tempor id eu nisl nunc mi ipsum faucibus. Amet luctus venenatis lectus magna fringilla urna porttitor rhoncus.
+            </p>
+        </div>
+        <div class="flex flex-col">
+            <div class="flex justify-between items-center w-full mb-3">
+                <p class="font-medium text-lg text-surface-700 dark:text-surface-100 mt-0">Checklist</p>
+                <span class="text-surface-500 dark:text-surface-300 flex items-center"><i class="pi pi-check-square text-lg mr-2" />1/4</span>
+            </div>
+            <div class="flex gap-2 mb-2 items-center">
+                <Checkbox v-model="checked1" binary input-id="binary1" />
+                <label for="binary">Placerat in egestas erat imperdiet.</label>
+            </div>
+            <div class="flex gap-2 mb-2 items-center">
+                <Checkbox v-model="checked2" binary input-id="binary2" />
+                <label for="binary">Cursus euismod quis viverra nibh.</label>
+            </div>
+            <div class="flex gap-2 mb-2 items-center">
+                <Checkbox v-model="checked3" binary input-id="binary3" />
+                <label for="binary">Malesuada fames ac turpis egestas integer eget.</label>
+            </div>
+            <div class="flex gap-2 mb-0 items-center">
+                <Checkbox v-model="checked4" binary input-id="binary4" />
+                <label for="binary">Nisl suscipit adipiscing bibendum est ultricies integer quis.</label>
+            </div>
+        </div>
+    </section>
+    <template #footer>
+        <div class="flex w-full border-t pt-8 border-surface justify-end items-center">
+            <Button icon="pi pi-check" label="Save" class="m-0" @click="visible = false" />
+        </div>
+    </template>
+</Dialog>
 </template>
