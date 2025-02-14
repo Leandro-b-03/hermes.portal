@@ -124,15 +124,7 @@ const deleteCarrier = (id: number): void => {
   <div class="p-8 flex flex-col flex-auto">
     <div class="grid grid-cols-12 gap-4">
       <div class="col-span-12">
-        <Transition name="fade" mode="out-in">
-          <Skeleton v-if="loading" height="3.4rem" class="rounded-none" />
-          <ul v-else
-            class="list-none p-0 m-0 bg-surface-0 dark:bg-surface-900 flex font-medium overflow-y-hidden overflow-x-auto">
-            <li v-for="(link, index) in links" :key="index" class="relative p-4">
-              <PagesBreadcrump :name="link" :index="index" />
-            </li>
-          </ul>
-        </Transition>
+        <PagesBreadcrump :links="links" :loading="loading" />
 
         <div class="bg-surface-50 dark:bg-surface-950 pt-2">
           <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
@@ -187,7 +179,7 @@ const deleteCarrier = (id: number): void => {
                 <Column field="address" :header="$t(`fields.address`)">
                   <template #body="slotProps">
                     <span class="cursor-pointer"
-                    v-tooltip.top="slotProps.data.address + ', ' + slotProps.data.number + ', ' + slotProps.data.address_2 + ' - ' + slotProps.data.address_3 + ', ' + slotProps.data.city + ' - ' + slotProps.data.state + ', ' + slotProps.data.zip">
+                    v-tooltip.top="slotProps.data.address + ', ' + slotProps.data.number + ', ' + slotProps.data.address_2 + ' - ' + slotProps.data.address_3 + ', ' + slotProps.data.city + ' - ' + slotProps.data.state + ', ' + slotProps.data.zip_code">
                       {{ slotProps.data.address }}
                     </span>
                   </template>

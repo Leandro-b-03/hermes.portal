@@ -355,7 +355,16 @@
       },
       "view": {
         "title": "Visualizar",
-        "description": "Veja os detalhes do pedido"
+        "description": "Veja os detalhes do pedido",
+        "kanban": {
+          "created": "Criado",
+          "approved": "Aprovado",
+          "waiting_for_invoice": "Aguardando fatura",
+          "waiting_to_ship": "Aguardando envio",
+          "shipped": "Enviado",
+          "delivered": "Entregue",
+          "error": "Erro com o envio"
+        }
       }
     },
     "settings": {

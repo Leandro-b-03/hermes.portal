@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import order from '~/server/api/order';
+import { PagesBreadcrump } from '#components';
 
 const route = useRoute();
 const router = useRouter();
@@ -133,21 +133,60 @@ const quoteId = (event: Event): void => {
     target.style.width = `75px`;
   }
 };
+
+const orderTrack = ref([
+  'created',
+  'approved',
+  'waiting_for_invoice',
+  'waiting_to_ship',
+  'shipped',
+  'delivered',
+  'error'
+])
 </script>
+
+<style>
+.created {
+  background-color: #50a82a;
+  color: #fff;
+}
+
+.approved {
+  background-color: #475fca;
+  color: #fff;
+}
+
+.waiting_for_invoice {
+  background-color: #38bbc6;
+  color: #fff;
+}
+
+.waiting_to_ship {
+  background-color: #3881a6;
+  color: #fff;
+}
+
+.shipped {
+  background-color: #286dae;
+  color: #fff;
+}
+
+.delivered {
+  background-color: #3aae89;
+  color: #fff;
+}
+
+.error {
+  background-color: #be2c2c;
+  color: #fff;
+}
+</style>
 
 <template>
   <div class="p-8 flex flex-col flex-auto">
     <div class="grid grid-cols-12 gap-4">
-      <div class="col-span-12">{{ loading }}
-        <Transition name="fade" mode="out-in">
-          <Skeleton v-if="loading" height="3.4rem" class="rounded-none" />
-          <ul v-else
-            class="list-none p-0 m-0 bg-surface-0 dark:bg-surface-900 flex font-medium overflow-y-hidden overflow-x-auto">
-            <li v-for="(link, index) in links" :key="index" class="relative p-4">
-              <PagesBreadcrump :name="link" :index="index" />
-            </li>
-          </ul>
-        </Transition>
+      <div class="col-span-12">
+        <PagesBreadcrump :links="links" :loading="loading" />
 
         <div class="bg-surface-50 dark:bg-surface-950 pt-2">
           <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow rounded-border">
@@ -180,7 +219,7 @@ const quoteId = (event: Event): void => {
             </div>
             <div>
               <ConfirmDialog></ConfirmDialog>
-              <DataTable :value="orders?.data" ref="dt" :loading="loading" sortMode="multiple" dataKey="carrier.id">
+              <!-- <DataTable :value="orders?.data" ref="dt" :loading="loading" sortMode="multiple" dataKey="carrier.id">
                 <template #header>
                   <div v-if="orders?.data?.length > 0" class="flex justify-end">
                     <div class="w-30">
@@ -188,7 +227,7 @@ const quoteId = (event: Event): void => {
                     </div>
                   </div>
                 </template>
-                <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
+                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
                 <Column field="id" :header="$t('fields.id')" sortable></Column>
                 <Column field="quote_id" :header="$t('fields.quote_id')" sortable class="" style="max-width: 75px">
                   <template #body="{ data }">
@@ -248,7 +287,25 @@ const quoteId = (event: Event): void => {
                 </Column>
                 <template #empty>{{ $t('setup.no_results') }}</template>
               </DataTable>
-              <PagesPaginatorc v-if="orders?.total > 0" v-model:totalRecords="orders.total" v-model:rows="orders.per_page" v-model:first="orders.from" v-model:last="orders.last_page" />
+              <PagesPaginatorc v-if="orders?.total > 0" v-model:totalRecords="orders.total" v-model:rows="orders.per_page" v-model:first="orders.from" v-model:last="orders.last_page" /> -->
+            
+              <div class="flex flex-row gap-1">
+                <div v-for="name in orderTrack" class="w-1/6 h-screen border border-surface-100 dark:border-surface-700 rounded overflow-hidden">
+                  <div class="h-16 p-4" :class="name">
+                    {{ $t(`modules.orders.view.kanban.${name}`) }}
+                  </div>
+                  <div class="bg-surface-100 dark:bg-surface-700 h-full p-2 shadow-inner">
+                    <div v-for="order in orders?.data" class="bg-white dark:bg-surface-500 min-h-16 p-4 rounded shadow-sm overflow-hidden">
+                      <span v-tooltip.top="order.quote_id" class="truncate w-4/6 inline-block text-lg">{{ order.quote_id }}</span>
+                      <ul class="list-disc ml-4">
+                        <li class="text-xs">{{ order.business_unit }}</li>
+                        <li class="text-xs">{{ order.service_type }}</li>
+                        <li class="text-xs">{{ order.order_type }}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
