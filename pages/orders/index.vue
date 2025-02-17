@@ -308,13 +308,14 @@ const showOrder = (order: any): void => {
                   <div class="bg-surface-100 dark:bg-surface-700 h-full p-2 shadow-inner dark:shadow-slate-800">
                     <TransitionScale mode="in-out">
                       <Skeleton v-if="loading" v-for="index in Math.floor(Math.random() * 5) + 1" class="mb-2 min-h-24" />
-                      <div v-show="!loading" v-else v-for="order in orders?.data" class="bg-white dark:bg-surface-500 min-h-16 p-4 rounded shadow-sm dark:shadow-md overflow-hidden cursor-pointer" @click="showOrder(order)">
-                        <span v-tooltip.top="order.quote_id" class="truncate w-4/6 inline-block text-lg">{{ order.quote_id }}</span>
-                        <ul class="list-disc ml-4">
-                          <li class="text-xs">{{ order.business_unit }}</li>
-                          <li class="text-xs">{{ order.service_type }}</li>
-                          <li class="text-xs">{{ order.order_type }}</li>
-                        </ul>
+                      <div v-show="!loading" v-else class="flex flex-col gap-2">
+                        <div v-for="order in orders?.data" class="bg-white dark:bg-surface-500 min-h-16 p-4 rounded shadow-sm dark:shadow-md overflow-hidden cursor-pointer" @click="showOrder(order)">
+                          <span class="truncate w-4/6 inline-block text-lg">Frete No {{ order.id }}</span>
+                          <ul class="list-disc ml-4">
+                            <li class="text-xs truncate">Order ID: {{ order.order_id }}</li>
+                            <li v-tooltip.top="order.order.quote_id" class="text-xs truncate">Quote ID: {{ order.order.quote_id }}</li>
+                          </ul>
+                        </div>
                       </div>
                     </TransitionScale>
                   </div>
