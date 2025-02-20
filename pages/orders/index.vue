@@ -3,7 +3,6 @@ import { PagesBreadcrump } from '#components';
 
 const route = useRoute();
 const router = useRouter();
-const carrierStore = useCarrierStore();
 const orderStore = useOrderStore();
 const confirm = useConfirm();
 const { $toast } = useNuxtApp();
@@ -11,8 +10,10 @@ const t = useNuxtApp().$i18n.t;
 
 const loading = computed(() => orderStore.isLoading);
 const orders = computed(() => orderStore.data);
+const carriers = computed(() => orderStore.carriers);
 const query = computed(() => new URLSearchParams(route.query).toString());
 const links = breadcrump(route.path);
+const expandedRows = ref({});
 const statuses = computed(() => {
   if (!orders.value) {
     return;
@@ -40,6 +41,7 @@ const modal = ref({
 const dialogOpen = ref(false);
 const order = ref(null);
 const filter = ref('');
+const stickyDiv = ref(null);
 const fields = ref([
   'id',
   'quote_id',
@@ -111,6 +113,26 @@ const actionItems = [
 
 onMounted(async () => {
   await orderStore.fetchData(query.value);
+
+  const options = {
+    rootMargin: '0px',
+    threshold: 1.0 // Trigger when the element is fully at the top
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    if (entries.isIntersecting) {
+      stickyDiv.value?.classList.add('fixed', 'top-[70px]', 'left-0', 'w-full', 'z-50'); 
+    } else {
+      stickyDiv.value?.classList.remove('fixed', 'top-[70px]', 'left-0', 'w-full', 'z-50');
+    }
+  }, options);
+
+  observer.observe(stickyDiv.value);
+
+  // Clean up on unmount to avoid memory leaks
+  onUnmounted(() => {
+    observer.disconnect();
+  });
 });
 
 const exportData = async (): Promise<void> => {
@@ -144,6 +166,12 @@ const returnDate = (status: any): string => {
   }
 
   return formatDate(status.created_at, true);
+};
+
+const carrierFind = (id: number): string => {
+  const carrier = carriers.value?.find((c: any) => c.id === id);
+
+  return carrier ? carrier.name : '-';
 };
 </script>
 
@@ -304,13 +332,15 @@ const returnDate = (status: any): string => {
             </div>
           </div>
           <div class="bg-surface-0 dark:bg-surface-900 p-1 shadow rounded-border">
-            <div>
-              <div class="flex flex-row gap-1">
-                <div v-for="status in orders" class="w-1/6 h-screen border border-surface-100 dark:border-surface-700 rounded overflow-hidden">
+            <div ref="stickyDiv" class="w-full overflow-x-scroll overflow-y-hidden">
+              <!-- <div class="flex gap-2 w-[2450px] h-[calc(100vh-90px)]"> -->
+              <div class="flex gap-2 w-[2450px] h-svh">
+                <div v-for="status in orders" class="w-[350px] max-h-[98%] border border-surface-100 dark:border-surface-700 rounded-border overflow-hidden">
                   <div class="h-14 p-4" :class="status.title">
                     {{ $t(`modules.orders.view.kanban.${status.title}`) }}
                   </div>
-                  <div class="bg-surface-100 dark:bg-surface-700 h-full p-2 shadow-inner dark:shadow-slate-800">
+                  <div class="bg-surface-100 dark:bg-surface-700 h-full p-2 shadow-inner dark:shadow-slate-800 !overflow-y-scroll flex flex-col gap-2">
+                    <Skeleton class="min-h-24" />
                     <TransitionScale mode="in-out">
                       <Skeleton v-if="loading" v-for="index in Math.floor(Math.random() * 5) + 1" class="mb-2 min-h-24" />
                       <div v-show="!loading" v-else class="flex flex-col gap-2">
@@ -331,19 +361,18 @@ const returnDate = (status: any): string => {
                               <span class="truncate w-4/6 inline-block text-lg">{{ `${$t('fields.freight_id')} ${freight.id}` }}</span>
                               <table class="w-full">
                                 <tr>
+                                  <td class="text-sm" colspan="2"><i class="pi pi-map-marker text-xs"></i> {{ formatZipCode(freight.destination_code) }}</td>
+                                </tr>
+                                <tr>
                                   <td class="text-sm"><i class="pi pi-file text-xs"></i> {{ freight.order_id }}</td>
                                   <td class="text-sm">{{ formatCurrency(freight.freight_cost_value) }}</td>
                                 </tr>
                                 <tr>
                                   <td class="text-sm"><i class="pi pi-box text-xs"></i> {{ `${freight.weight}/${freight.cubic_meters}` }}</td>
-                                  <td class="text-sm"><i class="pi pi-calendar text-xs"></i> {{ freight.carrier_shipping_days }}</td>
+                                  <td class="text-sm"><i class="pi pi-calendar text-xs"></i> {{ `${freight.carrier_shipping_days} ${$t('common.days')}` }}</td>
                                 </tr>
                                 <tr>
-                                  <td class="text-sm"><i class="pi pi-truck text-xs"></i> {{ freight.carrier_id }}</td>
-                                  <td class="text-sm"><i class="pi pi-map-marker text-xs"></i> {{ formatZipCode(freight.destination_code) }}</td>
-                                </tr>
-                                <tr>
-                                  <td class="text-sm"></td>
+                                  <td class="text-sm" colspan="2"><i class="pi pi-truck text-xs"></i> {{ carrierFind(freight.carrier_id) }}</td>
                                 </tr>
                               </table>
                               <ul v-if="false" class="list-none ml-0">
@@ -358,6 +387,9 @@ const returnDate = (status: any): string => {
                         </Panel>
                       </div>
                     </TransitionScale>
+                  </div>
+                  <div class="w-full bg-surface-300 dark:bg-surface-600 p-2 text-center h-10">
+                    Total in here: {{ orders.length }}
                   </div>
                 </div>
               </div>
@@ -379,66 +411,83 @@ const returnDate = (status: any): string => {
           <Button type="button" icon="pi pi-pencil text-sm" roudned text class="!w-8 !h-8 !bg-surface-200 dark:!bg-surface-600 !text-surface-600 dark:!text-surface-200" />
         </div>
         <table>
-            <tr class="h-10">
-              <td class="font-medium text-base text-surface-600 dark:text-surface-200">{{ $t('fields.status') }}</td>
-              <td class="font-medium text-base text-surface-900 dark:text-surface-0"> {{ $t(`modules.orders.view.kanban.${ order?.status_orders[0].status.name }`) }}
-                <Timeline v-if="false" :value="statuses">
-                  <template #opposite="slotProps">
-                    {{ $t(`modules.orders.view.kanban.${ slotProps.item }`) }}
-                  </template>
-                  <template #content="slotProps">
-                    <small class="text-surface-500 dark:text-surface-400">{{ returnDate(order?.status_orders.find((s) => s.status.name === slotProps.item)) }}</small>
-                  </template>
-                </Timeline>
-              </td>
-            </tr>
-            <tr class="h-10">
-              <td class="font-medium text-base text-surface-600 dark:text-surface-200">{{ $t('fields.zip_ini') }}</td>
-              <td>
-                <span class="font-medium text-base text-surface-900 dark:text-surface-0">{{ formatZipCode(order?.origin_code) }}</span>
-              </td>
-            </tr>
-            <tr class="h-10">
-              <td class="font-medium text-base text-surface-600 dark:text-surface-200">{{ $t('fields.zip_end') }}</td>
-              <td>
-                <span class="font-medium text-base text-surface-900 dark:text-surface-0">{{ formatZipCode(order?.destination_code) }}</span>
-              </td>
-            </tr>
-            <tr class="h-10">
-                <td class="font-medium text-base text-surface-600 dark:text-surface-200">Label</td>
-                <td>
-                    <Tag severity="warn" class="mr-2">Product</Tag>
-                    <Tag severity="success">Quality</Tag>
-                </td>
-            </tr>
+          <tr class="h-10">
+            <td class="font-medium text-base text-surface-600 dark:text-surface-200">{{ $t('fields.status') }}</td>
+            <td class="font-medium text-base text-surface-900 dark:text-surface-0"> {{ $t(`modules.orders.view.kanban.${ order?.status_orders[0].status.name }`) }}</td>
+          </tr>
+          <tr class="h-10">
+            <td class="font-medium text-base text-surface-600 dark:text-surface-200">{{ $t('fields.zip_ini') }}</td>
+            <td>
+              <span class="font-medium text-base text-surface-900 dark:text-surface-0">{{ formatZipCode(order?.origin_code) }}</span>
+            </td>
+          </tr>
+          <tr class="h-10">
+            <td class="font-medium text-base text-surface-600 dark:text-surface-200">{{ $t('fields.zip_end') }}</td>
+            <td>
+              <span class="font-medium text-base text-surface-900 dark:text-surface-0">{{ formatZipCode(order?.destination_code) }}</span>
+            </td>
+          </tr>
+          <tr class="h-10">
+            <td class="font-medium text-base text-surface-600 dark:text-surface-200">Label</td>
+            <td>
+              <Tag severity="warn" class="mr-2">Product</Tag>
+              <Tag severity="success">Quality</Tag>
+            </td>
+          </tr>
         </table>
         <div class="border-y border-surface py-6 my-6">
-            <p class="font-medium text-lg text-surface-700 dark:text-surface-100 mt-0">Description</p>
-            <p class="text-base text-surface-900 dark:text-surface-0 mt-0 mb-0">
-                Donec enim diam vulputate ut. Tellus mauris a diam maecenas. At varius vel pharetra vel turpis. Diam sollicitudin tempor id eu nisl nunc mi ipsum faucibus. Amet luctus venenatis lectus magna fringilla urna porttitor rhoncus.
-            </p>
+          <p class="font-medium text-lg text-surface-700 dark:text-surface-100 mt-0">Timeline</p>
+          <Timeline :value="statuses" layout="horizontal" align="bottom">
+            <template #opposite="slotProps">
+              {{ $t(`modules.orders.view.kanban.${ slotProps.item }`) }}
+            </template>
+            <template #content="slotProps">
+              <small class="text-surface-500 dark:text-surface-400">{{ returnDate(order?.status_orders.find((s) => s.status.name === slotProps.item)) }}</small>
+            </template>
+          </Timeline>
         </div>
         <div class="flex flex-col">
-            <div class="flex justify-between items-center w-full mb-3">
-                <p class="font-medium text-lg text-surface-700 dark:text-surface-100 mt-0">Checklist</p>
-                <span class="text-surface-500 dark:text-surface-300 flex items-center"><i class="pi pi-check-square text-lg mr-2" />1/4</span>
-            </div>
-            <div class="flex gap-2 mb-2 items-center">
-                <Checkbox v-model="checked1" binary input-id="binary1" />
-                <label for="binary">Placerat in egestas erat imperdiet.</label>
-            </div>
-            <div class="flex gap-2 mb-2 items-center">
-                <Checkbox v-model="checked2" binary input-id="binary2" />
-                <label for="binary">Cursus euismod quis viverra nibh.</label>
-            </div>
-            <div class="flex gap-2 mb-2 items-center">
-                <Checkbox v-model="checked3" binary input-id="binary3" />
-                <label for="binary">Malesuada fames ac turpis egestas integer eget.</label>
-            </div>
-            <div class="flex gap-2 mb-0 items-center">
-                <Checkbox v-model="checked4" binary input-id="binary4" />
-                <label for="binary">Nisl suscipit adipiscing bibendum est ultricies integer quis.</label>
-            </div>
+          <p class="font-medium text-lg text-surface-700 dark:text-surface-100 mt-0">Products</p>
+          <div class="flex flex-col gap-4">
+            {{ order.products }}
+            <DataTable v-model:selection="order.products" :expanded-rows="expandedRows" responsive-layout="scroll" data-key="id" class="mb-4" scrollable>
+              <Column field="name" header="Product Name">
+                <template #body="slotProps">
+                  {{ slotProps.data }}
+                  <div class="flex items-center min-w-48">
+                    <i v-if="slotProps.data.image != null" class="pi pi-barcode w-12 h-12 mr-4"></i>
+                    <img v-else :src="slotProps.data.image" :alt="slotProps.data.name" class="w-12 h-12 mr-4" />
+                    <div>
+                        <h3 class="font-medium text-surface-900 dark:text-surface-50">{{ slotProps.data.name }}</h3>
+                        <p class="text-surface-500 dark:text-surface-400">{{ slotProps.data.description }}</p>
+                    </div>
+                  </div>
+                </template>
+              </Column>
+              <Column header="SKU">
+                <template #body="slotProps">
+                  <span class="whitespace-nowrap px-2 py-1 text-sm bg-surface-100 dark:bg-surface-800 font-medium rounded-lg text-surface-900 dark:text-surface-50">{{ slotProps.data.sku_id }}</span>
+                </template>
+              </Column>
+              <Column header="EAN">
+                <template #body="slotProps">
+                  <span class="whitespace-nowrap px-2 py-1 text-sm bg-surface-100 dark:bg-surface-800 font-medium rounded-lg text-surface-900 dark:text-surface-50">{{ slotProps.data.ean }}</span>
+                </template>
+              </Column>
+              <Column field="status" header="Categories">
+                <template #body="slotProps">
+                  <Tag v-for="category in slotProps.data.product_category" :key="category.id" :value="category.name" :severity="category.severity" class="mr-2" />
+                </template>
+              </Column>
+              <Column field="total" header="Price">
+                <template #body="slotProps">
+                  <span class="font-medium text-surface-900 dark:text-surface-50">${{ slotProps.data.price }}</span>
+                </template>
+              </Column>
+              <Column expander style="width: 3rem" />
+              
+          </DataTable>
+          </div>
         </div>
     </section>
     <template #footer>

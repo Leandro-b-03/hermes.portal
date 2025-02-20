@@ -47,6 +47,6 @@ async function handleGetRequest(data: any, apiCall: any) {
       filter: data.filter || '',
       'fields[]': data.fields || '',
     });
-    return (await apiCall('GET', `/v1/order?${queryParams}`, { token: data.token })).orders;
+    return (await apiCall('GET', `/v1/order?${queryParams}`, { token: data.token }));
   }
 }

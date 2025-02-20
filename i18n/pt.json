@@ -12,7 +12,13 @@
     "view": "Visualizar",
     "confirm": "Confirmação",
     "are_you_sure": "Você tem certeza?",
-    "permissions_for": "Permissões para"
+    "permissions_for": "Permissões para",
+    "days": "dias",
+    "hours": "horas",
+    "minutes": "minutos",
+    "seconds": "segundos",
+    "yes": "Sim",
+    "no": "Não"
   },
   "fields": {
     "id": "ID",
@@ -68,6 +74,8 @@
     "country_placeholder": "Brasil",
     "zip_code": "CEP",
     "zip_code_placeholder": "00000-000",
+    "freight_id": "Pedido de Frete",
+    "freight_id_placeholder": "00000000",
     "contact": {
       "name": "Nome do contato",
       "name_placeholder": "João da Silva",

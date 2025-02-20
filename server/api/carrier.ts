@@ -60,6 +60,8 @@ async function handleGetRequest(data: any, apiCall: any) {
       order_by: data.order_by || 'desc',
       filter: data.filter || '',
       'fields[]': data.fields || '',
+      id: data.id || '',
+      order: data.order || false,
     });
     return (await apiCall('GET', `/v1/carrier?${queryParams}`, { token: data.token })).carriers;
   } else if (data.action === 'collect_carrier') {
