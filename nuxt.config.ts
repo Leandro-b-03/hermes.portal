@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import type { NuxtPage } from 'nuxt/schema'
-import path from 'path'
+import type { NuxtPage } from 'nuxt/schema';
+import path from 'path';
 import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({

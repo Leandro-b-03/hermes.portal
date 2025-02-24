@@ -113,26 +113,6 @@ const actionItems = [
 
 onMounted(async () => {
   await orderStore.fetchData(query.value);
-
-  const options = {
-    rootMargin: '0px',
-    threshold: 1.0 // Trigger when the element is fully at the top
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    if (entries.isIntersecting) {
-      stickyDiv.value?.classList.add('fixed', 'top-[70px]', 'left-0', 'w-full', 'z-50'); 
-    } else {
-      stickyDiv.value?.classList.remove('fixed', 'top-[70px]', 'left-0', 'w-full', 'z-50');
-    }
-  }, options);
-
-  observer.observe(stickyDiv.value);
-
-  // Clean up on unmount to avoid memory leaks
-  onUnmounted(() => {
-    observer.disconnect();
-  });
 });
 
 const exportData = async (): Promise<void> => {
@@ -215,6 +195,10 @@ const carrierFind = (id: number): string => {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   padding-bottom: 0.5rem;
+}
+
+.table-alt td {
+  padding: var(--p-datatable-body-cell-padding-alt);
 }
 </style>
 
@@ -333,18 +317,16 @@ const carrierFind = (id: number): string => {
           </div>
           <div class="bg-surface-0 dark:bg-surface-900 p-1 shadow rounded-border">
             <div ref="stickyDiv" class="w-full overflow-x-scroll overflow-y-hidden">
-              <!-- <div class="flex gap-2 w-[2450px] h-[calc(100vh-90px)]"> -->
-              <div class="flex gap-2 w-[2450px] h-svh">
-                <div v-for="status in orders" class="w-[350px] max-h-[98%] border border-surface-100 dark:border-surface-700 rounded-border overflow-hidden">
+              <div class="flex gap-2 w-[2450px] h-[calc(100vh-90px)]">
+                <div v-for="status in orders" class="w-[350px] max-h-[98%] border border-surface-100 dark:border-surface-700 rounded-border overflow-hidden flex flex-col">
                   <div class="h-14 p-4" :class="status.title">
                     {{ $t(`modules.orders.view.kanban.${status.title}`) }}
                   </div>
-                  <div class="bg-surface-100 dark:bg-surface-700 h-full p-2 shadow-inner dark:shadow-slate-800 !overflow-y-scroll flex flex-col gap-2">
-                    <Skeleton class="min-h-24" />
+                  <div class="bg-surface-100 dark:bg-surface-700 p-2 shadow-inner dark:shadow-slate-800 !overflow-y-scroll flex flex-col gap-2 h-full">
                     <TransitionScale mode="in-out">
-                      <Skeleton v-if="loading" v-for="index in Math.floor(Math.random() * 5) + 1" class="mb-2 min-h-24" />
+                      <Skeleton v-if="loading" v-for="index in Math.floor(Math.random() * 5) + 1" class="!h-[54px]" />
                       <div v-show="!loading" v-else class="flex flex-col gap-2">
-                        <Panel v-for="item in status.items" toggleable class="!bg-surface-200 dark:!bg-surface-600 p-0 kanban" :header="item.quote_id" :key="item.id" :collapsed="false">
+                        <Panel v-for="item in status.items" toggleable class="!bg-surface-200 dark:!bg-surface-600 p-0 kanban" :header="item.quote_id" :key="item.id" :collapsed="true">
                           <template #header>
                             <strong v-tooltip.top="item.quote_id" class="truncate w-3/6">{{ item.quote_id }}</strong>
                           </template>
@@ -375,13 +357,6 @@ const carrierFind = (id: number): string => {
                                   <td class="text-sm" colspan="2"><i class="pi pi-truck text-xs"></i> {{ carrierFind(freight.carrier_id) }}</td>
                                 </tr>
                               </table>
-                              <ul v-if="false" class="list-none ml-0">
-                                <li class="text-xs">{{ `${$t('fields.order_id')}: ${freight.order_id}` }}</li>
-                                <li class="text-xs">{{ `${$t('fields.products_lengh')}: ${freight.products.length}` }}</li>
-                                <li class="text-xs">{{ `${$t('fields.weight_volume')}: ${freight.weight}/${freight.cubic_meters}` }}</li>
-                                <li class="text-xs">{{ `${$t('fields.freight_cost_value')}: ${freight.freight_cost_value}` }}</li>
-                                <li class="text-xs">{{ `${$t('fields.carrier_shipping_days')}: ${freight.carrier_shipping_days}` }}</li>
-                              </ul>
                             </div>
                           </div>
                         </Panel>
@@ -389,7 +364,7 @@ const carrierFind = (id: number): string => {
                     </TransitionScale>
                   </div>
                   <div class="w-full bg-surface-300 dark:bg-surface-600 p-2 text-center h-10">
-                    Total in here: {{ orders.length }}
+                    Total in here: {{ status.items? Object.entries(status.items).reduce((total, [, item]) => total + (item.freights? Object.entries(item.freights).length: 0), 0): 0 }}
                   </div>
                 </div>
               </div>
@@ -449,43 +424,98 @@ const carrierFind = (id: number): string => {
         <div class="flex flex-col">
           <p class="font-medium text-lg text-surface-700 dark:text-surface-100 mt-0">Products</p>
           <div class="flex flex-col gap-4">
-            {{ order.products }}
-            <DataTable v-model:selection="order.products" :expanded-rows="expandedRows" responsive-layout="scroll" data-key="id" class="mb-4" scrollable>
+            <DataTable :value="order.products" :expanded-rows="expandedRows" responsive-layout="scroll" data-key="id" class="mb-4 table-alt" scrollable>
               <Column field="name" header="Product Name">
-                <template #body="slotProps">
-                  {{ slotProps.data }}
+                <template #body="{ data }">
                   <div class="flex items-center min-w-48">
-                    <i v-if="slotProps.data.image != null" class="pi pi-barcode w-12 h-12 mr-4"></i>
-                    <img v-else :src="slotProps.data.image" :alt="slotProps.data.name" class="w-12 h-12 mr-4" />
+                    <div v-if="data.image == null" class="w-12 h-12 mr-4 flex items-center justify-center">
+                      <i class="pi pi-barcode"></i>
+                    </div>
+                    <img v-else :src="data.image" :alt="data.name" class="w-12 h-12 mr-4 shadow-sm" />
                     <div>
-                        <h3 class="font-medium text-surface-900 dark:text-surface-50">{{ slotProps.data.name }}</h3>
-                        <p class="text-surface-500 dark:text-surface-400">{{ slotProps.data.description }}</p>
+                        <h3 class="font-sm text-surface-900 dark:text-surface-50">{{ data.name }}</h3>
+                        <p class="font-sm text-surface-500 dark:text-surface-400">{{ data.description ? data.description : '-' }}</p>
                     </div>
                   </div>
                 </template>
               </Column>
               <Column header="SKU">
-                <template #body="slotProps">
-                  <span class="whitespace-nowrap px-2 py-1 text-sm bg-surface-100 dark:bg-surface-800 font-medium rounded-lg text-surface-900 dark:text-surface-50">{{ slotProps.data.sku_id }}</span>
+                <template #body="{ data }">
+                  <Tag :value="data.sku_id" severity="info" />
                 </template>
               </Column>
               <Column header="EAN">
-                <template #body="slotProps">
-                  <span class="whitespace-nowrap px-2 py-1 text-sm bg-surface-100 dark:bg-surface-800 font-medium rounded-lg text-surface-900 dark:text-surface-50">{{ slotProps.data.ean }}</span>
+                <template #body="{ data }">
+                  <Tag :value="data.ean" severity="info" />
                 </template>
               </Column>
               <Column field="status" header="Categories">
-                <template #body="slotProps">
-                  <Tag v-for="category in slotProps.data.product_category" :key="category.id" :value="category.name" :severity="category.severity" class="mr-2" />
+                <template #body="{ data }">
+                  <Chip v-for="category in JSON.parse(data.product_category)" :key="category" :label="category" class="mr-2" />
                 </template>
               </Column>
               <Column field="total" header="Price">
-                <template #body="slotProps">
-                  <span class="font-medium text-surface-900 dark:text-surface-50">${{ slotProps.data.price }}</span>
+                <template #body="{ data }">
+                  <span class="font-medium text-surface-900 dark:text-surface-50">{{ formatCurrency(data.price) }}</span>
                 </template>
               </Column>
               <Column expander style="width: 3rem" />
-              
+                <template #expansion="slotProps">
+                  <div class="flex flex-col gap-4 rounded-lg my-2">
+                      <div class="flex justify-between items-center p-3 bg-surface-50 dark:bg-surface-900 rounded-lg border border-surface overflow-hidden">
+                          <div class="flex items-center">
+                              <span class="block border border-surface rounded-lg w-8 h-8 mr-3">
+                                <div v-if="slotProps.data.brandImage == null" class="flex justify-center items-center w-full h-full">
+                                  <i class="pi pi-star-fill"></i>
+                                </div>
+                                <img v-else :src="slotProps.data.brandImage" :alt="slotProps.data.brand" class="w-full h-full rounded-lg" />
+                              </span>
+
+                              <div>
+                                  <h3 class="text-surface-900 dark:text-surface-0">{{ slotProps.data.brand ? slotProps.data.brand : '-' }}</h3>
+                              </div>
+                          </div>
+                          <div class="flex items-center gap-2">
+                              <Button
+                                  label="Follow"
+                                  outlined
+                                  size="small"
+                                  class="!bg-surface-0 dark:!bg-surface-950 !text-surface-900 dark:!text-surface-50 !border !border-surface-200 dark:!border-surface-700 hover:!bg-surface-50 dark:hover:!bg-surface-900"
+                              />
+                              <Button label="Review" size="small" />
+                          </div>
+                      </div>
+                      <div class="w-full bg-surface-50 dark:bg-surface-900 border border-surface rounded-lg overflow-hidden">
+                          <div class="px-4 py-3 flex justify-between items-center bg-surface-50 dark:bg-surface-900 border-b border-surface">
+                              <h4 class="font-semibold text-surface-700 dark:text-surface-200">{{ $t('common.product_info') }}</h4>
+                              <div class="flex items-center gap-2">
+                              </div>
+                          </div>
+
+                          <div class="rounded-lg bg-surface-0 dark:bg-surface-950">
+                              <div class="flex flex-col">
+                                  <div class="flex flex-wrap px-4 py-3 justify-between">
+                                      <span class="block min-w-28 text-surface-600 dark:text-surface-200">{{ $t('fields.width') }}</span>
+                                      <span class="block font-medium">{{ slotProps.data.width }} cm</span>
+                                  </div>
+                                  <div class="flex flex-wrap px-4 py-3 justify-between">
+                                      <span class="block min-w-28 text-surface-600 dark:text-surface-200">{{ $t('fields.height') }}</span>
+                                      <span class="block font-medium">{{ slotProps.data.height }} cm</span>
+                                  </div>
+                                  <div class="flex flex-wrap px-4 py-3 justify-between">
+                                      <span class="block min-w-28 text-surface-600 dark:text-surface-200">{{ $t('fields.length') }}</span>
+                                      <span class="block font-medium">{{ slotProps.data.length }} cm</span>
+                                  </div>
+                                  <span class="block h-px bg-surface-200 dark:bg-surface-700 mx-4" />
+                                  <div class="flex flex-wrap px-4 py-3 justify-between">
+                                      <span class="block min-w-28 text-surface-600 dark:text-surface-200">{{ $t('fields.cubic_weight') }}</span>
+                                      <span class="block font-medium">{{ slotProps.data.cubic_weight }} m³</span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </template>
           </DataTable>
           </div>
         </div>
