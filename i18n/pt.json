@@ -18,7 +18,14 @@
     "minutes": "minutos",
     "seconds": "segundos",
     "yes": "Sim",
-    "no": "Não"
+    "no": "Não",
+    "order": "Pedido",
+    "settings": "Configurações da página",
+    "warning": "Atenção",
+    "error": "Erro",
+    "success": "Sucesso",
+    "info": "Informação",
+    "loading": "Carregando..."
   },
   "fields": {
     "id": "ID",
@@ -76,6 +83,48 @@
     "zip_code_placeholder": "00000-000",
     "freight_id": "Pedido de Frete",
     "freight_id_placeholder": "00000000",
+    "height": "Altura",
+    "height_placeholder": "0.00",
+    "height_error_required": "Altura é obrigatória",
+    "height_error_invalid": "Altura inválida",
+    "width": "Largura",
+    "width_placeholder": "0.00",
+    "width_error_required": "Largura é obrigatória",
+    "width_error_invalid": "Largura inválida",
+    "length": "Comprimento",
+    "length_placeholder": "0.00",
+    "length_error_required": "Comprimento é obrigatório",
+    "length_error_invalid": "Comprimento inválido",
+    "weight": "Peso",
+    "weight_placeholder": "0.00",
+    "weight_error_required": "Peso é obrigatório",
+    "weight_error_invalid": "Peso inválido",
+    "cubic_weight": "Peso cubado",
+    "cubic_weight_placeholder": "0.0000",
+    "cubic_weight_error_required": "Peso cubado é obrigatório",
+    "cubic_weight_error_invalid": "Peso cubado inválido",
+    "volume": "Volume",
+    "volume_placeholder": "0.00",
+    "volume_error_required": "Volume é obrigatório",
+    "volume_error_invalid": "Volume inválido",
+    "quote_id": "Cotação",
+    "business_unit": "Unidade de Negócio",
+    "service_type": "Tipo de Serviço",
+    "order_type": "Tipo de Pedido",
+    "freight_payment_type": "Tipo de Pagamento",
+    "shipping_provider": "Transportadora",
+    "handling_time_business_days": "Tempo de manuseio (dias úteis)",
+    "extra_delivery_time_business_days": "Tempo de entrega extra (dias úteis)",
+    "prefered_index": "Índice de preferência",
+    "client_type": "Tipo de Cliente",
+    "cumulative_rules": "Regras Cumulativas",
+    "rule_tags": "Tags de Regras",
+    "sales_channel": "Canal de Vendas",
+    "session": "Sessão",
+    "order_id": "ID do Pedido no Embacardor",
+    "ip": "IP",
+    "page_name": "Nome da Página",
+    "url": "URL",
     "contact": {
       "name": "Nome do contato",
       "name_placeholder": "João da Silva",
@@ -371,7 +420,22 @@
           "waiting_to_ship": "Aguardando envio",
           "shipped": "Enviado",
           "delivered": "Entregue",
-          "error_order": "Algo está errado"
+          "error_order": "Erro",
+          "total_items": "Total de itens:",
+          "messages": {
+            "2_cols_warning": "Minimo 2 colunas visíveis"
+          }
+        },
+        "settings": {
+          "description": "Configurações da exibição do Kanban"
+        }
+      },
+      "freight": {
+        "view": {
+          "title": "Visualizar Frete",
+          "description": "Veja os detalhes do frete",
+          "error": "Erro ao visualizar frete",
+          "general_order": "Pedido Geral"
         }
       }
     },
@@ -582,7 +646,8 @@
       "enter": "Entrar",
       "invite": "Convidar um novo membro",
       "signup": "Cadastrar",
-      "reset_password": "Redefinir senha"
+      "reset_password": "Redefinir senha",
+      "settings": "Configurar página"
     },
     "error": {
       "title": "Erro",
